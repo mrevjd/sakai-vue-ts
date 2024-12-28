@@ -1,6 +1,31 @@
+import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
-const layoutConfig = reactive({
+declare global {
+    interface Document {
+        startViewTransition?: (callback: () => void) => void;
+    }
+}
+
+interface LayoutConfig {
+    preset: string;
+    primary: string;
+    surface: string | null;
+    darkTheme: boolean;
+    menuMode: 'static' | 'overlay';
+}
+
+interface LayoutState {
+    staticMenuDesktopInactive: boolean;
+    overlayMenuActive: boolean;
+    profileSidebarVisible: boolean;
+    configSidebarVisible: boolean;
+    staticMenuMobileActive: boolean;
+    menuHoverActive: boolean;
+    activeMenuItem: unknown;
+}
+
+const layoutConfig = reactive<LayoutConfig>({
     preset: 'Aura',
     primary: 'emerald',
     surface: null,
@@ -8,7 +33,7 @@ const layoutConfig = reactive({
     menuMode: 'static'
 });
 
-const layoutState = reactive({
+const layoutState = reactive<LayoutState>({
     staticMenuDesktopInactive: false,
     overlayMenuActive: false,
     profileSidebarVisible: false,
@@ -18,19 +43,30 @@ const layoutState = reactive({
     activeMenuItem: null
 });
 
-export function useLayout() {
-    const setActiveMenuItem = (item) => {
-        layoutState.activeMenuItem = item.value || item;
+interface UseLayout {
+    layoutConfig: LayoutConfig;
+    layoutState: LayoutState;
+    toggleMenu: () => void;
+    isSidebarActive: ComputedRef<boolean>;
+    isDarkTheme: ComputedRef<boolean>;
+    getPrimary: ComputedRef<string>;
+    getSurface: ComputedRef<string | null>;
+    setActiveMenuItem: (item: unknown) => void;
+    toggleDarkMode: () => void;
+}
+
+export function useLayout(): UseLayout {
+    const setActiveMenuItem = (item: unknown) => {
+        layoutState.activeMenuItem = (item as { value: unknown })?.value || item;
     };
 
     const toggleDarkMode = () => {
         if (!document.startViewTransition) {
             executeDarkModeToggle();
-
             return;
         }
 
-        document.startViewTransition(() => executeDarkModeToggle(event));
+        document.startViewTransition(() => executeDarkModeToggle());
     };
 
     const executeDarkModeToggle = () => {

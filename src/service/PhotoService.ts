@@ -1,5 +1,7 @@
+import type { Photo } from './types';
+
 export const PhotoService = {
-    getData() {
+    getData(): Photo[] {
         return [
             {
                 itemImageSrc: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg',
@@ -94,7 +96,7 @@ export const PhotoService = {
         ];
     },
 
-    getImages() {
+    getImages(): Promise<Photo[]> {
         return Promise.resolve(this.getData());
     }
 };

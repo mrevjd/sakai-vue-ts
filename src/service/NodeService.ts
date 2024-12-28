@@ -1,5 +1,7 @@
+import type { TreeNode, TreeTableNode } from './types';
+
 export const NodeService = {
-    getTreeNodesData() {
+    getTreeNodesData(): TreeNode[] {
         return [
             {
                 key: '0',
@@ -68,7 +70,7 @@ export const NodeService = {
         ];
     },
 
-    getTreeTableNodesData() {
+    getTreeTableNodesData(): TreeTableNode[] {
         return [
             {
                 key: '0',
@@ -297,135 +299,15 @@ export const NodeService = {
                         ]
                     }
                 ]
-            },
-            {
-                key: '5',
-                data: {
-                    name: 'Main',
-                    size: '50kb',
-                    type: 'Folder'
-                },
-                children: [
-                    {
-                        key: '5-0',
-                        data: {
-                            name: 'bin',
-                            size: '50kb',
-                            type: 'Link'
-                        }
-                    },
-                    {
-                        key: '5-1',
-                        data: {
-                            name: 'etc',
-                            size: '100kb',
-                            type: 'Link'
-                        }
-                    },
-                    {
-                        key: '5-2',
-                        data: {
-                            name: 'var',
-                            size: '100kb',
-                            type: 'Link'
-                        }
-                    }
-                ]
-            },
-            {
-                key: '6',
-                data: {
-                    name: 'Other',
-                    size: '5kb',
-                    type: 'Folder'
-                },
-                children: [
-                    {
-                        key: '6-0',
-                        data: {
-                            name: 'todo.txt',
-                            size: '3kb',
-                            type: 'Text'
-                        }
-                    },
-                    {
-                        key: '6-1',
-                        data: {
-                            name: 'logo.png',
-                            size: '2kb',
-                            type: 'Picture'
-                        }
-                    }
-                ]
-            },
-            {
-                key: '7',
-                data: {
-                    name: 'Pictures',
-                    size: '150kb',
-                    type: 'Folder'
-                },
-                children: [
-                    {
-                        key: '7-0',
-                        data: {
-                            name: 'barcelona.jpg',
-                            size: '90kb',
-                            type: 'Picture'
-                        }
-                    },
-                    {
-                        key: '7-1',
-                        data: {
-                            name: 'primevue.png',
-                            size: '30kb',
-                            type: 'Picture'
-                        }
-                    },
-                    {
-                        key: '7-2',
-                        data: {
-                            name: 'prime.jpg',
-                            size: '30kb',
-                            type: 'Picture'
-                        }
-                    }
-                ]
-            },
-            {
-                key: '8',
-                data: {
-                    name: 'Videos',
-                    size: '1500kb',
-                    type: 'Folder'
-                },
-                children: [
-                    {
-                        key: '8-0',
-                        data: {
-                            name: 'primefaces.mkv',
-                            size: '1000kb',
-                            type: 'Video'
-                        }
-                    },
-                    {
-                        key: '8-1',
-                        data: {
-                            name: 'intro.avi',
-                            size: '500kb',
-                            type: 'Video'
-                        }
-                    }
-                ]
             }
         ];
     },
 
-    getTreeTableNodes() {
+    getTreeTableNodes(): Promise<TreeTableNode[]> {
         return Promise.resolve(this.getTreeTableNodesData());
     },
 
-    getTreeNodes() {
+    getTreeNodes(): Promise<TreeNode[]> {
         return Promise.resolve(this.getTreeNodesData());
     }
 };

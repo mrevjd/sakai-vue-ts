@@ -1,5 +1,7 @@
+import type { Country } from './types';
+
 export const CountryService = {
-    getData() {
+    getData(): Country[] {
         return [
             { name: 'Afghanistan', code: 'AF' },
             { name: 'Albania', code: 'AL' },
@@ -246,7 +248,7 @@ export const CountryService = {
         ];
     },
 
-    getCountries() {
+    getCountries(): Promise<Country[]> {
         return Promise.resolve(this.getData());
     }
 };
