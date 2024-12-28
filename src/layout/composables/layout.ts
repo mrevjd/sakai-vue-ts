@@ -1,5 +1,5 @@
 import type { ComputedRef } from 'vue';
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 declare global {
     interface Document {
@@ -25,12 +25,20 @@ interface LayoutState {
     activeMenuItem: unknown;
 }
 
+// Load saved theme settings from localStorage
+const loadSavedTheme = (): Partial<LayoutConfig> => {
+    const savedTheme = localStorage.getItem('layoutConfig');
+    return savedTheme ? JSON.parse(savedTheme) : {};
+};
+
+const savedTheme = loadSavedTheme();
+
 const layoutConfig = reactive<LayoutConfig>({
-    preset: 'Aura',
-    primary: 'emerald',
-    surface: null,
-    darkTheme: false,
-    menuMode: 'static'
+    preset: savedTheme.preset || 'Aura',
+    primary: savedTheme.primary || 'emerald',
+    surface: savedTheme.surface || null,
+    darkTheme: savedTheme.darkTheme || false,
+    menuMode: savedTheme.menuMode || 'static'
 });
 
 const layoutState = reactive<LayoutState>({
@@ -56,6 +64,11 @@ interface UseLayout {
 }
 
 export function useLayout(): UseLayout {
+    // Save theme settings to localStorage whenever they change
+    const saveThemeSettings = () => {
+        localStorage.setItem('layoutConfig', JSON.stringify(layoutConfig));
+    };
+
     const setActiveMenuItem = (item: unknown) => {
         layoutState.activeMenuItem = (item as { value: unknown })?.value || item;
     };
@@ -72,6 +85,7 @@ export function useLayout(): UseLayout {
     const executeDarkModeToggle = () => {
         layoutConfig.darkTheme = !layoutConfig.darkTheme;
         document.documentElement.classList.toggle('app-dark');
+        saveThemeSettings();
     };
 
     const toggleMenu = () => {
@@ -85,6 +99,13 @@ export function useLayout(): UseLayout {
             layoutState.staticMenuMobileActive = !layoutState.staticMenuMobileActive;
         }
     };
+
+    // Apply saved dark theme on mount
+    onMounted(() => {
+        if (layoutConfig.darkTheme) {
+            document.documentElement.classList.add('app-dark');
+        }
+    });
 
     const isSidebarActive = computed(() => layoutState.overlayMenuActive || layoutState.staticMenuMobileActive);
 
