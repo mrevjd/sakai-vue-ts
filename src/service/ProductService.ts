@@ -48,23 +48,23 @@ export const ProductService = {
         ];
     },
 
-    getProductsMini(): Product[] {
-        return this.getProductsData().slice(0, 5);
+    getProductsMini(): Promise<Product[]> {
+        return Promise.resolve(this.getProductsData().slice(0, 5));
     },
 
-    getProductsSmall(): Product[] {
-        return this.getProductsData().slice(0, 10);
+    getProductsSmall(): Promise<Product[]> {
+        return Promise.resolve(this.getProductsData().slice(0, 10));
     },
 
-    getProducts(): Product[] {
-        return this.getProductsData();
+    getProducts(): Promise<Product[]> {
+        return Promise.resolve(this.getProductsData());
     },
 
-    getProductsWithOrdersSmall(): Product[] {
-        return this.getProductsWithOrdersData().slice(0, 10);
+    getProductsWithOrdersSmall(): Promise<Product[]> {
+        return Promise.resolve(this.getProductsWithOrdersData().slice(0, 10));
     },
 
-    getProductsWithOrders(): Product[] {
-        return this.getProductsWithOrdersData();
+    getProductsWithOrders(): Promise<Product[]> {
+        return Promise.resolve(this.getProductsWithOrdersData());
     }
 };

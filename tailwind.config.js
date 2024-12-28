@@ -1,6 +1,6 @@
-import type { Config } from 'tailwindcss';
 import primeui from 'tailwindcss-primeui';
 
+/** @type {import('tailwindcss').Config} */
 export default {
     darkMode: ['selector', '[class*="app-dark"]'],
     content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
@@ -14,4 +14,4 @@ export default {
             '2xl': '1920px'
         }
     }
-} satisfies Config;
+};

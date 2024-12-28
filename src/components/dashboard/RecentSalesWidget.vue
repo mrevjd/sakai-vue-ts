@@ -1,5 +1,8 @@
 <script setup>
 import { ProductService } from '@/service/ProductService';
+import Button from 'primevue/button';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
 import { onMounted, ref } from 'vue';
 
 const products = ref(null);

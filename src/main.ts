@@ -2,15 +2,26 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 
-import '@primevue/themes/lara-light-blue/theme.css';
-import 'primeicons/primeicons.css';
+import Aura from '@primevue/themes/aura';
 import PrimeVue from 'primevue/config';
-import 'primevue/resources/primevue.min.css';
-import './assets/styles.scss';
+import ConfirmationService from 'primevue/confirmationservice';
+import ToastService from 'primevue/toastservice';
+
+import '@/assets/styles.scss';
+import '@/assets/tailwind.css';
 
 const app = createApp(App);
 
 app.use(router);
-app.use(PrimeVue, { ripple: true });
+app.use(PrimeVue, {
+    theme: {
+        preset: Aura,
+        options: {
+            darkModeSelector: '.app-dark'
+        }
+    }
+});
+app.use(ToastService);
+app.use(ConfirmationService);
 
 app.mount('#app');

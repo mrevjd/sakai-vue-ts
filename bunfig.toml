@@ -1,0 +1,23 @@
+[install]
+# Use the exact versions specified in package.json
+exact = true
+# Install peer dependencies automatically
+peer = true
+# Use the latest versions when installing
+latest = false
+
+[install.cache]
+# Enable global cache
+enable = true
+# Set cache directory
+dir = ".bun/cache"
+
+[test]
+# Configure test environment
+coverage = true
+# Use TypeScript for tests
+typescript = true
+
+[debug]
+# Enable source maps
+sourcemap = true
