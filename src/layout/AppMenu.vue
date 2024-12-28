@@ -129,7 +129,13 @@ const model = ref([
                 to: '/documentation'
             },
             {
-                label: 'View Source',
+                label: 'Sakai Vue TS Source',
+                icon: 'pi pi-fw pi-github',
+                url: 'https://github.com/mrevjd/sakai-vue-ts',
+                target: '_blank'
+            },
+            {
+                label: 'Original Source',
                 icon: 'pi pi-fw pi-github',
                 url: 'https://github.com/primefaces/sakai-vue',
                 target: '_blank'
