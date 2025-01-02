@@ -1,6 +1,6 @@
 {
-    "name": "sakai-vue",
-    "version": "4.2.0",
+    "name": "sakai-vue-ts",
+    "version": "1.0.1",
     "type": "module",
     "scripts": {
         "dev": "vite",

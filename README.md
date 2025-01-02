@@ -1,6 +1,6 @@
 # Sakai Vue TypeScript
 
-Sakai is an application template for Vue based on the [create-vue](https://github.com/vuejs/create-vue), using TypeScript and Bun.
+A Vue 3 TypeScript application template based on [Sakai](https://sakai.primevue.org/) and [PrimeVue](https://primevue.org/), using Bun as the package manager.
 
 ## Getting Started
 
