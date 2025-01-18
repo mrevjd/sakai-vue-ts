@@ -43,26 +43,27 @@ Also update the title in `index.html` to match your project name:
 
 ### Updating Dependencies
 
-To check and update dependencies to their latest versions:
+There are two ways to update dependencies:
 
-1. Install npm-check-updates globally:
+1. Using npm-check-updates:
 ```bash
+# Install npm-check-updates globally
 bun add -g npm-check-updates
-```
 
-2. Check for possible updates:
-```bash
+# Check for possible updates
 ncu
-```
 
-3. Apply the updates to package.json:
-```bash
+# Apply the updates to package.json
 ncu -u
+
+# Install the updated dependencies
+bun install
 ```
 
-4. Install the updated dependencies:
+2. Using the built-in update script:
 ```bash
-bun install
+# Update dependencies based on installed Bun packages
+bun run update-deps
 ```
 
 ### Development
