@@ -1,17 +1,17 @@
 <script setup>
-import { useToast } from 'primevue/usetoast';
-import { ref } from 'vue';
+    import { useToast } from 'primevue/usetoast';
+    import { ref } from 'vue';
 
-const toast = useToast();
-const fileupload = ref();
+    const toast = useToast();
+    const fileupload = ref();
 
-function upload() {
-    fileupload.value.upload();
-}
+    function upload() {
+        fileupload.value.upload();
+    }
 
-function onUpload() {
-    toast.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
-}
+    function onUpload() {
+        toast.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
+    }
 </script>
 
 <template>

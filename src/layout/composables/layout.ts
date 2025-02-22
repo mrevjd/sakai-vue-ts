@@ -1,11 +1,6 @@
+/// <reference lib="dom" />
 import type { ComputedRef } from 'vue';
 import { computed, onMounted, reactive } from 'vue';
-
-declare global {
-    interface Document {
-        startViewTransition?: (callback: () => void) => void;
-    }
-}
 
 interface LayoutConfig {
     preset: string;

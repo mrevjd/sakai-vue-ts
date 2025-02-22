@@ -1,75 +1,75 @@
 <script setup>
-import { ProductService } from '@/service/ProductService';
-import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
-import { onMounted, ref } from 'vue';
+    import { ProductService } from '@/service/ProductService';
+    import { useConfirm } from 'primevue/useconfirm';
+    import { useToast } from 'primevue/usetoast';
+    import { onMounted, ref } from 'vue';
 
-const display = ref(false);
-const displayConfirmation = ref(false);
-const visibleLeft = ref(false);
-const visibleRight = ref(false);
-const visibleTop = ref(false);
-const visibleBottom = ref(false);
-const visibleFull = ref(false);
-const products = ref(null);
-const selectedProduct = ref(null);
-const op = ref(null);
-const op2 = ref(null);
-const popup = ref(null);
+    const display = ref(false);
+    const displayConfirmation = ref(false);
+    const visibleLeft = ref(false);
+    const visibleRight = ref(false);
+    const visibleTop = ref(false);
+    const visibleBottom = ref(false);
+    const visibleFull = ref(false);
+    const products = ref(null);
+    const selectedProduct = ref(null);
+    const op = ref(null);
+    const op2 = ref(null);
+    const popup = ref(null);
 
-const toast = useToast();
-const confirmPopup = useConfirm();
+    const toast = useToast();
+    const confirmPopup = useConfirm();
 
-onMounted(() => {
-    ProductService.getProductsSmall().then((data) => (products.value = data));
-});
-
-function open() {
-    display.value = true;
-}
-
-function close() {
-    display.value = false;
-}
-
-function openConfirmation() {
-    displayConfirmation.value = true;
-}
-
-function closeConfirmation() {
-    displayConfirmation.value = false;
-}
-
-function toggleDataTable(event) {
-    op2.value.toggle(event);
-}
-
-function onProductSelect(event) {
-    op.value.hide();
-    toast.add({ severity: 'info', summary: 'Product Selected', detail: event.data.name, life: 3000 });
-}
-
-function confirm(event) {
-    confirmPopup.require({
-        target: event.target,
-        message: 'Are you sure you want to proceed?',
-        icon: 'pi pi-exclamation-triangle',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Save'
-        },
-        accept: () => {
-            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
-        },
-        reject: () => {
-            toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
-        }
+    onMounted(() => {
+        ProductService.getProductsSmall().then((data) => (products.value = data));
     });
-}
+
+    function open() {
+        display.value = true;
+    }
+
+    function close() {
+        display.value = false;
+    }
+
+    function openConfirmation() {
+        displayConfirmation.value = true;
+    }
+
+    function closeConfirmation() {
+        displayConfirmation.value = false;
+    }
+
+    function toggleDataTable(event) {
+        op2.value.toggle(event);
+    }
+
+    function onProductSelect(event) {
+        op.value.hide();
+        toast.add({ severity: 'info', summary: 'Product Selected', detail: event.data.name, life: 3000 });
+    }
+
+    function confirm(event) {
+        confirmPopup.require({
+            target: event.target,
+            message: 'Are you sure you want to proceed?',
+            icon: 'pi pi-exclamation-triangle',
+            rejectProps: {
+                label: 'Cancel',
+                severity: 'secondary',
+                outlined: true
+            },
+            acceptProps: {
+                label: 'Save'
+            },
+            accept: () => {
+                toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
+            },
+            reject: () => {
+                toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+            }
+        });
+    }
 </script>
 
 <template>

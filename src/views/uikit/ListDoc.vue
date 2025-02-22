@@ -1,36 +1,36 @@
 <script setup>
-import { ProductService } from '@/service/ProductService';
-import { onMounted, ref } from 'vue';
+    import { ProductService } from '@/service/ProductService';
+    import { onMounted, ref } from 'vue';
 
-const products = ref(null);
-const picklistProducts = ref(null);
-const orderlistProducts = ref(null);
-const options = ref(['list', 'grid']);
-const layout = ref('list');
+    const products = ref(null);
+    const picklistProducts = ref(null);
+    const orderlistProducts = ref(null);
+    const options = ref(['list', 'grid']);
+    const layout = ref('list');
 
-onMounted(() => {
-    ProductService.getProductsSmall().then((data) => {
-        products.value = data.slice(0, 6);
-        picklistProducts.value = [data, []];
-        orderlistProducts.value = data;
+    onMounted(() => {
+        ProductService.getProductsSmall().then((data) => {
+            products.value = data.slice(0, 6);
+            picklistProducts.value = [data, []];
+            orderlistProducts.value = data;
+        });
     });
-});
 
-function getSeverity(product) {
-    switch (product.inventoryStatus) {
-        case 'INSTOCK':
-            return 'success';
+    function getSeverity(product) {
+        switch (product.inventoryStatus) {
+            case 'INSTOCK':
+                return 'success';
 
-        case 'LOWSTOCK':
-            return 'warning';
+            case 'LOWSTOCK':
+                return 'warning';
 
-        case 'OUTOFSTOCK':
-            return 'danger';
+            case 'OUTOFSTOCK':
+                return 'danger';
 
-        default:
-            return null;
+            default:
+                return null;
+        }
     }
-}
 </script>
 
 <template>

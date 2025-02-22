@@ -1,19 +1,19 @@
 <script setup>
-import { ProductService } from '@/service/ProductService';
-import Button from 'primevue/button';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-import { onMounted, ref } from 'vue';
+    import { ProductService } from '@/service/ProductService';
+    import Button from 'primevue/button';
+    import Column from 'primevue/column';
+    import DataTable from 'primevue/datatable';
+    import { onMounted, ref } from 'vue';
 
-const products = ref(null);
+    const products = ref(null);
 
-function formatCurrency(value) {
-    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-}
+    function formatCurrency(value) {
+        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    }
 
-onMounted(() => {
-    ProductService.getProductsSmall().then((data) => (products.value = data));
-});
+    onMounted(() => {
+        ProductService.getProductsSmall().then((data) => (products.value = data));
+    });
 </script>
 
 <template>

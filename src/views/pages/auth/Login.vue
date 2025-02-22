@@ -1,10 +1,10 @@
 <script setup>
-import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
-import { ref } from 'vue';
+    import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
+    import { ref } from 'vue';
 
-const email = ref('');
-const password = ref('');
-const checked = ref(false);
+    const email = ref('');
+    const password = ref('');
+    const checked = ref(false);
 </script>
 
 <template>
@@ -58,13 +58,13 @@ const checked = ref(false);
 </template>
 
 <style scoped>
-.pi-eye {
-    transform: scale(1.6);
-    margin-right: 1rem;
-}
+    .pi-eye {
+        transform: scale(1.6);
+        margin-right: 1rem;
+    }
 
-.pi-eye-slash {
-    transform: scale(1.6);
-    margin-right: 1rem;
-}
+    .pi-eye-slash {
+        transform: scale(1.6);
+        margin-right: 1rem;
+    }
 </style>
