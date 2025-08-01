@@ -2,7 +2,7 @@
     <div id="highlights" class="py-6 px-6 lg:px-20 mx-0 my-12 lg:mx-20">
         <div class="text-center">
             <div class="text-surface-900 dark:text-surface-0 font-normal mb-2 text-4xl">Powerful Everywhere</div>
-            <span class="text-muted-color text-2xl">Amet consectetur adipiscing elit...</span>
+            <span class="text-muted-color text-xxl">Amet consectetur adipiscing elit...</span>
         </div>
 
         <div class="grid grid-cols-12 gap-4 mt-20 pb-2 md:pb-20">
@@ -15,7 +15,7 @@
                     <i class="pi pi-fw pi-mobile !text-4xl text-purple-700"></i>
                 </div>
                 <div class="leading-none text-surface-900 dark:text-surface-0 text-3xl font-normal">Congue Quisque Egestas</div>
-                <span class="text-surface-700 dark:text-surface-100 text-2xl leading-normal ml-0 md:ml-2" style="max-width: 650px"
+                <span class="text-surface-700 dark:text-surface-100 text-xxl leading-normal ml-0 md:ml-2" style="max-width: 650px"
                     >Lectus arcu bibendum at varius vel pharetra vel turpis nunc. Eget aliquet nibh praesent tristique magna sit amet purus gravida. Sit amet mattis vulputate enim nulla aliquet.</span
                 >
             </div>
@@ -27,7 +27,7 @@
                     <i class="pi pi-fw pi-desktop !text-3xl text-yellow-700"></i>
                 </div>
                 <div class="leading-none text-surface-900 dark:text-surface-0 text-3xl font-normal">Celerisque Eu Ultrices</div>
-                <span class="text-surface-700 dark:text-surface-100 text-2xl leading-normal mr-0 md:mr-2" style="max-width: 650px"
+                <span class="text-surface-700 dark:text-surface-100 text-xxl leading-normal mr-0 md:mr-2" style="max-width: 650px"
                     >Adipiscing commodo elit at imperdiet dui. Viverra nibh cras pulvinar mattis nunc sed blandit libero. Suspendisse in est ante in. Mauris pharetra et ultrices neque ornare aenean euismod elementum nisi.</span
                 >
             </div>

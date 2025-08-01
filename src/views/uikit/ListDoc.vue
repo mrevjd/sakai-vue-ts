@@ -122,7 +122,7 @@
                                         </div>
                                     </div>
                                     <div class="flex flex-col gap-6 mt-6">
-                                        <span class="text-2xl font-semibold">${{ item.price }}</span>
+                                        <span class="text-xxl font-semibold">${{ item.price }}</span>
                                         <div class="flex gap-2">
                                             <Button icon="pi pi-shopping-cart" label="Buy Now" :disabled="item.inventoryStatus === 'OUTOFSTOCK'" class="flex-auto whitespace-nowrap"></Button>
                                             <Button icon="pi pi-heart" outlined></Button>

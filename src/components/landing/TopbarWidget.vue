@@ -30,7 +30,7 @@
                 />
             </g>
         </svg>
-        <span class="text-surface-900 dark:text-surface-0 font-medium text-2xl leading-normal mr-20">SAKAI</span>
+        <span class="text-surface-900 dark:text-surface-0 font-medium text-xxl leading-normal mr-20">SAKAI</span>
     </a>
     <Button
         class="lg:!hidden"
@@ -39,7 +39,7 @@
         rounded
         v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'animate-scalein', leaveToClass: 'hidden', leaveActiveClass: 'animate-fadeout', hideOnOutsideClick: true }"
     >
-        <i class="pi pi-bars !text-2xl"></i>
+        <i class="pi pi-bars !text-xxl"></i>
     </Button>
     <div class="items-center bg-surface-0 dark:bg-surface-900 grow justify-between hidden lg:flex absolute lg:static w-full left-0 top-full px-12 lg:px-0 z-20 rounded-border">
         <ul class="list-none p-0 m-0 flex lg:items-center select-none flex-col lg:flex-row cursor-pointer gap-8">

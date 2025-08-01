@@ -2,7 +2,7 @@
     <div id="pricing" class="py-6 px-6 lg:px-20 my-2 md:my-6">
         <div class="text-center mb-6">
             <div class="text-surface-900 dark:text-surface-0 font-normal mb-2 text-4xl">Matchless Pricing</div>
-            <span class="text-muted-color text-2xl">Amet consectetur adipiscing elit...</span>
+            <span class="text-muted-color text-xxl">Amet consectetur adipiscing elit...</span>
         </div>
 
         <div class="grid grid-cols-12 gap-4 justify-between mt-20 md:mt-0">
