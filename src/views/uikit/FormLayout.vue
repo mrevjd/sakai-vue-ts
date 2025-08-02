@@ -1,6 +1,8 @@
 <script setup>
     import { ref } from 'vue';
 
+    import Editor from 'primevue/editor';
+
     const dropdownItems = ref([
         { name: 'Option 1', code: 'Option 1' },
         { name: 'Option 2', code: 'Option 2' },
@@ -8,6 +10,7 @@
     ]);
 
     const dropdownItem = ref(null);
+    const editorValue = ref('');
 </script>
 
 <template>
@@ -115,6 +118,11 @@
                         <InputText id="zip" type="text" />
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="flex mt-8">
+            <div class="card flex flex-col gap-4 w-full">
+                <Editor id="editor" v-model="editorValue" editorStyle="height: 320px" />
             </div>
         </div>
     </Fluid>
