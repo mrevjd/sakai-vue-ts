@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 import type { ComputedRef } from 'vue';
-import { computed, onMounted, reactive } from 'vue';
+import { computed, onMounted, reactive, watch } from 'vue';
 
 type MenuMode = 'static' | 'overlay';
 
@@ -53,6 +53,14 @@ const layoutState = reactive<LayoutState>({
     anchored: false
 });
 
+watch(
+    layoutConfig,
+    (config) => {
+        localStorage.setItem('layoutConfig', JSON.stringify(config));
+    },
+    { deep: true }
+);
+
 interface MenuModeChangeEvent {
     value: MenuMode;
 }
@@ -71,10 +79,6 @@ interface UseLayout {
 }
 
 export function useLayout(): UseLayout {
-    const saveThemeSettings = () => {
-        localStorage.setItem('layoutConfig', JSON.stringify(layoutConfig));
-    };
-
     const isDesktop = (): boolean => window.innerWidth > 991;
 
     const toggleDarkMode = () => {
@@ -89,7 +93,6 @@ export function useLayout(): UseLayout {
     const executeDarkModeToggle = () => {
         layoutConfig.darkTheme = !layoutConfig.darkTheme;
         document.documentElement.classList.toggle('app-dark');
-        saveThemeSettings();
     };
 
     const toggleMenu = () => {
@@ -121,7 +124,6 @@ export function useLayout(): UseLayout {
         layoutState.sidebarExpanded = false;
         layoutState.menuHoverActive = false;
         layoutState.anchored = false;
-        saveThemeSettings();
     };
 
     onMounted(() => {
