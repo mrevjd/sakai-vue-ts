@@ -107,7 +107,7 @@ declare module 'vue' {
     TreeSelect: typeof import('primevue/treeselect')['default']
     TreeTable: typeof import('primevue/treetable')['default']
   }
-  export interface ComponentCustomProperties {
+  export interface GlobalDirectives {
     StyleClass: typeof import('primevue/styleclass')['default']
     Tooltip: typeof import('primevue/tooltip')['default']
   }
