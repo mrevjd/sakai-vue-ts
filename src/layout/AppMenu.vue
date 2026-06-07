@@ -1,15 +1,21 @@
-<script setup>
+<script setup lang="ts">
     import { ref } from 'vue';
-
     import AppMenuItem from './AppMenuItem.vue';
 
     const model = ref([
         {
             label: 'Home',
-            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+            items: [
+                {
+                    label: 'Dashboard',
+                    icon: 'pi pi-fw pi-home',
+                    to: '/'
+                }
+            ]
         },
         {
             label: 'UI Components',
+            path: '/uikit',
             items: [
                 { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },
                 { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
@@ -29,9 +35,27 @@
             ]
         },
         {
+            label: 'Prime Blocks',
+            icon: 'pi pi-fw pi-prime',
+            path: '/blocks',
+            items: [
+                {
+                    label: 'Free Blocks',
+                    icon: 'pi pi-fw pi-eye',
+                    to: '/blocks/free'
+                },
+                {
+                    label: 'All Blocks',
+                    icon: 'pi pi-fw pi-globe',
+                    url: 'https://blocks.primevue.org/',
+                    target: '_blank'
+                }
+            ]
+        },
+        {
             label: 'Pages',
             icon: 'pi pi-fw pi-briefcase',
-            to: '/pages',
+            path: '/pages',
             items: [
                 {
                     label: 'Landing',
@@ -41,6 +65,7 @@
                 {
                     label: 'Auth',
                     icon: 'pi pi-fw pi-user',
+                    path: '/auth',
                     items: [
                         {
                             label: 'Login',
@@ -78,43 +103,51 @@
         },
         {
             label: 'Hierarchy',
+            icon: 'pi pi-fw pi-align-left',
+            path: '/hierarchy',
             items: [
                 {
                     label: 'Submenu 1',
-                    icon: 'pi pi-fw pi-bookmark',
+                    icon: 'pi pi-fw pi-align-left',
+                    path: '/submenu_1',
                     items: [
                         {
                             label: 'Submenu 1.1',
-                            icon: 'pi pi-fw pi-bookmark',
+                            icon: 'pi pi-fw pi-align-left',
+                            path: '/submenu_1_1',
                             items: [
-                                { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-bookmark' }
+                                { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-align-left' },
+                                { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-align-left' },
+                                { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-align-left' }
                             ]
                         },
                         {
                             label: 'Submenu 1.2',
-                            icon: 'pi pi-fw pi-bookmark',
-                            items: [{ label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-bookmark' }]
+                            icon: 'pi pi-fw pi-align-left',
+                            path: '/submenu_1_2',
+                            items: [{ label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-align-left' }]
                         }
                     ]
                 },
                 {
                     label: 'Submenu 2',
-                    icon: 'pi pi-fw pi-bookmark',
+                    icon: 'pi pi-fw pi-align-left',
+                    path: '/submenu_2',
                     items: [
                         {
                             label: 'Submenu 2.1',
-                            icon: 'pi pi-fw pi-bookmark',
+                            icon: 'pi pi-fw pi-align-left',
+                            path: '/submenu_2_1',
                             items: [
-                                { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-bookmark' }
+                                { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-align-left' },
+                                { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-align-left' }
                             ]
                         },
                         {
                             label: 'Submenu 2.2',
-                            icon: 'pi pi-fw pi-bookmark',
-                            items: [{ label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-bookmark' }]
+                            icon: 'pi pi-fw pi-align-left',
+                            path: '/submenu_2_2',
+                            items: [{ label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-align-left' }]
                         }
                     ]
                 }
@@ -122,11 +155,12 @@
         },
         {
             label: 'Get Started',
+            path: '/start',
             items: [
                 {
                     label: 'Documentation',
                     icon: 'pi pi-fw pi-book',
-                    to: '/documentation'
+                    to: '/start/documentation'
                 },
                 {
                     label: 'Sakai Vue TS Source',
@@ -147,11 +181,8 @@
 
 <template>
     <ul class="layout-menu">
-        <template v-for="(item, i) in model" :key="item">
-            <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
-            <li v-if="item.separator" class="menu-separator"></li>
+        <template v-for="item in model" :key="item.label">
+            <app-menu-item :item="item" />
         </template>
     </ul>
 </template>
-
-<style lang="scss" scoped></style>

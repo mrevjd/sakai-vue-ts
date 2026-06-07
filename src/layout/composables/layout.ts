@@ -2,25 +2,29 @@
 import type { ComputedRef } from 'vue';
 import { computed, onMounted, reactive } from 'vue';
 
+type MenuMode = 'static' | 'overlay';
+
 interface LayoutConfig {
     preset: string;
     primary: string;
     surface: string | null;
     darkTheme: boolean;
-    menuMode: 'static' | 'overlay';
+    menuMode: MenuMode;
 }
 
 interface LayoutState {
-    staticMenuDesktopInactive: boolean;
+    staticMenuInactive: boolean;
     overlayMenuActive: boolean;
     profileSidebarVisible: boolean;
     configSidebarVisible: boolean;
-    staticMenuMobileActive: boolean;
+    mobileMenuActive: boolean;
+    sidebarExpanded: boolean;
     menuHoverActive: boolean;
     activeMenuItem: unknown;
+    activePath: string | null;
+    anchored: boolean;
 }
 
-// Load saved theme settings from localStorage
 const loadSavedTheme = (): Partial<LayoutConfig> => {
     const savedTheme = localStorage.getItem('layoutConfig');
     return savedTheme ? JSON.parse(savedTheme) : {};
@@ -37,36 +41,41 @@ const layoutConfig = reactive<LayoutConfig>({
 });
 
 const layoutState = reactive<LayoutState>({
-    staticMenuDesktopInactive: false,
+    staticMenuInactive: false,
     overlayMenuActive: false,
     profileSidebarVisible: false,
     configSidebarVisible: false,
-    staticMenuMobileActive: false,
+    mobileMenuActive: false,
+    sidebarExpanded: false,
     menuHoverActive: false,
-    activeMenuItem: null
+    activeMenuItem: null,
+    activePath: null,
+    anchored: false
 });
+
+interface MenuModeChangeEvent {
+    value: MenuMode;
+}
 
 interface UseLayout {
     layoutConfig: LayoutConfig;
     layoutState: LayoutState;
-    toggleMenu: () => void;
-    isSidebarActive: ComputedRef<boolean>;
     isDarkTheme: ComputedRef<boolean>;
-    getPrimary: ComputedRef<string>;
-    getSurface: ComputedRef<string | null>;
-    setActiveMenuItem: (item: unknown) => void;
+    hasOpenOverlay: ComputedRef<boolean>;
+    isDesktop: () => boolean;
     toggleDarkMode: () => void;
+    toggleMenu: () => void;
+    toggleConfigSidebar: () => void;
+    hideMobileMenu: () => void;
+    changeMenuMode: (event: MenuModeChangeEvent) => void;
 }
 
 export function useLayout(): UseLayout {
-    // Save theme settings to localStorage whenever they change
     const saveThemeSettings = () => {
         localStorage.setItem('layoutConfig', JSON.stringify(layoutConfig));
     };
 
-    const setActiveMenuItem = (item: unknown) => {
-        layoutState.activeMenuItem = (item as { value: unknown })?.value || item;
-    };
+    const isDesktop = (): boolean => window.innerWidth > 991;
 
     const toggleDarkMode = () => {
         if (!document.startViewTransition) {
@@ -84,41 +93,56 @@ export function useLayout(): UseLayout {
     };
 
     const toggleMenu = () => {
-        if (layoutConfig.menuMode === 'overlay') {
-            layoutState.overlayMenuActive = !layoutState.overlayMenuActive;
-        }
+        if (isDesktop()) {
+            if (layoutConfig.menuMode === 'static') {
+                layoutState.staticMenuInactive = !layoutState.staticMenuInactive;
+            }
 
-        if (window.innerWidth > 991) {
-            layoutState.staticMenuDesktopInactive = !layoutState.staticMenuDesktopInactive;
+            if (layoutConfig.menuMode === 'overlay') {
+                layoutState.overlayMenuActive = !layoutState.overlayMenuActive;
+            }
         } else {
-            layoutState.staticMenuMobileActive = !layoutState.staticMenuMobileActive;
+            layoutState.mobileMenuActive = !layoutState.mobileMenuActive;
         }
     };
 
-    // Apply saved dark theme on mount
+    const toggleConfigSidebar = () => {
+        layoutState.configSidebarVisible = !layoutState.configSidebarVisible;
+    };
+
+    const hideMobileMenu = () => {
+        layoutState.mobileMenuActive = false;
+    };
+
+    const changeMenuMode = (event: MenuModeChangeEvent) => {
+        layoutConfig.menuMode = event.value;
+        layoutState.staticMenuInactive = false;
+        layoutState.mobileMenuActive = false;
+        layoutState.sidebarExpanded = false;
+        layoutState.menuHoverActive = false;
+        layoutState.anchored = false;
+        saveThemeSettings();
+    };
+
     onMounted(() => {
         if (layoutConfig.darkTheme) {
             document.documentElement.classList.add('app-dark');
         }
     });
 
-    const isSidebarActive = computed(() => layoutState.overlayMenuActive || layoutState.staticMenuMobileActive);
-
     const isDarkTheme = computed(() => layoutConfig.darkTheme);
-
-    const getPrimary = computed(() => layoutConfig.primary);
-
-    const getSurface = computed(() => layoutConfig.surface);
+    const hasOpenOverlay = computed(() => layoutState.overlayMenuActive);
 
     return {
         layoutConfig,
         layoutState,
-        toggleMenu,
-        isSidebarActive,
         isDarkTheme,
-        getPrimary,
-        getSurface,
-        setActiveMenuItem,
-        toggleDarkMode
+        hasOpenOverlay,
+        isDesktop,
+        toggleDarkMode,
+        toggleMenu,
+        toggleConfigSidebar,
+        hideMobileMenu,
+        changeMenuMode
     };
 }
