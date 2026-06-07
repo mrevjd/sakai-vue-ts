@@ -1,7 +1,7 @@
 <script setup>
-    import { ref } from 'vue';
-
+    import { sanitizeHtml } from '@/utils/sanitize';
     import Editor from 'primevue/editor';
+    import { computed, ref } from 'vue';
 
     const dropdownItems = ref([
         { name: 'Option 1', code: 'Option 1' },
@@ -11,6 +11,11 @@
 
     const dropdownItem = ref(null);
     const editorValue = ref('');
+
+    // Quill's HTML output is untrusted — never render it raw. Use the
+    // shared sanitizer helper (DOMPurify with a Quill-tuned tag/attr
+    // allowlist) before passing it to v-html or persisting it server-side.
+    const sanitizedEditorHtml = computed(() => sanitizeHtml(editorValue.value));
 </script>
 
 <template>
@@ -123,6 +128,10 @@
         <div class="flex mt-8">
             <div class="card flex flex-col gap-4 w-full">
                 <Editor id="editor" v-model="editorValue" editorStyle="height: 320px" />
+                <div v-if="editorValue" class="border-t border-surface pt-4">
+                    <div class="font-semibold text-base mb-2">Rendered (sanitized via DOMPurify)</div>
+                    <div class="prose max-w-none" v-html="sanitizedEditorHtml" />
+                </div>
             </div>
         </div>
     </Fluid>

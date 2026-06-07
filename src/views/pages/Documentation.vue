@@ -40,6 +40,14 @@ npm run dev</code></pre>
         <div class="font-semibold text-xl mb-4">Tailwind CSS</div>
         <p class="text-lg mb-4">The demo pages are developed with Tailwind CSS however the core application shell mainly uses custom CSS.</p>
 
+        <div class="font-semibold text-xl mb-4">Rich Text Sanitization</div>
+        <p class="text-lg mb-4">
+            The Quill-backed PrimeVue <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">Editor</span> emits HTML that should be treated as untrusted before it is rendered. The
+            <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">src/utils/sanitize.ts</span> helper wraps DOMPurify with a Quill-tuned allowlist; pipe editor output through
+            <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">sanitizeHtml()</span> before any <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">v-html</span> render or
+            server-side persistence. The <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">Form Layout</span> demo (UI Components &rarr; Form Layout) shows the round-trip.
+        </p>
+
         <div class="font-semibold text-xl mb-4">Variables</div>
         <p class="text-lg mb-4">
             CSS variables used in the template derive their values from the PrimeVue styled mode presets, use the files under <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">assets/layout/_variables.scss</span> to customize
