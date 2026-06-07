@@ -90,6 +90,14 @@ const router = createRouter({
                     component: () => import('@/views/uikit/TimelineDoc.vue')
                 },
                 {
+                    path: '/blocks/free',
+                    name: 'blocks',
+                    meta: {
+                        breadcrumb: ['Prime Blocks', 'Free Blocks']
+                    },
+                    component: () => import('@/views/utilities/Blocks.vue')
+                },
+                {
                     path: '/pages/empty',
                     name: 'empty',
                     component: () => import('@/views/pages/Empty.vue')
@@ -100,7 +108,7 @@ const router = createRouter({
                     component: () => import('@/views/pages/Crud.vue')
                 },
                 {
-                    path: '/documentation',
+                    path: '/start/documentation',
                     name: 'documentation',
                     component: () => import('@/views/pages/Documentation.vue')
                 }
