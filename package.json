@@ -6,7 +6,7 @@
         "dev": "vite",
         "build": "vue-tsc --noEmit && vite build",
         "preview": "vite preview",
-        "lint": "eslint --fix . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx --fix --ignore-path .gitignore",
+        "lint": "eslint . --fix",
         "type-check": "vue-tsc --noEmit",
         "update-deps": "bun scripts/update-deps.ts"
     },
@@ -24,12 +24,10 @@
         "vue-router": "^4.5.0"
     },
     "devDependencies": {
+        "@eslint/js": "^9.24.0",
         "@primevue/auto-import-resolver": "^4.5.4",
-        "@rushstack/eslint-patch": "^1.11.0",
         "@tailwindcss/vite": "^4.1.17",
         "@types/node": "^22.14.1",
-        "@typescript-eslint/eslint-plugin": "^8.30.1",
-        "@typescript-eslint/parser": "^8.30.1",
         "@vitejs/plugin-vue": "^5.2.3",
         "@vue/eslint-config-prettier": "^10.2.0",
         "@vue/eslint-config-typescript": "^14.5.0",
