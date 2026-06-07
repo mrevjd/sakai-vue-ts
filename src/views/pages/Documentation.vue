@@ -33,8 +33,8 @@ npm run dev</code></pre>
 
         <div class="font-semibold text-xl mb-4">Layout Composable</div>
         <p class="text-lg mb-4">
-            The <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">src/layout/composables/layout.js</span> is a composable that manages the layout state changes including dark mode, PrimeVue theme, menu modes and states. If you
-            change the initial values like the preset or colors, make sure to apply them at PrimeVue config at main.js as well.
+            The <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">src/layout/composables/layout.ts</span> is a composable that manages the layout state changes including dark mode, PrimeVue theme, menu modes and states. If you
+            change the initial values like the preset or colors, make sure to apply them at PrimeVue config at main.ts as well.
         </p>
 
         <div class="font-semibold text-xl mb-4">Tailwind CSS</div>
@@ -53,7 +53,7 @@ npm run dev</code></pre>
 
         <p class="text-lg mb-4">Add Prime related libraries to the project.</p>
         <pre class="app-code">
-<code>npm install primevue @primevue/themes tailwindcss-primeui primeicons
+<code>npm install primevue @primeuix/themes tailwindcss-primeui primeicons
 npm install --save-dev @primevue/nuxt-module</code></pre>
 
         <p class="text-lg mb-4">Add PrimeVue-Nuxt module to <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">nuxt.config.js</span></p>
@@ -62,17 +62,18 @@ npm install --save-dev @primevue/nuxt-module</code></pre>
     '@primevue/nuxt-module',
 ]</code></pre>
 
-        <p class="text-lg mb-4">Install <a href="https://tailwindcss.com/docs/guides/nuxtjs" class="font-medium text-primary hover:underline">Tailwind CSS</a> with Nuxt using official documentation.</p>
+        <p class="text-lg mb-4">Install <a href="https://tailwindcss.com/docs/installation/using-vite" class="font-medium text-primary hover:underline">Tailwind CSS v4</a> with Nuxt using official documentation.</p>
 
         <p class="text-lg mb-4">
-            Add <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">tailwindcss-primeui</span> package as a plugin to <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">tailwind.config.js</span>
+            Register the <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">tailwindcss-primeui</span> plugin from <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">assets/tailwind.css</span>
         </p>
         <pre class="app-code">
-<code>plugins: [require('tailwindcss-primeui')]</code></pre>
+<code>@import 'tailwindcss';
+@plugin 'tailwindcss-primeui';</code></pre>
 
         <p class="text-lg mb-4">Add PrimeVue to in <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">nuxt.config.js</span></p>
         <pre class="app-code">
-<code>import Aura from '@primevue/themes/aura';
+<code>import Aura from '@primeuix/themes/aura';
 
 primevue: {
     options: {
@@ -113,7 +114,7 @@ import AppLayout from './AppLayout.vue';
         <p class="text-lg mb-4">
             Create <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">layouts</span> folder and copy <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">src/layout</span> folder and paste them. And then
             create <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">composables/use-layout.vue</span> and replace it with
-            <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">src/layout/composables/layout.js</span>. Then remove this line:
+            <span class="bg-highlight px-2 py-1 rounded-border not-italic text-base">src/layout/composables/layout.ts</span>. Then remove this line:
         </p>
         <pre class="app-code">
 <code>import { useLayout } from '@/layout/composables/layout';</code></pre>
