@@ -53,10 +53,10 @@ PrimeVue components are auto-imported via `unplugin-vue-components` with `PrimeV
 Services in `src/service/` return Promise-wrapped static data for demo purposes. Follow the same pattern when adding new services.
 
 ### HTML Sanitization
-Quill (`src/views/uikit/FormLayout.vue`) emits raw HTML. Always pass untrusted/editor HTML through `sanitizeHtml()` from `src/utils/sanitize.ts` before rendering it with `v-html` — it runs DOMPurify with a Quill-tuned tag/attribute allowlist. Never `v-html` Quill output directly.
+Quill (`src/views/uikit/FormLayout.vue`) emits raw HTML. Always pass untrusted/editor HTML through `sanitizeHtml()` from `src/utils/sanitize.ts` before rendering it with `v-html`. It runs DOMPurify with a Quill-tuned tag/attribute allowlist. Never `v-html` Quill output directly.
 
 ### Testing
-Vitest (with `jsdom`) is the standard test runner. Config lives in the `test` block of `vite.config.ts` and is intentionally scoped to `src/utils/**/*.{test,spec}.ts` — the place for pure, logic-heavy, or security-sensitive code (the DOMPurify sanitizer is covered in `src/utils/sanitize.test.ts`). Test real invariants and security boundaries; don't aim for blanket coverage of the demo services/views, which are scaffolding.
+Vitest (with `jsdom`) is the standard test runner. Config lives in the `test` block of `vite.config.ts` and is intentionally scoped to `src/utils/**/*.{test,spec}.ts`, the place for pure, logic-heavy, or security-sensitive code (the DOMPurify sanitizer is covered in `src/utils/sanitize.test.ts`). Test real invariants and security boundaries; don't aim for blanket coverage of the demo services/views, which are scaffolding.
 
 This repo is used as a **template** copied into other projects: keep Vitest set up in derived projects, and broaden the `include` glob (and add a setup file / `@vue/test-utils`) as real logic moves beyond `src/utils`.
 
