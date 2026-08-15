@@ -1,67 +1,60 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Vue 3 application template based on the Sakai admin template and PrimeVue.
 
-## Project Overview
-
-Sakai Vue TypeScript is a Vue 3 application template based on the Sakai admin template and PrimeVue component library. Uses Bun as the package manager.
+**This repo is used as a template copied into other projects.** Changes here propagate by being
+copied, so keep it generic and keep the tooling set up rather than stripping it out.
 
 ## Commands
 
 ```bash
-bun install          # Install dependencies
-bun run dev          # Start development server (Vite)
-bun run build        # Type-check and build for production
-bun run type-check   # Run vue-tsc type checking only
-bun run lint         # ESLint with auto-fix
-bun run preview      # Preview production build
-bun run test         # Run Vitest once (CI mode)
-bun run test:watch   # Run Vitest in watch mode
-bun run update-deps  # Update deps from installed Bun packages
+bun run dev / build / preview
+bun run type-check     # vue-tsc only
+bun run lint           # ESLint with auto-fix
+bun run test           # Vitest once (CI mode)
+bun run test:watch
+bun run update-deps    # update deps from installed Bun packages
 ```
 
-Run a single test file or case:
+Single test file or case:
 ```bash
-bun run test src/utils/sanitize.test.ts   # one file
-bun run test -t "strips <script>"         # by test name
+bun run test src/utils/sanitize.test.ts
+bun run test -t "strips <script>"
 ```
 
-## Architecture
+## Rules that are not obvious from the code
 
-### Component Auto-Import
-PrimeVue components are auto-imported via `unplugin-vue-components` with `PrimeVueResolver` in `vite.config.ts`. Do not add redundant imports for PrimeVue components.
+- **Never `v-html` Quill output directly.** Quill (`src/views/uikit/FormLayout.vue`) emits raw HTML.
+  Pass untrusted or editor HTML through `sanitizeHtml()` from `src/utils/sanitize.ts` first: it runs
+  DOMPurify with a Quill-tuned tag and attribute allowlist.
+- **PrimeVue components are auto-imported** via `unplugin-vue-components` with `PrimeVueResolver` in
+  `vite.config.ts`. Do not add redundant imports for them.
+- **Layout state lives in `useLayout()`**, not Pinia. `src/layout/composables/layout.ts` holds a
+  reactive `layoutConfig` (`preset`, `primary`, `surface`, `darkTheme`, `menuMode`), deep-watched and
+  serialised to the `layoutConfig` localStorage key. Pinia is a dependency but defines no stores.
+- **Dark mode** toggles the `.app-dark` class on `document.documentElement`, wrapped in
+  `document.startViewTransition` where available. The Aura preset registers it in `src/main.ts` via
+  `darkModeSelector: '.app-dark'`. Override SCSS tokens in `src/assets/layout/variables/`.
+- **Routing**: all routes in `src/router/index.ts`. Main app routes are children of `/` under
+  `AppLayout`; auth (`/auth/*`) and `/landing` are standalone and render without the admin chrome.
+  Catch-all redirects to `/pages/notfound`.
+- **Services** in `src/service/` are two-tier demo data, and adding one means copying both tiers: a
+  synchronous `get*Data()` holding the literal array, and async `get*()` methods that
+  `Promise.resolve()` it or a `.slice()` of it, so components consume the shape a real API would
+  return.
 
-### Theming System
-- **Theme preset**: Aura, registered with PrimeVue in `src/main.ts` (`darkModeSelector: '.app-dark'`)
-- **Dark mode**: Toggled via `.app-dark` class on `document.documentElement`; the toggle wraps the class change in `document.startViewTransition` when available
-- **Theme persistence**: `useLayout()` (`src/layout/composables/layout.ts`) holds a reactive `layoutConfig` (`preset`, `primary`, `surface`, `darkTheme`, `menuMode`) that is deep-watched and serialized to the `layoutConfig` localStorage key; defaults are restored on load
-- **SCSS tokens**: Override in `src/assets/layout/variables/` (e.g., `_dark.scss` for dark mode overrides)
-- Layout/UI state lives in this composable, not Pinia. Pinia is a dependency but no stores are currently defined.
+## Testing scope is deliberately narrow
 
-### Layout Structure
-- `src/layout/AppLayout.vue` - Main layout wrapper with sidebar, topbar, footer
-- `src/layout/composables/layout.ts` - Reactive layout state (menu mode, dark theme, sidebar visibility)
-- Routes inside `AppLayout` children get the full admin template; standalone routes (landing, auth) render without it
+Vitest with `jsdom`, configured in the `test` block of `vite.config.ts`, scoped on purpose to
+`src/utils/**/*.{test,spec}.ts`: the home of pure, logic-heavy or security-sensitive code. Test real
+invariants and security boundaries. Do **not** chase blanket coverage of the demo services and
+views, which are scaffolding.
 
-### Routing Pattern
-- `src/router/index.ts` - All routes defined here
-- Main app routes are children of `/` with `AppLayout` component
-- Auth pages (`/auth/*`) and landing (`/landing`) are standalone routes
-- Catch-all redirects to `/pages/notfound`
+In a derived project, broaden the `include` glob and add a setup file plus `@vue/test-utils` as real
+logic moves beyond `src/utils`.
 
-### Services
-Services in `src/service/` return Promise-wrapped static data for demo purposes. Follow the same pattern when adding new services.
+## Code style
 
-### HTML Sanitization
-Quill (`src/views/uikit/FormLayout.vue`) emits raw HTML. Always pass untrusted/editor HTML through `sanitizeHtml()` from `src/utils/sanitize.ts` before rendering it with `v-html`. It runs DOMPurify with a Quill-tuned tag/attribute allowlist. Never `v-html` Quill output directly.
-
-### Testing
-Vitest (with `jsdom`) is the standard test runner. Config lives in the `test` block of `vite.config.ts` and is intentionally scoped to `src/utils/**/*.{test,spec}.ts`, the place for pure, logic-heavy, or security-sensitive code (the DOMPurify sanitizer is covered in `src/utils/sanitize.test.ts`). Test real invariants and security boundaries; don't aim for blanket coverage of the demo services/views, which are scaffolding.
-
-This repo is used as a **template** copied into other projects: keep Vitest set up in derived projects, and broaden the `include` glob (and add a setup file / `@vue/test-utils`) as real logic moves beyond `src/utils`.
-
-### Code Style
-- Use Composition API with `<script setup>` in all components
-- TypeScript strict mode enabled (`noUnusedLocals`, `noUnusedParameters`)
-- Path alias: `@/*` maps to `src/*`
-- ESLint warns on `any` types and unused vars (except `_`-prefixed args)
+Composition API with `<script setup>` everywhere. TypeScript strict mode (`noUnusedLocals`,
+`noUnusedParameters`). Path alias `@/*` maps to `src/*`. ESLint warns rather than errors on `any`
+and on unused vars, ignoring `_`-prefixed args, vars and caught errors.
