@@ -43,7 +43,7 @@
         "typescript": "^6.0.3",
         "unplugin-vue-components": "^32.1.0",
         "vite": "^8.0.16",
-        "vitest": "4.1.8",
+        "vitest": "4.1.11",
         "vue-tsc": "^3.3.3"
     },
     "trustedDependencies": [
