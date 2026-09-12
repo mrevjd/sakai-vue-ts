@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { primaryPalettes, surfacePalettes } from '@/layout/palettes';
-import { PRIMARY_TOKENS, primaryVars, resolvePrimary, resolveSurface, SURFACE_TOKENS, surfaceVars } from './theme';
+import { PRESET_TOKENS, presetVars, PRIMARY_TOKENS, primaryVars, resolvePreset, resolvePrimary, resolveSurface, SURFACE_TOKENS, surfaceVars, themeVars } from './theme';
 
 const emerald = primaryPalettes.find((p) => p.name === 'emerald')!;
 const noir = primaryPalettes.find((p) => p.name === 'noir')!;
@@ -72,5 +72,41 @@ describe('surfaceVars', () => {
 
     it('returns exactly the documented surface tokens', () => {
         expect(Object.keys(surfaceVars(slate, 'light')).sort()).toEqual([...SURFACE_TOKENS].sort());
+    });
+});
+
+describe('presetVars', () => {
+    it('returns the recorded PrimeVue values per preset', () => {
+        expect(presetVars('Aura')).toEqual({ '--radius': '6px', '--control-height': '2.25rem', '--button-font-weight': '500', '--transition-duration': '0.2s' });
+        expect(presetVars('Lara')['--control-height']).toBe('2.5rem');
+        expect(presetVars('Nora')['--radius']).toBe('2px');
+        expect(presetVars('Nora')['--transition-duration']).toBe('0s');
+    });
+
+    it('falls back to Aura for an unknown preset name', () => {
+        expect(resolvePreset('Material')).toBe('Aura');
+        expect(resolvePreset('Nora')).toBe('Nora');
+    });
+
+    it('returns exactly the documented preset tokens', () => {
+        expect(Object.keys(presetVars('Aura')).sort()).toEqual([...PRESET_TOKENS].sort());
+    });
+});
+
+describe('themeVars', () => {
+    it('merges preset, surface and primary tokens with no overlap', () => {
+        const vars = themeVars({ preset: 'Aura', primary: 'emerald', surface: null, darkTheme: false });
+        expect(Object.keys(vars)).toHaveLength(PRESET_TOKENS.length + SURFACE_TOKENS.length + PRIMARY_TOKENS.length);
+        expect(vars['--primary']).toBe('#10b981');
+        expect(vars['--background']).toBe('#f1f5f9');
+        expect(vars['--radius']).toBe('6px');
+    });
+
+    it('switches to the dark mapping and the zinc default surface', () => {
+        const vars = themeVars({ preset: 'Nora', primary: 'emerald', surface: null, darkTheme: true });
+        expect(vars['--primary']).toBe('#34d399');
+        expect(vars['--background']).toBe('#09090b');
+        expect(vars['--primary-foreground']).toBe('#18181b');
+        expect(vars['--radius']).toBe('2px');
     });
 });

@@ -139,3 +139,15 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* Preset density hooks. presetVars() in src/utils/theme.ts sets the variables on <html>; the fallbacks equal Aura. */
+@layer components {
+    [data-slot='button'] {
+        font-weight: var(--button-font-weight, 500);
+        transition-duration: var(--transition-duration, 0.2s);
+    }
+    [data-slot='input'],
+    [data-slot='select-trigger'] {
+        height: var(--control-height, 2.25rem);
+    }
+}

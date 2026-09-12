@@ -1,4 +1,5 @@
 import { DEFAULT_PRIMARY, DEFAULT_SURFACE_DARK, DEFAULT_SURFACE_LIGHT, primaryPalettes, surfacePalettes, type Palette, type PaletteOption, type Shade } from '@/layout/palettes';
+import { DEFAULT_PRESET, presetNames, presets, type PresetName } from '@/layout/presets';
 
 export type ThemeMode = 'light' | 'dark';
 export type TokenRecord = Record<string, string>;
@@ -111,5 +112,38 @@ export function surfaceVars(surface: Palette, mode: ThemeMode): TokenRecord {
         '--sidebar-accent': s('100'),
         '--sidebar-accent-foreground': s('700'),
         '--sidebar-border': s('200')
+    };
+}
+
+export const PRESET_TOKENS = ['--radius', '--control-height', '--button-font-weight', '--transition-duration'] as const;
+
+export function resolvePreset(name: string): PresetName {
+    return presetNames.includes(name as PresetName) ? (name as PresetName) : DEFAULT_PRESET;
+}
+
+export function presetVars(name: PresetName): TokenRecord {
+    const preset = presets[name];
+    return {
+        '--radius': preset.radius,
+        '--control-height': preset.controlHeight,
+        '--button-font-weight': preset.buttonFontWeight,
+        '--transition-duration': preset.transitionDuration
+    };
+}
+
+export interface ThemeInput {
+    preset: string;
+    primary: string;
+    surface: string | null;
+    darkTheme: boolean;
+}
+
+export function themeVars(input: ThemeInput): TokenRecord {
+    const mode: ThemeMode = input.darkTheme ? 'dark' : 'light';
+    const surface = resolveSurface(input.surface, mode);
+    return {
+        ...presetVars(resolvePreset(input.preset)),
+        ...surfaceVars(surface.palette, mode),
+        ...primaryVars(resolvePrimary(input.primary), mode, surface.palette)
     };
 }
