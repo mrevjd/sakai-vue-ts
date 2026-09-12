@@ -15,6 +15,8 @@ export default defineConfig({
         vue(),
         tailwindcss(),
         Components({
+            // Only PrimeVue is auto-imported; shadcn components are imported explicitly. Removed in the sweep that drops PrimeVue.
+            dirs: [],
             resolvers: [PrimeVueResolver()]
         })
     ],
