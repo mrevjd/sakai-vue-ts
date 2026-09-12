@@ -1,7 +1,8 @@
 # Migrate the Sakai template from PrimeVue to shadcn-vue
 
 Date: 2026-09-12
-Status: draft for review (revision 2: full 1-for-1 scope)
+Status: approved 2026-09-12 (revision 2: full 1-for-1 scope); revision 3 records what a CLI
+rehearsal on a scratch copy established the same day
 Branch: `worktree-shadcn-vue-migration`
 
 ## 1. Goal
@@ -39,6 +40,12 @@ Everything below was checked by grep in this checkout on 2026-09-12.
 - ESLint already disables `vue/multi-word-component-names`, so single-word shadcn component
   files lint clean. `tsconfig.json` already maps `@/*` to `src/*`.
 - Vitest is scoped to `src/utils/**/*.{test,spec}.ts` and runs 7 passing tests.
+- A rehearsal of `init` and `add` on a scratch copy of this project confirmed that shadcn-vue
+  CLI 2.8.2 runs on Vite 8, TypeScript 6 and Tailwind 4.3, that the generated components build
+  with `tailwindcss-primeui` still loaded, and that `@vue/test-utils` 2.5.0 mounts them under
+  jsdom. One vendored file, `carousel/CarouselContent.vue`, trips `noUnusedLocals` and needs a
+  one-line `defineExpose`. TanStack Table 9.2.4 (the v9 feature API) was exercised for sorting,
+  global filter, pagination, selection and sub-row expansion in the same rehearsal.
 
 ## 3. Decisions taken with the user
 
@@ -76,9 +83,11 @@ Tailwind utilities by an `@theme inline` block, with `@custom-variant dark (&:is
 `--muted-foreground`, `--accent`, `--accent-foreground`, `--destructive`, `--border`,
 `--input`, `--ring`, `--chart-1` to `--chart-5`, and the `--sidebar*` group. The CLI's `init`
 writes this block into `src/assets/tailwind.css`; the existing breakpoint and `text-xxl`
-entries are merged back in, the `.app-dark` custom variant and the `tailwindcss-primeui` plugin
-line are removed, and the Tailwind 3 border-colour compatibility layer is dropped in favour of
-the base layer the CLI writes.
+entries are kept, the Google Fonts import the CLI injects for its `--font` choice is removed in
+favour of Lato, the `.app-dark` custom variant is renamed to `.dark` in phase 2, and the
+Tailwind 3 border-colour compatibility layer is dropped in favour of the base layer the CLI
+writes. The `tailwindcss-primeui` plugin line stays until the phase-6 sweep because every
+unported page still uses its classes; the rehearsal showed both token systems compile together.
 
 ### 5.2 Runtime palettes (the colour picker)
 
@@ -108,9 +117,8 @@ record onto `document.documentElement.style` with `setProperty`. A module-level 
 so the colours are in place inside the view-transition callback. Static `:root` and `.dark`
 values from the CLI remain as the fallback before the watcher runs.
 
-Whether the installed Sidebar component reads `--sidebar` (theming docs) or
-`--sidebar-background` (sidebar docs) is checked from the generated component in phase 7 and the
-mapping follows the code, not the docs.
+The generated Sidebar component uses `bg-sidebar`, `bg-sidebar-accent` and `bg-sidebar-border`
+classes, so the variables are the `--sidebar*` set above, not `--sidebar-background`.
 
 ### 5.3 Presets
 
@@ -143,8 +151,12 @@ are untouched.
 ### 5.6 Component layer
 
 Components are added with `bunx shadcn-vue@latest add <name>` into `src/components/ui/<name>/`
-with `components.json` set to the `new-york` style, base colour `zinc`, CSS variables on, CSS
-path `src/assets/tailwind.css`, aliases `@/components/ui` and `@/lib/utils`. Files under
+with `components.json` set to the `nova` style (the CLI 2.8 default; `new-york` no longer
+exists), base `reka`, base colour `zinc`, icon library `lucide` (package `@lucide/vue`), CSS
+variables on, CSS path `src/assets/tailwind.css`, aliases `@/components/ui`, `@/lib/utils` and
+`@/composables`. The non-interactive command is
+`bunx shadcn-vue@latest init -y --base reka --style nova --base-color zinc --icon-library lucide --font inter`;
+the font flag is mandatory and its import is replaced during the merge. Files under
 `src/components/ui` are vendored: formatted once with the repo's Prettier settings, then edited
 only to add variants (for example `success`, `warning`, `info`, `contrast` on `Badge` to cover
 `Tag` severities, and `severity` colour variants on `Button` to cover PrimeVue's
@@ -152,13 +164,15 @@ only to add variants (for example `success`, `warning`, `info`, `contrast` on `B
 (`import { Button } from '@/components/ui/button'`); `unplugin-vue-components` and
 `PrimeVueResolver` are removed, and `components.d.ts` is deleted if present.
 
-Component set from the registry (all present on the shadcn-vue components page): accordion,
+Component set from the registry (each name probed against the `nova` registry): accordion,
 alert, alert-dialog, avatar, badge, breadcrumb, button, button-group, calendar, card, carousel,
-checkbox, collapsible, combobox, command, context-menu, date-picker, dialog, dropdown-menu,
-field, form, input, input-group, label, menubar, navigation-menu, number-field, pagination,
-popover, progress, radio-group, resizable, scroll-area, select, separator, sheet, sidebar,
-skeleton, slider, sonner, spinner, stepper, switch, table, tabs, tags-input, textarea, toggle,
-toggle-group, tooltip.
+checkbox, collapsible, combobox, command, context-menu, dialog, dropdown-menu, field, form,
+input, input-group, label, menubar, navigation-menu, number-field, pagination, popover,
+progress, radio-group, resizable, scroll-area, select, separator, sheet, sidebar, skeleton,
+slider, sonner, spinner, stepper, switch, table, tabs, tags-input, textarea, toggle,
+toggle-group, tooltip. `native-select` arrives as a dependency of `calendar`. The docs' "Date
+Picker" and "Data Table" are compositions, not registry items: the first is `calendar` plus
+`popover` with `@internationalized/date`, the second is `table` plus `@tanstack/vue-table` 9.
 
 ### 5.7 Local wrappers and gap components (in `src/components/`)
 
@@ -169,7 +183,7 @@ and the ones with logic have tests (section 8).
 
 | PrimeVue | Local component | Built on | Behaviour to preserve |
 |---|---|---|---|
-| DataTable, Column, TreeTable | `data-table/DataTable.vue` | `@tanstack/vue-table` + `Table` | sorting, global and per-column filters, row selection (single, multiple, checkbox), pagination with page report and rows-per-page, row expansion, frozen first column via sticky class, `subRows` expansion for TreeTable, CSV export via `toCsv` |
+| DataTable, Column, TreeTable | `data-table/DataTable.vue` | `@tanstack/vue-table` 9 (`useTable`, `tableFeatures`, `createColumnHelper`, `FlexRender`) + `Table` | sorting, global and per-column filters, row selection (single, multiple, checkbox), pagination with page report and rows-per-page, row expansion, frozen first column via sticky class, `subRows` expansion for TreeTable, CSV export via `toCsv` |
 | Chart | `AppChart.vue` | `chart.js` | `type`, `data`, `options`; create on mount, update on change, destroy on unmount |
 | Editor | `QuillEditor.vue` | `quill` | v-model HTML, snow toolbar, readonly, placeholder; output sanitised by consumers with `sanitizeHtml()` |
 | Rating | `StarRating.vue` | lucide `Star` | interactive and readonly, `cancel`, keyboard |
@@ -185,7 +199,7 @@ and the ones with logic have tests (section 8).
 | Password | `PasswordInput.vue` + `src/utils/passwordStrength.ts` | `Input`, `Popover` | toggle mask, strength meter with weak, medium, strong labels, `feedback` off |
 | FloatLabel | `FloatLabel.vue` | `Label` | label floats on focus or value, `variant` over and in |
 | Listbox | `Listbox.vue` | `Command` list | single and multiple, filter, option groups, `optionLabel`, `optionValue` |
-| MultiSelect | `MultiSelect.vue` | `Combobox` multiple + `Badge` chips | filter, select all, chip display, max selected labels |
+| MultiSelect | `MultiSelect.vue` | `Combobox` multiple + `Badge` chips (the generated `Combobox.vue` forwards every `ComboboxRootProps`, `multiple` included) | filter, select all, chip display, max selected labels |
 | Chip | `Chip.vue` | `Badge` | label, icon, image, removable |
 | AvatarGroup, OverlayBadge | `AvatarGroup.vue`, `OverlayBadge.vue` | `Avatar`, `Badge` | stacked overlap; badge anchored top-right, dot mode |
 | ScrollTop | `ScrollTop.vue` | `@vueuse/core` scroll | appears past threshold, smooth scroll to top, `target` parent or window |
@@ -308,19 +322,22 @@ values. All five services stay with their two-tier shape.
 
 ### 5.12 Icons
 
-`lucide-vue-next` replaces `primeicons`. The tree references 94 distinct icons (`pi-fw`
-excluded); each maps to the nearest lucide name during the port, recorded once in
+`@lucide/vue` (the package the CLI installs for `--icon-library lucide`; it exports both bare
+names such as `ArrowUpDown` and suffixed ones such as `ArrowUpDownIcon`, and the bare form is
+used) replaces `primeicons`. The tree references 94 distinct icons (`pi-fw` excluded); each maps
+to the nearest lucide name during the port, recorded once in
 `src/components/icons.ts` as a named re-export map so the mapping is reviewable in one file. The
 menu model stores the component, so a derived project adds an icon with one import.
 
 ### 5.13 Dependencies
 
-Added at runtime: `reka-ui`, `class-variance-authority`, `clsx`, `tailwind-merge`,
-`lucide-vue-next`, `@vueuse/core`, `@tanstack/vue-table`, `vue-sonner`,
-`@internationalized/date`, `embla-carousel-vue`, `vee-validate`, `zod`, `@vee-validate/zod`.
-Added as dev: `tw-animate-css`, `@vue/test-utils`. The CLI decides part of the set when `init`
-and `add` run; the PR body lists what was actually added, and any package outside this list is
-raised before it is kept.
+Added at runtime by the CLI, versions as installed in the rehearsal (`bunfig.toml` pins exact
+versions): `reka-ui` 2.10.4, `class-variance-authority` 0.7.1, `clsx` 2.1.1, `tailwind-merge`
+3.6.0, `@lucide/vue` 1.45.0, `@vueuse/core` 14.4.0, `embla-carousel-vue` 8.6.0, `vee-validate`
+4.15.1, `@vee-validate/zod` 4.15.1, `zod` 3.25.76, `vue-sonner` 2.0.9. Added by hand:
+`@tanstack/vue-table` 9.2.4 and `@internationalized/date`. Added as dev: `tw-animate-css` 1.4.0
+(CLI) and `@vue/test-utils` 2.5.0. The PR body lists what was actually added, and any package
+outside this list is raised before it is kept.
 
 Removed: `primevue`, `@primeuix/themes`, `@primevue/auto-import-resolver`, `primeflex`,
 `primeicons`, `tailwindcss-primeui`, `unplugin-vue-components`, and `sass` in phase 7.
@@ -347,9 +364,8 @@ re-applies the dark mapping, all inside one view transition.
 - `FileUpload` reports files over `maxFileSize` or outside `accept` in its message area rather
   than silently dropping them.
 - `toCsv` with no rows returns the header line only.
-- The shadcn CLI failing on this toolchain (Vite 8, TypeScript 6, Tailwind 4.3 are newer than
-  the docs assume) is handled by adding components from the registry JSON by hand; the
-  `components.json` and `cn` helper are two small files.
+- The shadcn CLI is confirmed working on this toolchain; if a later `add` fails for a single
+  item, that component is added from its registry JSON by hand rather than blocking the phase.
 
 ## 8. Testing
 
