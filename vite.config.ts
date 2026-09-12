@@ -33,9 +33,9 @@ export default defineConfig({
         }
     },
     test: {
-        // Scoped to pure logic in src/utils (e.g. the DOMPurify sanitizer).
-        // jsdom is required because DOMPurify needs a DOM to operate on.
+        // jsdom because DOMPurify and the mounted components need a DOM.
         environment: 'jsdom',
-        include: ['src/utils/**/*.{test,spec}.ts']
+        include: ['src/**/*.{test,spec}.ts'],
+        setupFiles: ['src/test/setup.ts']
     }
 });
