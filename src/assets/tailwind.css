@@ -4,8 +4,7 @@
 /* Removed in the Plan 3 sweep, once no page uses its classes. */
 @plugin 'tailwindcss-primeui';
 
-/* Renamed to .dark in Task 7 of Plan 1. */
-@custom-variant dark (&:where([class*="app-dark"], [class*="app-dark"] *));
+@custom-variant dark (&:is(.dark *));
 
 @theme {
     --breakpoint-*: initial;

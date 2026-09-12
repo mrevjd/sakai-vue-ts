@@ -1,16 +1,12 @@
 /// <reference lib="dom" />
 import type { ComputedRef } from 'vue';
 import { computed, onMounted, reactive, watch } from 'vue';
+import { applyTheme } from '@/layout/composables/theme';
+import { syncPrimeVueTheme } from '@/layout/composables/primevueBridge';
+import { parseLayoutConfig, type LayoutConfig, type MenuMode } from '@/utils/layoutConfig';
 
-type MenuMode = 'static' | 'overlay';
-
-interface LayoutConfig {
-    preset: string;
-    primary: string;
-    surface: string | null;
-    darkTheme: boolean;
-    menuMode: MenuMode;
-}
+const STORAGE_KEY = 'layoutConfig';
+const DARK_CLASS = 'dark';
 
 interface LayoutState {
     staticMenuInactive: boolean;
@@ -25,20 +21,16 @@ interface LayoutState {
     anchored: boolean;
 }
 
-const loadSavedTheme = (): Partial<LayoutConfig> => {
-    const savedTheme = localStorage.getItem('layoutConfig');
-    return savedTheme ? JSON.parse(savedTheme) : {};
-};
+function readStoredConfig(): string | null {
+    // Storage can be disabled or throw in private modes; a missing value is not an error.
+    try {
+        return localStorage.getItem(STORAGE_KEY);
+    } catch {
+        return null;
+    }
+}
 
-const savedTheme = loadSavedTheme();
-
-const layoutConfig = reactive<LayoutConfig>({
-    preset: savedTheme.preset || 'Aura',
-    primary: savedTheme.primary || 'emerald',
-    surface: savedTheme.surface || null,
-    darkTheme: savedTheme.darkTheme || false,
-    menuMode: savedTheme.menuMode || 'static'
-});
+export const layoutConfig = reactive<LayoutConfig>(parseLayoutConfig(readStoredConfig()));
 
 const layoutState = reactive<LayoutState>({
     staticMenuInactive: false,
@@ -56,10 +48,21 @@ const layoutState = reactive<LayoutState>({
 watch(
     layoutConfig,
     (config) => {
-        localStorage.setItem('layoutConfig', JSON.stringify(config));
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        } catch {
+            // Persistence is best effort; the in-memory config still drives the UI.
+        }
     },
     { deep: true }
 );
+
+const themeInput = () => ({ preset: layoutConfig.preset, primary: layoutConfig.primary, surface: layoutConfig.surface, darkTheme: layoutConfig.darkTheme });
+
+// Synchronous flush so the new colours are already on <html> inside the view transition callback.
+watch(themeInput, applyTheme, { immediate: true, flush: 'sync' });
+// Not immediate: PrimeVue is not installed yet when this module first evaluates; main.ts runs the first sync.
+watch(themeInput, syncPrimeVueTheme, { flush: 'sync' });
 
 interface MenuModeChangeEvent {
     value: MenuMode;
@@ -81,18 +84,17 @@ interface UseLayout {
 export function useLayout(): UseLayout {
     const isDesktop = (): boolean => window.innerWidth > 991;
 
+    const executeDarkModeToggle = () => {
+        layoutConfig.darkTheme = !layoutConfig.darkTheme;
+        document.documentElement.classList.toggle(DARK_CLASS, layoutConfig.darkTheme);
+    };
+
     const toggleDarkMode = () => {
         if (!document.startViewTransition) {
             executeDarkModeToggle();
             return;
         }
-
         document.startViewTransition(() => executeDarkModeToggle());
-    };
-
-    const executeDarkModeToggle = () => {
-        layoutConfig.darkTheme = !layoutConfig.darkTheme;
-        document.documentElement.classList.toggle('app-dark');
     };
 
     const toggleMenu = () => {
@@ -100,7 +102,6 @@ export function useLayout(): UseLayout {
             if (layoutConfig.menuMode === 'static') {
                 layoutState.staticMenuInactive = !layoutState.staticMenuInactive;
             }
-
             if (layoutConfig.menuMode === 'overlay') {
                 layoutState.overlayMenuActive = !layoutState.overlayMenuActive;
             }
@@ -127,9 +128,7 @@ export function useLayout(): UseLayout {
     };
 
     onMounted(() => {
-        if (layoutConfig.darkTheme) {
-            document.documentElement.classList.add('app-dark');
-        }
+        document.documentElement.classList.toggle(DARK_CLASS, layoutConfig.darkTheme);
     });
 
     const isDarkTheme = computed(() => layoutConfig.darkTheme);
