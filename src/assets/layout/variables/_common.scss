@@ -1,20 +1,22 @@
 :root {
-    --primary-color: var(--p-primary-color);
-    --primary-contrast-color: var(--p-primary-contrast-color);
-    --text-color: var(--p-text-color);
-    --text-color-secondary: var(--p-text-muted-color);
-    --surface-border: var(--p-content-border-color);
-    --surface-card: var(--p-content-background);
-    --surface-hover: var(--p-content-hover-background);
-    --surface-overlay: var(--p-overlay-popover-background);
-    --transition-duration: var(--p-transition-duration);
-    --maskbg: var(--p-mask-background);
-    --content-border-radius: var(--p-content-border-radius);
+    --primary-color: var(--primary);
+    --primary-contrast-color: var(--primary-foreground);
+    --text-color: var(--foreground);
+    --text-color-secondary: var(--muted-foreground);
+    --surface-border: var(--border);
+    --surface-card: var(--card);
+    --surface-hover: var(--accent);
+    --surface-overlay: var(--popover);
+    --surface-ground: var(--background);
+    --maskbg: rgba(0, 0, 0, 0.4);
+    --content-border-radius: var(--radius);
+    /* Overridden per preset by the inline --transition-duration that applyTheme() writes on <html>. */
+    --transition-duration: 0.2s;
     --layout-section-transition-duration: 0.2s;
-    --element-transition-duration: var(--p-transition-duration);
-    --focus-ring-width: var(--p-focus-ring-width);
-    --focus-ring-style: var(--p-focus-ring-style);
-    --focus-ring-color: var(--p-focus-ring-color);
-    --focus-ring-offset: var(--p-focus-ring-offset);
-    --focus-ring-shadow: var(--p-focus-ring-shadow);
+    --element-transition-duration: var(--transition-duration);
+    --focus-ring-width: 1px;
+    --focus-ring-style: solid;
+    --focus-ring-color: var(--ring);
+    --focus-ring-offset: 2px;
+    --focus-ring-shadow: none;
 }

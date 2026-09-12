@@ -28,7 +28,7 @@
             </div>
             <AppFooter />
         </div>
-        <div class="layout-mask animate-fadein" @click="hideMobileMenu" />
+        <div class="layout-mask animate-in fade-in" @click="hideMobileMenu" />
     </div>
     <Toast />
 </template>
