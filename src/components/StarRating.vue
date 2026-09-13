@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, type HTMLAttributes } from 'vue';
+    import { computed, type ComponentPublicInstance, type HTMLAttributes } from 'vue';
     import { IconStar } from '@/components/icons';
     import { cn } from '@/lib/utils';
 
@@ -18,6 +18,14 @@
     const inert = computed(() => props.readonly || props.disabled);
     const values = computed(() => Array.from({ length: Math.max(1, Math.floor(props.stars)) }, (_, index) => index + 1));
 
+    // Keyed by star value rather than an array ref because Vue does not guarantee array-ref order.
+    const buttons = new Map<number, HTMLButtonElement>();
+
+    function setButton(value: number, el: Element | ComponentPublicInstance | null): void {
+        if (el instanceof HTMLButtonElement) buttons.set(value, el);
+        else buttons.delete(value);
+    }
+
     function select(value: number): void {
         if (inert.value) return;
         // Clicking the current value again clears the rating; PrimeVue keeps it, so this is the one documented difference.
@@ -33,6 +41,8 @@
         if (next === null || next === current) return;
         event.preventDefault();
         model.value = next;
+        // The ARIA radiogroup pattern moves focus with the checked radio, and the map avoids waiting on a parent to echo the v-model before the tabindex updates.
+        buttons.get(next)?.focus();
     }
 </script>
 
@@ -41,6 +51,7 @@
         <button
             v-for="value in values"
             :key="value"
+            :ref="(el) => setButton(value, el)"
             type="button"
             role="radio"
             :aria-checked="model === value"

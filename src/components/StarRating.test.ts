@@ -32,6 +32,16 @@ describe('StarRating', () => {
         expect(wrapper.emitted('update:modelValue')!.at(-1)).toEqual([1]);
     });
 
+    it('moves focus to the newly checked star on arrow keys', async () => {
+        const wrapper = mount(StarRating, { props: { modelValue: 3 }, attachTo: document.body });
+        const buttons = wrapper.findAll('button');
+        buttons[2]!.element.focus();
+        expect(document.activeElement).toBe(buttons[2]!.element);
+        await wrapper.get('[role=radiogroup]').trigger('keydown', { key: 'ArrowRight' });
+        expect(document.activeElement).toBe(buttons[3]!.element);
+        wrapper.unmount();
+    });
+
     it('ignores clicks and keys when readonly or disabled', async () => {
         const wrapper = mount(StarRating, { props: { modelValue: 2, readonly: true } });
         await wrapper.findAll('[role=radio]')[0]!.trigger('click');
