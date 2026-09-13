@@ -37,6 +37,7 @@
                 variant="ghost"
                 size="icon-sm"
                 class="absolute top-1/2 right-1 -translate-y-1/2"
+                :disabled="props.disabled"
                 :aria-label="revealed ? 'Hide password' : 'Show password'"
                 data-testid="password-toggle"
                 @click="revealed = !revealed"

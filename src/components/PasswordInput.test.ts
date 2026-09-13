@@ -34,4 +34,12 @@ describe('PasswordInput', () => {
         expect(wrapper.find('[data-testid=password-strength]').exists()).toBe(false);
         expect(wrapper.find('[data-testid=password-toggle]').exists()).toBe(false);
     });
+
+    it('disables the toggle together with the field', async () => {
+        const wrapper = mount(PasswordInput, { props: { modelValue: 'secret', disabled: true } });
+        const toggle = wrapper.get('[data-testid=password-toggle]');
+        expect(toggle.attributes('disabled')).toBeDefined();
+        await toggle.trigger('click');
+        expect(wrapper.get('input').attributes('type')).toBe('password');
+    });
 });
