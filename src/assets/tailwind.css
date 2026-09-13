@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import 'shadcn-vue/tailwind.css';
 
 /* Removed in the Plan 3 sweep, once no page uses its classes. */
 @plugin 'tailwindcss-primeui';

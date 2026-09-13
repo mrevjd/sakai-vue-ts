@@ -42,7 +42,7 @@
                         :key="option.name"
                         type="button"
                         :title="option.name"
-                        :class="['border-none w-5 h-5 rounded-full p-0 cursor-pointer outline-none outline-offset-1', { 'outline-primary': layoutConfig.primary === option.name }]"
+                        :class="['border-none w-5 h-5 rounded-full p-0 cursor-pointer outline-2 outline-offset-1', { 'outline-primary': layoutConfig.primary === option.name, 'outline-transparent': layoutConfig.primary !== option.name }]"
                         :style="{ backgroundColor: swatchColor(option) }"
                         @click="layoutConfig.primary = option.name"
                     ></button>
@@ -56,7 +56,7 @@
                         :key="option.name"
                         type="button"
                         :title="option.name"
-                        :class="['border-none w-5 h-5 rounded-full p-0 cursor-pointer outline-none outline-offset-1', { 'outline-primary': isSurfaceSelected(option) }]"
+                        :class="['border-none w-5 h-5 rounded-full p-0 cursor-pointer outline-2 outline-offset-1', { 'outline-primary': isSurfaceSelected(option), 'outline-transparent': !isSurfaceSelected(option) }]"
                         :style="{ backgroundColor: option.palette['500'] }"
                         @click="layoutConfig.surface = option.name"
                     ></button>
