@@ -136,6 +136,13 @@
         if (Number.isFinite(size) && size > 0) table.setPageSize(size);
     }
 
+    // Mirrors PrimeVue's isClickable guard: clicks that land on a control inside the row are the control's, not the row's.
+    function onRowClick(event: MouseEvent, row: TData): void {
+        const target = event.target as Element | null;
+        if (target?.closest('button, a, input, textarea, [role=checkbox]')) return;
+        emit('row-click', row);
+    }
+
     defineExpose({
         table,
         visibleRows: (): TData[] => table.getPrePaginatedRowModel().rows.map((row) => row.original),
@@ -167,10 +174,10 @@
                     <TableEmpty v-if="table.getRowModel().rows.length === 0" :colspan="allColumns.length">
                         <slot name="empty">No records found.</slot>
                     </TableEmpty>
-                    <TableRow v-for="row in table.getRowModel().rows" :key="row.id" :data-state="row.getIsSelected() ? 'selected' : undefined" :data-depth="row.depth" @click="emit('row-click', row.original)">
+                    <TableRow v-for="row in table.getRowModel().rows" :key="row.id" :data-state="row.getIsSelected() ? 'selected' : undefined" :data-depth="row.depth" @click="onRowClick($event, row.original)">
                         <TableCell v-for="(cell, index) in row.getVisibleCells()" :key="cell.id" :style="index === 0 && row.depth > 0 ? { paddingLeft: `${row.depth * 1.5 + 0.5}rem` } : undefined">
                             <span v-if="index === 0 && row.getCanExpand()" class="inline-flex items-center gap-1">
-                                <Button variant="ghost" size="icon-xs" :aria-label="row.getIsExpanded() ? 'Collapse row' : 'Expand row'" @click.stop="row.toggleExpanded()">
+                                <Button variant="ghost" size="icon-xs" :aria-label="row.getIsExpanded() ? 'Collapse row' : 'Expand row'" @click="row.toggleExpanded()">
                                     <ChevronRight :class="cn('transition-transform', row.getIsExpanded() && 'rotate-90')" />
                                 </Button>
                                 <FlexRender :cell="cell" />

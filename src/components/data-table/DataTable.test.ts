@@ -103,4 +103,13 @@ describe('DataTable', () => {
         await wrapper.findAll('tbody tr')[0]!.trigger('click');
         expect((wrapper.emitted('row-click')![0]![0] as Product).name).toBe('banana');
     });
+
+    it('does not emit row-click when a control inside the row is clicked', async () => {
+        const wrapper = make({ selectable: true, subRowsKey: 'children' });
+        await wrapper.findAll('tbody [data-slot=checkbox]')[0]!.trigger('click');
+        await wrapper.get('[aria-label="Expand row"]').trigger('click');
+        expect(wrapper.emitted('row-click')).toBeUndefined();
+        expect(wrapper.emitted('update:selection')).toBeTruthy();
+        expect(wrapper.findAll('tbody tr')[1]!.text()).toContain('banana child');
+    });
 });
