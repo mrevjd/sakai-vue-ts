@@ -1,0 +1,64 @@
+// One import point for icons. Each export is named after the PrimeIcons glyph it replaces (pi-home
+// becomes IconHome) so a port is a rename, and a derived project adds an icon by adding one line.
+export {
+    AlignLeft as IconAlignLeft, // pi-align-left
+    ChevronDown as IconAngleDown, // pi-angle-down
+    ArrowRight as IconArrowRight, // pi-arrow-right
+    ArrowUp as IconArrowUp, // pi-arrow-up
+    Menu as IconBars, // pi-bars
+    Bell as IconBell, // pi-bell
+    Book as IconBook, // pi-book
+    Briefcase as IconBriefcase, // pi-briefcase
+    Calendar as IconCalendar, // pi-calendar
+    ChartBar as IconChartBar, // pi-chart-bar
+    Check as IconCheck, // pi-check
+    SquareCheck as IconCheckSquare, // pi-check-square
+    Circle as IconCircle, // pi-circle
+    CircleOff as IconCircleOff, // pi-circle-off
+    Copy as IconClone, // pi-clone
+    Settings as IconCog, // pi-cog
+    MessageSquare as IconComment, // pi-comment
+    Monitor as IconDesktop, // pi-desktop
+    DollarSign as IconDollar, // pi-dollar
+    Download as IconDownload, // pi-download
+    EllipsisVertical as IconEllipsisV, // pi-ellipsis-v
+    CircleAlert as IconExclamationCircle, // pi-exclamation-circle
+    TriangleAlert as IconExclamationTriangle, // pi-exclamation-triangle
+    Eye as IconEye, // pi-eye
+    EyeOff as IconEyeSlash, // pi-eye-slash
+    File as IconFile, // pi-file
+    ExternalLink as IconGithub, // pi-github (lucide ships no brand icons)
+    Globe as IconGlobe, // pi-globe
+    Heart as IconHeart, // pi-heart
+    House as IconHome, // pi-home
+    IdCard as IconIdCard, // pi-id-card
+    Image as IconImage, // pi-image
+    Inbox as IconInbox, // pi-inbox
+    List as IconList, // pi-list
+    Lock as IconLock, // pi-lock
+    Map as IconMap, // pi-map
+    Smartphone as IconMobile, // pi-mobile
+    Moon as IconMoon, // pi-moon
+    Palette as IconPalette, // pi-palette
+    Pencil as IconPencil, // pi-pencil
+    Plus as IconPlus, // pi-plus
+    Power as IconPowerOff, // pi-power-off
+    Hexagon as IconPrime, // pi-prime
+    CircleQuestionMark as IconQuestion, // pi-question
+    CircleHelp as IconQuestionCircle, // pi-question-circle
+    Search as IconSearch, // pi-search
+    Share2 as IconShareAlt, // pi-share-alt
+    ShoppingCart as IconShoppingCart, // pi-shopping-cart
+    LogIn as IconSignIn, // pi-sign-in
+    Star as IconStar, // pi-star
+    Sun as IconSun, // pi-sun
+    Table as IconTable, // pi-table
+    Tablet as IconTablet, // pi-tablet
+    X as IconTimes, // pi-times
+    CircleX as IconTimesCircle, // pi-times-circle
+    Trash2 as IconTrash, // pi-trash
+    LockOpen as IconUnlock, // pi-unlock
+    Upload as IconUpload, // pi-upload
+    User as IconUser, // pi-user
+    Users as IconUsers // pi-users
+} from '@lucide/vue';
