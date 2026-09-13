@@ -1,14 +1,6 @@
 import DOMPurify from 'dompurify';
 
-const QUILL_ALLOWED_TAGS = [
-    'p', 'br', 'span', 'div',
-    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-    'strong', 'em', 'u', 's', 'sub', 'sup',
-    'blockquote', 'pre', 'code',
-    'ol', 'ul', 'li',
-    'a',
-    'img'
-];
+const QUILL_ALLOWED_TAGS = ['p', 'br', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong', 'em', 'u', 's', 'sub', 'sup', 'blockquote', 'pre', 'code', 'ol', 'ul', 'li', 'a', 'img'];
 
 const QUILL_ALLOWED_ATTR = ['href', 'target', 'rel', 'src', 'alt', 'class', 'style'];
 

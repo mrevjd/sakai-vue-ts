@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import BlockViewer from '@/components/BlockViewer.vue';
-import { ref } from 'vue';
+    import BlockViewer from '@/components/BlockViewer.vue';
+    import { ref } from 'vue';
 
-const password = ref('');
-const checked1 = ref(true);
+    const password = ref('');
+    const checked1 = ref(true);
 
-const blocksCode = {
-    hero: `<div class="relative min-h-160 lg:min-h-0 bg-surface-0 dark:bg-surface-900 flex lg:flex-row flex-col">
+    const blocksCode = {
+        hero: `<div class="relative min-h-160 lg:min-h-0 bg-surface-0 dark:bg-surface-900 flex lg:flex-row flex-col">
     <div class="flex lg:flex lg:flex-row flex-col justify-center md:justify-normal h-full flex-1">
         <div class="relative flex-1 z-20 flex items-center justify-center">
             <div class="flex items-center justify-center h-full">
@@ -39,7 +39,7 @@ const blocksCode = {
     </div>
 </div>`,
 
-    feature: `<div class="bg-surface-0 dark:bg-surface-950 px-6 md:px-12 lg:px-20 py-20 text-center">
+        feature: `<div class="bg-surface-0 dark:bg-surface-950 px-6 md:px-12 lg:px-20 py-20 text-center">
     <div class="flex flex-col gap-6">
         <div class="flex flex-col items-center gap-4">
             <div class="font-bold text-3xl leading-tight">
@@ -107,7 +107,7 @@ const blocksCode = {
     </div>
 </div>`,
 
-    pricing: `<div class="bg-surface-50 dark:bg-surface-950 px-6 py-20 md:px-12 lg:px-20">
+        pricing: `<div class="bg-surface-50 dark:bg-surface-950 px-6 py-20 md:px-12 lg:px-20">
         <div class="flex flex-col gap-4 items-center justify-center mb-12">
             <div class="text-surface-900 dark:text-surface-0 font-bold text-4xl lg:text-5xl text-center leading-tight">Pricing Plans</div>
             <div class="text-surface-500 dark:text-surface-400 text-lg text-center leading-normal">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Velit numquam eligendi quos.</div>
@@ -213,7 +213,7 @@ const blocksCode = {
         </div>
     </div>`,
 
-    cta: ` <div class="bg-surface-0 dark:bg-surface-950 px-6 py-20 md:px-12 lg:px-20">
+        cta: ` <div class="bg-surface-0 dark:bg-surface-950 px-6 py-20 md:px-12 lg:px-20">
     <div class="text-surface-700 dark:text-surface-100 text-center flex flex-col items-center gap-4">
         <div class="text-primary font-bold text-lg leading-tight"><i class="pi pi-discord text-lg! leading-none!" />&nbsp;POWERED BY DISCORD</div>
         <div class="text-surface-900 dark:text-surface-0 font-bold text-4xl leading-tight">Join our design community</div>
@@ -222,7 +222,7 @@ const blocksCode = {
     </div>
 </div>`,
 
-    banner: `<div class="pb-20 bg-surface-0 dark:bg-surface-950">
+        banner: `<div class="pb-20 bg-surface-0 dark:bg-surface-950">
     <div class="bg-surface-900 text-surface-100 py-4 px-6 lg:px-20 flex justify-between items-center flex-wrap">
         <div class="font-bold">🔥 Hot Deals!</div>
         <div class="inline-flex gap-1 items-center">
@@ -233,7 +233,7 @@ const blocksCode = {
     </div>
 </div>`,
 
-    'page-heading': `<div class="bg-surface-0 dark:bg-surface-950 px-6 py-8 md:px-12 lg:px-20">
+        'page-heading': `<div class="bg-surface-0 dark:bg-surface-950 px-6 py-8 md:px-12 lg:px-20">
     <ul class="list-none p-0 m-0 flex items-center font-medium mb-5">
         <li>
             <a class="text-surface-500 dark:text-surface-300 no-underline leading-normal cursor-pointer">Application</a>
@@ -270,7 +270,7 @@ const blocksCode = {
     </div>
 </div>`,
 
-    stats: `<div class="bg-surface-50 dark:bg-surface-950 px-6 py-8 md:px-12 lg:px-20">
+        stats: `<div class="bg-surface-50 dark:bg-surface-950 px-6 py-8 md:px-12 lg:px-20">
     <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
         <div class="bg-surface-0 dark:bg-surface-900 shadow-sm p-5 rounded-2xl">
             <div class="flex justify-between gap-4">
@@ -337,7 +337,7 @@ const blocksCode = {
     </div>
 </div>`,
 
-    'sign-in': ` <div class="bg-surface-0 dark:bg-surface-900 p-8 md:p-12 shadow-sm rounded-2xl w-full max-w-xl mx-auto flex flex-col gap-8">
+        'sign-in': ` <div class="bg-surface-0 dark:bg-surface-900 p-8 md:p-12 shadow-sm rounded-2xl w-full max-w-xl mx-auto flex flex-col gap-8">
     <div class="flex flex-col items-center gap-4">
         <div class="flex items-center gap-4">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" width="33" height="32" viewBox="0 0 33 32" fill="none">
@@ -382,7 +382,7 @@ const blocksCode = {
     </Button>
 </div>`,
 
-    'description-list': `<div class="bg-surface-0 dark:bg-surface-950 px-8 md:px-20 py-12 md:py-20 lg:px-80">
+        'description-list': `<div class="bg-surface-0 dark:bg-surface-950 px-8 md:px-20 py-12 md:py-20 lg:px-80">
     <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-2 pb-4">
             <div class="font-semibold text-xl text-surface-900 dark:text-surface-0 leading-tight">Movie Information</div>
@@ -461,7 +461,7 @@ const blocksCode = {
     </div>
 </div>`,
 
-    card: `<div class="bg-surface-50 dark:bg-surface-950">
+        card: `<div class="bg-surface-50 dark:bg-surface-950">
     <div class="bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-2xl flex flex-col gap-4">
         <div class="flex gap-4">
             <div class="flex flex-col gap-2 flex-1">
@@ -474,7 +474,7 @@ const blocksCode = {
         </div>
     </div>
 </div>`,
-    glass: `<div
+        glass: `<div
         class="px-6 py-20 md:px-20 lg:px-80 flex items-center justify-center backdrop-blur-3xl bg-cover! bg-center! bg-no-repeat!"
         style="background-image: url('https://fqjltiegiezfetthbags.supabase.co/storage/v1/object/public/block.images/blocks/signin/signin-glass.jpg')"
     >
@@ -516,15 +516,13 @@ const blocksCode = {
             <a class="text-white/80 cursor-pointer hover:text-white/90">Forgot Password?</a>
         </div>
     </div>`
-};
+    };
 </script>
 
 <template>
     <div>
         <!-- Page Hero Section -->
-        <div
-            class="bg-surface-0 dark:bg-surface-900 border border-surface rounded-xl p-8 bg-[url('/demo/images/blocks/landing-blocks.jpg')] dark:bg-[url('/demo/images/blocks/landing-blocks-dark.jpg')] bg-cover bg-no-repeat h-[440px] flex mb-8"
-        >
+        <div class="bg-surface-0 dark:bg-surface-900 border border-surface rounded-xl p-8 bg-[url('/demo/images/blocks/landing-blocks.jpg')] dark:bg-[url('/demo/images/blocks/landing-blocks-dark.jpg')] bg-cover bg-no-repeat h-[440px] flex mb-8">
             <div class="flex flex-col gap-4 items-center sm:items-start justify-center sm:max-w-144">
                 <span class="bg-surface-950 text-white px-2 py-1 font-bold rounded-md text-sm">TailwindCSS v4</span>
                 <div class="flex items-center gap-4">
