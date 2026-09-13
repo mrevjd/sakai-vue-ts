@@ -56,8 +56,9 @@
             @include focused();
         }
 
-        i {
-            font-size: 1.25rem;
+        svg {
+            width: 1.25rem;
+            height: 1.25rem;
         }
 
         span {
@@ -140,8 +141,9 @@
                 border-radius: var(--content-border-radius);
                 padding: 0.5rem 1rem;
 
-                i {
-                    font-size: 1rem;
+                svg {
+                    width: 1rem;
+                    height: 1rem;
                     margin-right: 0.5rem;
                 }
 
@@ -155,47 +157,5 @@
         .layout-topbar-menu-content {
             flex-direction: column;
         }
-    }
-}
-
-.config-panel {
-    .config-panel-label {
-        font-size: 0.875rem;
-        color: var(--text-secondary-color);
-        font-weight: 600;
-        line-height: 1;
-    }
-
-    .config-panel-colors {
-        > div {
-            padding-top: 0.5rem;
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            justify-content: space-between;
-
-            button {
-                border: none;
-                width: 1.25rem;
-                height: 1.25rem;
-                border-radius: 50%;
-                padding: 0;
-                cursor: pointer;
-                outline-color: transparent;
-                outline-width: 2px;
-                outline-style: solid;
-                outline-offset: 1px;
-
-                &.active-color {
-                    outline-color: var(--primary-color);
-                }
-            }
-        }
-    }
-
-    .config-panel-settings {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
     }
 }

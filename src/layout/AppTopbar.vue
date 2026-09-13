@@ -1,60 +1,35 @@
-<script setup>
-    import { useLayout } from '@/layout/composables/layout';
-    import Menu from 'primevue/menu';
+<script setup lang="ts">
+    import { onClickOutside } from '@vueuse/core';
     import { ref } from 'vue';
+    import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+    import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+    import { IconBars, IconBell, IconCalendar, IconCog, IconEllipsisV, IconInbox, IconMoon, IconPalette, IconPowerOff, IconSun, IconUser } from '@/components/icons';
+    import { useLayout } from '@/layout/composables/layout';
     import AppConfigurator from './AppConfigurator.vue';
 
-    const profileMenu = ref(null); // Corrected ref name
-    const profileMenuItems = ref([
-        {
-            label: 'Profile',
-            icon: 'pi pi-user',
-            command: () => {
-                /* Handle profile action */
-            }
-        },
-        {
-            label: 'Settings',
-            icon: 'pi pi-cog',
-            command: () => {
-                /* Handle settings action */
-            }
-        },
-        {
-            label: 'Calendar',
-            icon: 'pi pi-calendar',
-            command: () => {
-                /* Handle calendar action */
-            }
-        },
-        {
-            label: 'Inbox',
-            icon: 'pi pi-inbox',
-            command: () => {
-                /* Handle inbox action */
-            }
-        },
-        {
-            label: 'Log out',
-            icon: 'pi pi-power-off',
-            command: () => {
-                /* Handle logout action */
-            }
-        }
-    ]);
-
-    const toggleProfileMenu = (event) => {
-        profileMenu.value.toggle(event);
-    };
-
     const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
+
+    const profileMenuItems = [
+        { label: 'Profile', icon: IconUser },
+        { label: 'Settings', icon: IconCog },
+        { label: 'Calendar', icon: IconCalendar },
+        { label: 'Inbox', icon: IconInbox },
+        { label: 'Log out', icon: IconPowerOff }
+    ];
+
+    // Below the lg breakpoint the action list is a dropdown panel; the SCSS positions it, this only shows and hides it.
+    const mobileMenuOpen = ref(false);
+    const actionsRef = ref<HTMLElement | null>(null);
+    onClickOutside(actionsRef, () => {
+        mobileMenuOpen.value = false;
+    });
 </script>
 
 <template>
     <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
-            <button class="layout-menu-button layout-topbar-action" @click="toggleMenu">
-                <i class="pi pi-bars"></i>
+            <button type="button" class="layout-menu-button layout-topbar-action" aria-label="Toggle menu" @click="toggleMenu">
+                <IconBars class="size-5" />
             </button>
             <router-link to="/" class="layout-topbar-logo">
                 <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -79,50 +54,57 @@
             </router-link>
         </div>
 
-        <div class="layout-topbar-actions">
+        <div ref="actionsRef" class="layout-topbar-actions">
             <div class="layout-config-menu">
-                <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
-                    <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
+                <button type="button" class="layout-topbar-action" :aria-label="isDarkTheme ? 'Switch to light mode' : 'Switch to dark mode'" @click="toggleDarkMode">
+                    <IconMoon v-if="isDarkTheme" class="size-5" />
+                    <IconSun v-else class="size-5" />
                 </button>
-                <div class="relative">
-                    <button
-                        v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'p-anchored-overlay-enter-active', leaveToClass: 'hidden', leaveActiveClass: 'p-anchored-overlay-leave-active', hideOnOutsideClick: true }"
-                        type="button"
-                        class="layout-topbar-action layout-topbar-action-highlight"
-                    >
-                        <i class="pi pi-palette"></i>
-                    </button>
-                    <AppConfigurator />
-                </div>
+                <Popover>
+                    <PopoverTrigger as-child>
+                        <button type="button" class="layout-topbar-action layout-topbar-action-highlight" aria-label="Theme settings">
+                            <IconPalette class="size-5" />
+                        </button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" class="w-64 p-4">
+                        <AppConfigurator />
+                    </PopoverContent>
+                </Popover>
             </div>
 
-            <button
-                class="layout-topbar-menu-button layout-topbar-action"
-                v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'p-anchored-overlay-enter-active', leaveToClass: 'hidden', leaveActiveClass: 'p-anchored-overlay-leave-active', hideOnOutsideClick: true }"
-            >
-                <i class="pi pi-ellipsis-v"></i>
+            <button type="button" class="layout-topbar-menu-button layout-topbar-action" aria-label="More actions" @click="mobileMenuOpen = !mobileMenuOpen">
+                <IconEllipsisV class="size-5" />
             </button>
 
-            <div class="layout-topbar-menu hidden lg:block">
+            <div class="layout-topbar-menu lg:block" :class="{ hidden: !mobileMenuOpen }">
                 <div class="layout-topbar-menu-content">
                     <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
+                        <IconCalendar class="size-5" />
                         <span>Calendar</span>
                     </button>
                     <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
+                        <IconInbox class="size-5" />
                         <span>Messages</span>
                     </button>
-                    <button type="button" class="layout-topbar-action notification-button" @click="toggleNotifications">
-                        <span class="w-2 h-2 rounded-full bg-red-500 absolute top-2 right-2.5"></span>
-                        <i class="pi pi-bell"></i>
+                    <button type="button" class="layout-topbar-action notification-button">
+                        <span class="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-red-500"></span>
+                        <IconBell class="size-5" />
                         <span>Notifications</span>
                     </button>
-                    <button type="button" class="layout-topbar-action" @click="toggleProfileMenu">
-                        <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
-                    <Menu ref="profileMenu" :model="profileMenuItems" :popup="true" />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger as-child>
+                            <button type="button" class="layout-topbar-action">
+                                <IconUser class="size-5" />
+                                <span>Profile</span>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" class="min-w-40">
+                            <DropdownMenuItem v-for="item in profileMenuItems" :key="item.label">
+                                <component :is="item.icon" class="size-4" />
+                                {{ item.label }}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
         </div>

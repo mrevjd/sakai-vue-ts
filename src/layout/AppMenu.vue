@@ -1,14 +1,46 @@
 <script setup lang="ts">
     import { ref } from 'vue';
-    import AppMenuItem from './AppMenuItem.vue';
+    import {
+        IconAlignLeft,
+        IconBars,
+        IconBook,
+        IconBriefcase,
+        IconCalendar,
+        IconChartBar,
+        IconCheckSquare,
+        IconCircle,
+        IconCircleOff,
+        IconClone,
+        IconComment,
+        IconExclamationCircle,
+        IconEye,
+        IconFile,
+        IconGithub,
+        IconGlobe,
+        IconHome,
+        IconIdCard,
+        IconImage,
+        IconList,
+        IconLock,
+        IconMobile,
+        IconPencil,
+        IconPrime,
+        IconShareAlt,
+        IconSignIn,
+        IconTable,
+        IconTablet,
+        IconTimesCircle,
+        IconUser
+    } from '@/components/icons';
+    import AppMenuItem, { type MenuItem } from './AppMenuItem.vue';
 
-    const model = ref([
+    const model = ref<MenuItem[]>([
         {
             label: 'Home',
             items: [
                 {
                     label: 'Dashboard',
-                    icon: 'pi pi-fw pi-home',
+                    icon: IconHome,
                     to: '/'
                 }
             ]
@@ -17,36 +49,36 @@
             label: 'UI Components',
             path: '/uikit',
             items: [
-                { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },
-                { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
-                { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/uikit/button', class: 'rotated-icon' },
-                { label: 'Table', icon: 'pi pi-fw pi-table', to: '/uikit/table' },
-                { label: 'List', icon: 'pi pi-fw pi-list', to: '/uikit/list' },
-                { label: 'Tree', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
-                { label: 'Panel', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' },
-                { label: 'Overlay', icon: 'pi pi-fw pi-clone', to: '/uikit/overlay' },
-                { label: 'Media', icon: 'pi pi-fw pi-image', to: '/uikit/media' },
-                { label: 'Menu', icon: 'pi pi-fw pi-bars', to: '/uikit/menu' },
-                { label: 'Message', icon: 'pi pi-fw pi-comment', to: '/uikit/message' },
-                { label: 'File', icon: 'pi pi-fw pi-file', to: '/uikit/file' },
-                { label: 'Chart', icon: 'pi pi-fw pi-chart-bar', to: '/uikit/charts' },
-                { label: 'Timeline', icon: 'pi pi-fw pi-calendar', to: '/uikit/timeline' },
-                { label: 'Misc', icon: 'pi pi-fw pi-circle', to: '/uikit/misc' }
+                { label: 'Form Layout', icon: IconIdCard, to: '/uikit/formlayout' },
+                { label: 'Input', icon: IconCheckSquare, to: '/uikit/input' },
+                { label: 'Button', icon: IconMobile, to: '/uikit/button' },
+                { label: 'Table', icon: IconTable, to: '/uikit/table' },
+                { label: 'List', icon: IconList, to: '/uikit/list' },
+                { label: 'Tree', icon: IconShareAlt, to: '/uikit/tree' },
+                { label: 'Panel', icon: IconTablet, to: '/uikit/panel' },
+                { label: 'Overlay', icon: IconClone, to: '/uikit/overlay' },
+                { label: 'Media', icon: IconImage, to: '/uikit/media' },
+                { label: 'Menu', icon: IconBars, to: '/uikit/menu' },
+                { label: 'Message', icon: IconComment, to: '/uikit/message' },
+                { label: 'File', icon: IconFile, to: '/uikit/file' },
+                { label: 'Chart', icon: IconChartBar, to: '/uikit/charts' },
+                { label: 'Timeline', icon: IconCalendar, to: '/uikit/timeline' },
+                { label: 'Misc', icon: IconCircle, to: '/uikit/misc' }
             ]
         },
         {
             label: 'Prime Blocks',
-            icon: 'pi pi-fw pi-prime',
+            icon: IconPrime,
             path: '/blocks',
             items: [
                 {
                     label: 'Free Blocks',
-                    icon: 'pi pi-fw pi-eye',
+                    icon: IconEye,
                     to: '/blocks/free'
                 },
                 {
                     label: 'All Blocks',
-                    icon: 'pi pi-fw pi-globe',
+                    icon: IconGlobe,
                     url: 'https://blocks.primevue.org/',
                     target: '_blank'
                 }
@@ -54,100 +86,100 @@
         },
         {
             label: 'Pages',
-            icon: 'pi pi-fw pi-briefcase',
+            icon: IconBriefcase,
             path: '/pages',
             items: [
                 {
                     label: 'Landing',
-                    icon: 'pi pi-fw pi-globe',
+                    icon: IconGlobe,
                     to: '/landing'
                 },
                 {
                     label: 'Auth',
-                    icon: 'pi pi-fw pi-user',
+                    icon: IconUser,
                     path: '/auth',
                     items: [
                         {
                             label: 'Login',
-                            icon: 'pi pi-fw pi-sign-in',
+                            icon: IconSignIn,
                             to: '/auth/login'
                         },
                         {
                             label: 'Error',
-                            icon: 'pi pi-fw pi-times-circle',
+                            icon: IconTimesCircle,
                             to: '/auth/error'
                         },
                         {
                             label: 'Access Denied',
-                            icon: 'pi pi-fw pi-lock',
+                            icon: IconLock,
                             to: '/auth/access'
                         }
                     ]
                 },
                 {
                     label: 'Crud',
-                    icon: 'pi pi-fw pi-pencil',
+                    icon: IconPencil,
                     to: '/pages/crud'
                 },
                 {
                     label: 'Not Found',
-                    icon: 'pi pi-fw pi-exclamation-circle',
+                    icon: IconExclamationCircle,
                     to: '/pages/notfound'
                 },
                 {
                     label: 'Empty',
-                    icon: 'pi pi-fw pi-circle-off',
+                    icon: IconCircleOff,
                     to: '/pages/empty'
                 }
             ]
         },
         {
             label: 'Hierarchy',
-            icon: 'pi pi-fw pi-align-left',
+            icon: IconAlignLeft,
             path: '/hierarchy',
             items: [
                 {
                     label: 'Submenu 1',
-                    icon: 'pi pi-fw pi-align-left',
+                    icon: IconAlignLeft,
                     path: '/submenu_1',
                     items: [
                         {
                             label: 'Submenu 1.1',
-                            icon: 'pi pi-fw pi-align-left',
+                            icon: IconAlignLeft,
                             path: '/submenu_1_1',
                             items: [
-                                { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-align-left' },
-                                { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-align-left' },
-                                { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-align-left' }
+                                { label: 'Submenu 1.1.1', icon: IconAlignLeft },
+                                { label: 'Submenu 1.1.2', icon: IconAlignLeft },
+                                { label: 'Submenu 1.1.3', icon: IconAlignLeft }
                             ]
                         },
                         {
                             label: 'Submenu 1.2',
-                            icon: 'pi pi-fw pi-align-left',
+                            icon: IconAlignLeft,
                             path: '/submenu_1_2',
-                            items: [{ label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-align-left' }]
+                            items: [{ label: 'Submenu 1.2.1', icon: IconAlignLeft }]
                         }
                     ]
                 },
                 {
                     label: 'Submenu 2',
-                    icon: 'pi pi-fw pi-align-left',
+                    icon: IconAlignLeft,
                     path: '/submenu_2',
                     items: [
                         {
                             label: 'Submenu 2.1',
-                            icon: 'pi pi-fw pi-align-left',
+                            icon: IconAlignLeft,
                             path: '/submenu_2_1',
                             items: [
-                                { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-align-left' },
-                                { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-align-left' }
+                                { label: 'Submenu 2.1.1', icon: IconAlignLeft },
+                                { label: 'Submenu 2.1.2', icon: IconAlignLeft }
                             ]
                         },
                         {
                             label: 'Submenu 2.2',
-                            icon: 'pi pi-fw pi-align-left',
+                            icon: IconAlignLeft,
                             path: '/submenu_2_2',
-                            items: [{ label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-align-left' }]
+                            items: [{ label: 'Submenu 2.2.1', icon: IconAlignLeft }]
                         }
                     ]
                 }
@@ -159,18 +191,18 @@
             items: [
                 {
                     label: 'Documentation',
-                    icon: 'pi pi-fw pi-book',
+                    icon: IconBook,
                     to: '/start/documentation'
                 },
                 {
                     label: 'Sakai Vue TS Source',
-                    icon: 'pi pi-fw pi-github',
+                    icon: IconGithub,
                     url: 'https://github.com/mrevjd/sakai-vue-ts',
                     target: '_blank'
                 },
                 {
                     label: 'Original Source',
-                    icon: 'pi pi-fw pi-github',
+                    icon: IconGithub,
                     url: 'https://github.com/primefaces/sakai-vue',
                     target: '_blank'
                 }

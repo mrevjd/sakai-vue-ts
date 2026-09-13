@@ -68,15 +68,13 @@
             cursor: pointer;
             padding: 0.75rem 1rem;
             border-radius: var(--content-border-radius);
-            transition:
-                box-shadow var(--element-transition-duration);
+            transition: box-shadow var(--element-transition-duration);
 
             .layout-menuitem-icon {
                 margin-right: 0.5rem;
             }
 
             .layout-submenu-toggler {
-                font-size: 75%;
                 margin-left: auto;
                 transition: transform var(--element-transition-duration);
             }
