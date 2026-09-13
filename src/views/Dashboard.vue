@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
     import BestSellingWidget from '@/components/dashboard/BestSellingWidget.vue';
     import NotificationsWidget from '@/components/dashboard/NotificationsWidget.vue';
     import RecentSalesWidget from '@/components/dashboard/RecentSalesWidget.vue';
