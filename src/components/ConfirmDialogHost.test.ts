@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { h, isProxy } from 'vue';
 import { closeConfirm, confirmState, requireConfirm } from '@/composables/useConfirm';
 import ConfirmDialogHost from './ConfirmDialogHost.vue';
 
@@ -40,6 +41,16 @@ describe('ConfirmDialogHost', () => {
         await settle();
         expect(reject).toHaveBeenCalledTimes(1);
         expect(confirmState.visible).toBe(false);
+        wrapper.unmount();
+    });
+
+    it('renders a functional icon component without proxying it', async () => {
+        const Icon = () => h('svg', { 'data-testid': 'confirm-icon' });
+        const wrapper = mount(ConfirmDialogHost, { attachTo: document.body });
+        requireConfirm({ message: 'With icon', icon: Icon });
+        await settle();
+        expect(document.body.querySelector('[data-testid=confirm-icon]')).not.toBeNull();
+        expect(isProxy(confirmState.options?.icon)).toBe(false);
         wrapper.unmount();
     });
 });

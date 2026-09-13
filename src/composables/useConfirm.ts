@@ -1,4 +1,4 @@
-import { readonly, shallowReactive, type Component, type DeepReadonly } from 'vue';
+import { shallowReactive, shallowReadonly, type Component } from 'vue';
 
 export interface ConfirmOptions {
     /** Element to anchor a popover to. Plan 2 adds ConfirmPopover; until then the dialog is used for every request. */
@@ -21,8 +21,8 @@ interface ConfirmState {
 // Shallow so the `icon` option, a component definition, is stored as is rather than deep-proxied.
 const state = shallowReactive<ConfirmState>({ visible: false, options: null });
 
-// Annotated explicitly: the inferred DeepReadonly over Vue's Component union (icon) is too large for vue-tsc to serialise (TS7056).
-export const confirmState: DeepReadonly<ConfirmState> = readonly(state);
+// Shallow on both sides: readonly() would deep-proxy the icon component again and trip Vue's reactive-component warning.
+export const confirmState: Readonly<ConfirmState> = shallowReadonly(state);
 
 export function requireConfirm(options: ConfirmOptions): void {
     state.options = options;
