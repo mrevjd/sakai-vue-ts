@@ -13,7 +13,11 @@ export const badgeVariants = cva(
                 destructive: 'bg-destructive/10 [a]:hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-destructive dark:bg-destructive/20',
                 outline: 'border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground',
                 ghost: 'hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50',
-                link: 'text-primary underline-offset-4 hover:underline'
+                link: 'text-primary underline-offset-4 hover:underline',
+                success: 'bg-green-600 text-white [a]:hover:bg-green-600/80',
+                warning: 'bg-amber-500 text-white [a]:hover:bg-amber-500/80',
+                info: 'bg-sky-500 text-white [a]:hover:bg-sky-500/80',
+                contrast: 'bg-foreground text-background [a]:hover:bg-foreground/80'
             }
         },
         defaultVariants: {
