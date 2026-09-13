@@ -44,8 +44,9 @@ describe('ConfirmDialogHost', () => {
         wrapper.unmount();
     });
 
-    it('renders a functional icon component without proxying it', async () => {
-        const Icon = () => h('svg', { 'data-testid': 'confirm-icon' });
+    it('renders an object-form icon component without proxying it', async () => {
+        // Object form on purpose: readonly() never proxies functions, so a functional icon could not catch a deep-readonly regression.
+        const Icon = { render: () => h('svg', { 'data-testid': 'confirm-icon' }) };
         const wrapper = mount(ConfirmDialogHost, { attachTo: document.body });
         requireConfirm({ message: 'With icon', icon: Icon });
         await settle();
