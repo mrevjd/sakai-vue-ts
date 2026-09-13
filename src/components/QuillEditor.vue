@@ -17,6 +17,7 @@
     );
 
     const emit = defineEmits<{
+        /** Raw editor HTML. Consumers must pass it through `sanitizeHtml()` from `@/utils/sanitize` before any `v-html`. */
         'update:modelValue': [html: string];
         'text-change': [payload: { htmlValue: string; textValue: string }];
     }>();

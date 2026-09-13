@@ -3,7 +3,7 @@
     import { Button } from '@/components/ui/button';
     import { acceptConfirm, confirmState, rejectConfirm } from '@/composables/useConfirm';
 
-    // Escape and overlay clicks arrive here as open=false; the footer buttons settle the state themselves.
+    // Escape arrives here as open=false (Reka alert dialogs block overlay clicks); the footer buttons settle the state themselves.
     function onOpenChange(open: boolean): void {
         if (!open && confirmState.visible) rejectConfirm();
     }

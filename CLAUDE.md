@@ -17,6 +17,7 @@ bun run update-deps    # update deps from installed Bun packages
 ```
 
 Single test file or case:
+
 ```bash
 bun run test src/utils/sanitize.test.ts
 bun run test -t "strips <script>"
@@ -32,9 +33,9 @@ bun run test -t "strips <script>"
 - **Layout state lives in `useLayout()`**, not Pinia. `src/layout/composables/layout.ts` holds a
   reactive `layoutConfig` (`preset`, `primary`, `surface`, `darkTheme`, `menuMode`), deep-watched and
   serialised to the `layoutConfig` localStorage key. Pinia is a dependency but defines no stores.
-- **Dark mode** toggles the `.app-dark` class on `document.documentElement`, wrapped in
+- **Dark mode** toggles the `.dark` class on `document.documentElement`, wrapped in
   `document.startViewTransition` where available. The Aura preset registers it in `src/main.ts` via
-  `darkModeSelector: '.app-dark'`. Override SCSS tokens in `src/assets/layout/variables/`.
+  `darkModeSelector: '.dark'`. Override SCSS tokens in `src/assets/layout/variables/`.
 - **Routing**: all routes in `src/router/index.ts`. Main app routes are children of `/` under
   `AppLayout`; auth (`/auth/*`) and `/landing` are standalone and render without the admin chrome.
   Catch-all redirects to `/pages/notfound`.
@@ -43,15 +44,16 @@ bun run test -t "strips <script>"
   `Promise.resolve()` it or a `.slice()` of it, so components consume the shape a real API would
   return.
 
-## Testing scope is deliberately narrow
+## Testing scope
 
-Vitest with `jsdom`, configured in the `test` block of `vite.config.ts`, scoped on purpose to
-`src/utils/**/*.{test,spec}.ts`: the home of pure, logic-heavy or security-sensitive code. Test real
-invariants and security boundaries. Do **not** chase blanket coverage of the demo services and
-views, which are scaffolding.
+Vitest with `jsdom`, configured in the `test` block of `vite.config.ts`, includes
+`src/**/*.{test,spec}.ts` with `src/test/setup.ts` as the setup file and `@vue/test-utils` for
+mounting.
 
-In a derived project, broaden the `include` glob and add a setup file plus `@vue/test-utils` as real
-logic moves beyond `src/utils`.
+Tests cover pure or security-sensitive utilities under `src/utils` and the local components and
+composables under `src/components`, `src/composables` and `src/layout/composables` that hold logic;
+`src/test/mount.test.ts` checks the harness itself. Vendored files under `src/components/ui` and the
+demo views and services are not tested.
 
 ## Code style
 

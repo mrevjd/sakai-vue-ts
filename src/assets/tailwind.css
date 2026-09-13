@@ -140,14 +140,12 @@
     }
 }
 
-/* Preset density hooks. presetVars() in src/utils/theme.ts sets the variables on <html>; the fallbacks equal Aura. */
-@layer components {
-    [data-slot='button'] {
-        font-weight: var(--button-font-weight, 500);
-        transition-duration: var(--transition-duration, 0.2s);
-    }
-    [data-slot='input'],
-    [data-slot='select-trigger'] {
-        height: var(--control-height, 2.25rem);
-    }
+/* Preset density hooks. presetVars() in src/utils/theme.ts sets the variables on <html>; the fallbacks equal Aura. Unlayered on purpose: layered rules would lose to the vendored utilities. */
+[data-slot='button'] {
+    font-weight: var(--button-font-weight, 500);
+    transition-duration: var(--transition-duration, 0.2s);
+}
+[data-slot='input'],
+[data-slot='select-trigger']:not([data-size='sm']) {
+    height: var(--control-height, 2.25rem);
 }

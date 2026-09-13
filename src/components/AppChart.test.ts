@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { nextTick, reactive } from 'vue';
 import AppChart from './AppChart.vue';
 
 const { MockChart } = vi.hoisted(() => {
@@ -7,15 +8,20 @@ const { MockChart } = vi.hoisted(() => {
         static register = vi.fn();
         static instances: MockChart[] = [];
         data: unknown;
-        options: unknown;
-        update = vi.fn();
+        options: Record<string, unknown>;
         destroy = vi.fn();
+        // Real chart.js writes fresh `scales`/`plugins` objects onto the options it is handed, at
+        // construction and on every update(); the mock mirrors that so a reactive proxy would loop.
+        update = vi.fn(() => {
+            this.options.scales = {};
+        });
         constructor(
             public canvas: HTMLCanvasElement,
-            public config: { type: string; data: unknown; options?: unknown }
+            public config: { type: string; data: unknown; options?: Record<string, unknown> }
         ) {
             this.data = config.data;
-            this.options = config.options;
+            this.options = config.options ?? {};
+            this.options.scales = {};
             MockChart.instances.push(this);
         }
     }
@@ -48,7 +54,18 @@ describe('AppChart', () => {
         const instance = MockChart.instances[0]!;
         expect(instance.update).toHaveBeenCalledTimes(1);
         expect(instance.data).toEqual(next);
-        expect(instance.options).toEqual({ responsive: false });
+        // The mock, like chart.js, adds its own `scales` key, so match on what the parent passed.
+        expect(instance.options).toMatchObject({ responsive: false });
+    });
+
+    it('updates once per parent change when data and options are reactive', async () => {
+        const reactiveData = reactive({ labels: ['a'], datasets: [{ label: 'Sales', data: [1] }] });
+        const options = reactive({ plugins: { legend: { display: true } } });
+        mount(AppChart, { props: { type: 'bar', data: reactiveData, options } });
+        options.plugins.legend.display = false;
+        await nextTick();
+        await nextTick();
+        expect(MockChart.instances[0]!.update).toHaveBeenCalledTimes(1);
     });
 
     it('destroys the chart when unmounted', () => {
