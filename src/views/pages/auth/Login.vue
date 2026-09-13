@@ -1,6 +1,12 @@
-<script setup>
-    import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
+<script setup lang="ts">
     import { ref } from 'vue';
+    import { RouterLink } from 'vue-router';
+    import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
+    import PasswordInput from '@/components/PasswordInput.vue';
+    import { Button } from '@/components/ui/button';
+    import { Checkbox } from '@/components/ui/checkbox';
+    import { Input } from '@/components/ui/input';
+    import { Label } from '@/components/ui/label';
 
     const email = ref('');
     const password = ref('');
@@ -9,10 +15,10 @@
 
 <template>
     <FloatingConfigurator />
-    <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
+    <div class="bg-background flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
         <div class="flex flex-col items-center justify-center">
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
-                <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+                <div class="w-full bg-card py-20 px-8 sm:px-20" style="border-radius: 53px">
                     <div class="text-center mb-8">
                         <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-8 w-16 shrink-0 mx-auto">
                             <path
@@ -31,40 +37,28 @@
                                 />
                             </g>
                         </svg>
-                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Welcome to PrimeLand!</div>
-                        <span class="text-muted-color font-medium">Sign in to continue</span>
+                        <div class="text-foreground text-3xl font-medium mb-4">Welcome to PrimeLand!</div>
+                        <span class="text-muted-foreground font-medium">Sign in to continue</span>
                     </div>
 
                     <div>
-                        <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                        <InputText id="email1" type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-8" v-model="email" />
+                        <Label for="email1" class="mb-2 block text-xl font-medium text-foreground">Email</Label>
+                        <Input id="email1" v-model="email" type="text" placeholder="Email address" class="mb-8 w-full md:w-[30rem]" />
 
-                        <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                        <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
+                        <Label for="password1" class="mb-2 block text-xl font-medium text-foreground">Password</Label>
+                        <PasswordInput id="password1" v-model="password" placeholder="Password" :feedback="false" class="mb-4" />
 
-                        <div class="flex items-center justify-between mt-2 mb-8 gap-8">
-                            <div class="flex items-center">
-                                <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
-                                <label for="rememberme1">Remember me</label>
+                        <div class="mt-2 mb-8 flex items-center justify-between gap-8">
+                            <div class="flex items-center gap-2">
+                                <Checkbox id="rememberme1" v-model="checked" />
+                                <Label for="rememberme1">Remember me</Label>
                             </div>
-                            <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
+                            <span class="ml-2 cursor-pointer text-right font-medium text-primary no-underline">Forgot password?</span>
                         </div>
-                        <Button label="Sign In" class="w-full" as="router-link" to="/"></Button>
+                        <Button as-child class="w-full"><RouterLink to="/">Sign In</RouterLink></Button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
-
-<style scoped>
-    .pi-eye {
-        transform: scale(1.6);
-        margin-right: 1rem;
-    }
-
-    .pi-eye-slash {
-        transform: scale(1.6);
-        margin-right: 1rem;
-    }
-</style>
