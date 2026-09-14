@@ -93,6 +93,7 @@ export {
     ShoppingCart as IconShoppingCart, // pi-shopping-cart
     LogIn as IconSignIn, // pi-sign-in
     LogOut as IconSignOut, // pi-sign-out
+    ArrowUpDown as IconSort, // pi-sort-alt
     LoaderCircle as IconSpinner, // pi-spinner
     // pi-star-fill has no export of its own: give IconStar a fill-* class (StarRating uses fill-primary)
     // so one glyph covers both the outline and the filled star.

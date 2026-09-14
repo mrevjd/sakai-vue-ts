@@ -199,4 +199,65 @@ describe('DataTable', () => {
         expect(wrapper.findAll('tbody tr[data-state=selected]')[0]!.text()).toContain('apple');
         expect((wrapper.vm as unknown as Exposed).selectedRows().map((p) => p.name)).toEqual(['apple']);
     });
+
+    it('pins frozen columns with sticky offsets and marks them', () => {
+        const frozenColumns = helper.columns([
+            helper.accessor('name', { header: 'Name', meta: { frozen: 'left' } }),
+            helper.accessor('price', { header: 'Price' }),
+            helper.accessor('added', { header: 'Added', cell: (ctx) => ctx.getValue().toDateString(), meta: { frozen: 'right' } })
+        ]);
+        const wrapper = mount(DataTable<Product>, { props: { columns: frozenColumns, data: products, rowKey: 'id', scrollHeight: '200px' } });
+        const heads = wrapper.findAll('thead th');
+        expect(heads[0]!.attributes('data-pinned')).toBe('left');
+        expect(heads[2]!.attributes('data-pinned')).toBe('right');
+        expect(heads[1]!.attributes('data-pinned')).toBeUndefined();
+        expect(heads[0]!.attributes('style')).toContain('left: 0px');
+        expect(wrapper.get('[data-slot=data-table-scroller]').attributes('style')).toContain('max-height: 200px');
+        expect(wrapper.findAll('tbody tr')[0]!.findAll('td')[0]!.attributes('data-pinned')).toBe('left');
+    });
+
+    it('renders the expansion slot for expanded rows and toggles all rows', async () => {
+        const wrapper = mount(DataTable<Product>, {
+            props: { columns, data: products, rowKey: 'id', expandable: true },
+            slots: { expansion: `<template #expansion="{ row }"><div data-testid="expansion">Orders for {{ row.name }}</div></template>` }
+        });
+        expect(wrapper.findAll('[data-testid=expansion]')).toHaveLength(0);
+        await wrapper.findAll('[aria-label="Expand row"]')[1]!.trigger('click');
+        expect(wrapper.findAll('[data-testid=expansion]')).toHaveLength(1);
+        expect(wrapper.get('[data-testid=expansion]').text()).toBe('Orders for apple');
+        (wrapper.vm as unknown as Exposed & { expandAll: () => void; collapseAll: () => void }).expandAll();
+        await nextTick();
+        expect(wrapper.findAll('[data-testid=expansion]')).toHaveLength(5);
+        (wrapper.vm as unknown as Exposed & { expandAll: () => void; collapseAll: () => void }).collapseAll();
+        await nextTick();
+        expect(wrapper.findAll('[data-testid=expansion]')).toHaveLength(0);
+    });
+
+    it('groups rows under header and footer rows when groupBy is set', () => {
+        interface Sale extends Record<string, unknown> {
+            id: string;
+            rep: string;
+            amount: number;
+        }
+        const saleHelper = createColumns<Sale>();
+        const saleColumns = saleHelper.columns([saleHelper.accessor('rep', { header: 'Rep' }), saleHelper.accessor('amount', { header: 'Amount' })]);
+        const sales: Sale[] = [
+            { id: '1', rep: 'Amy', amount: 10 },
+            { id: '2', rep: 'Bob', amount: 20 },
+            { id: '3', rep: 'Amy', amount: 30 }
+        ];
+        const wrapper = mount(DataTable<Sale>, {
+            props: { columns: saleColumns, data: sales, rowKey: 'id', groupBy: 'rep', initialSorting: [{ id: 'rep', desc: false }] },
+            slots: {
+                groupHeader: `<template #groupHeader="{ value, count }"><span data-testid="group-header">{{ value }} ({{ count }})</span></template>`,
+                groupFooter: `<template #groupFooter="{ count }"><span data-testid="group-footer">Total: {{ count }}</span></template>`
+            }
+        });
+        expect(wrapper.findAll('[data-testid=group-header]').map((h) => h.text())).toEqual(['Amy (2)', 'Bob (1)']);
+        expect(wrapper.findAll('[data-testid=group-footer]').map((f) => f.text())).toEqual(['Total: 2', 'Total: 1']);
+        const bodyRows = wrapper.findAll('tbody tr');
+        expect(bodyRows).toHaveLength(7);
+        expect(bodyRows[1]!.text()).toContain('10');
+        expect(bodyRows[2]!.text()).toContain('30');
+    });
 });
