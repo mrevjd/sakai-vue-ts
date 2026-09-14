@@ -4,7 +4,7 @@ import type { DataTableFeatures } from './features';
 export { default as DataTable } from './DataTable.vue';
 export { features, type DataTableFeatures } from './features';
 export type { DataTableColumnFilter, DataTableColumnMeta, MatchMode, MatchModeFilterValue } from './filters';
-export { DEFAULT_MATCH_MODES, MATCH_MODE_LABELS } from './filters';
+export { DEFAULT_MATCH_MODES, MATCH_MODE_LABELS, matchModeFilter, matchModeFns } from './filters';
 
 export type DataTableColumn<TData extends RowData> = ColumnDef<DataTableFeatures, TData>;
 

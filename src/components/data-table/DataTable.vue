@@ -228,11 +228,12 @@
                     <TableEmpty v-else-if="table.getRowModel().rows.length === 0" :colspan="allColumns.length">
                         <slot name="empty">No records found.</slot>
                     </TableEmpty>
+                    <!-- The vendored TableRow already hovers subtly (bg-muted/50); rowHover opts into the strong accent highlight. -->
                     <TableRow
                         v-for="row in table.getRowModel().rows"
                         v-else
                         :key="row.id"
-                        :class="cn(props.rowHover && 'hover:bg-muted/50')"
+                        :class="cn(props.rowHover && 'hover:bg-accent')"
                         :data-state="row.getIsSelected() ? 'selected' : undefined"
                         :data-depth="row.depth"
                         @click="onRowClick($event, row.original)"

@@ -183,6 +183,13 @@ describe('DataTable', () => {
         const styled = make({ showGridlines: true, rowHover: true });
         expect(styled.get('[data-slot=data-table]').attributes('data-gridlines')).toBe('true');
         expect(styled.get('[data-slot=data-table]').attributes('data-row-hover')).toBe('true');
+        // The prop's whole effect is this class (the vendored row already hovers subtly), so the class is the assertion here.
+        expect(styled.get('tbody tr').classes()).toContain('hover:bg-accent');
+        expect(
+            make()
+                .findAll('tbody tr')
+                .some((row) => row.classes().includes('hover:bg-accent'))
+        ).toBe(false);
     });
 
     it('checks rows that the parent puts in the selection model', async () => {
