@@ -50,6 +50,7 @@ export {
     ThumbsUp as IconFacebook, // pi-facebook (lucide ships no brand icons)
     Smile as IconFaceSmile, // pi-face-smile
     File as IconFile, // pi-file
+    Funnel as IconFilter, // pi-filter
     FunnelX as IconFilterSlash, // pi-filter-slash
     ExternalLink as IconGithub, // pi-github (lucide ships no brand icons)
     Globe as IconGlobe, // pi-globe

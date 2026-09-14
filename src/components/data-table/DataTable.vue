@@ -1,14 +1,16 @@
 <script setup lang="ts" generic="TData extends Record<string, unknown>">
-    import type { ColumnDef, ExpandedState, PaginationState, RowSelectionState, SortingState, Updater } from '@tanstack/vue-table';
+    import type { Column, ColumnDef, ColumnFiltersState, ExpandedState, Header, PaginationState, RowSelectionState, SortingState, Updater } from '@tanstack/vue-table';
     import { FlexRender, useTable } from '@tanstack/vue-table';
     import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from '@lucide/vue';
-    import { computed, h, ref, watch, type HTMLAttributes } from 'vue';
+    import { computed, h, ref, useSlots, watch, type HTMLAttributes } from 'vue';
     import { Button } from '@/components/ui/button';
     import { Checkbox } from '@/components/ui/checkbox';
     import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
     import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table';
     import { cn } from '@/lib/utils';
+    import DataTableFilterMenu from './DataTableFilterMenu.vue';
     import { features, type DataTableFeatures } from './features';
+    import type { DataTableColumnMeta } from './filters';
 
     const props = withDefaults(
         defineProps<{
@@ -21,6 +23,10 @@
             reportTemplate?: string;
             selectable?: boolean;
             subRowsKey?: keyof TData & string;
+            loading?: boolean;
+            showGridlines?: boolean;
+            rowHover?: boolean;
+            globalFilterFields?: string[];
             class?: HTMLAttributes['class'];
         }>(),
         {
@@ -30,6 +36,10 @@
             reportTemplate: 'Showing {first} to {last} of {totalRecords} entries',
             selectable: false,
             subRowsKey: undefined,
+            loading: false,
+            showGridlines: false,
+            rowHover: false,
+            globalFilterFields: undefined,
             class: undefined
         }
     );
@@ -37,8 +47,10 @@
     const selection = defineModel<TData[]>('selection', { default: () => [] });
     const globalFilter = defineModel<string>('globalFilter', { default: '' });
     const emit = defineEmits<{ 'row-click': [row: TData] }>();
+    const slots = useSlots();
 
     const sorting = ref<SortingState>([]);
+    const columnFilters = ref<ColumnFiltersState>([]);
     const rowSelection = ref<RowSelectionState>({});
     const expanded = ref<ExpandedState>({});
     const pagination = ref<PaginationState>({ pageIndex: 0, pageSize: props.pageSize });
@@ -65,7 +77,13 @@
             })
     };
 
-    const allColumns = computed(() => (props.selectable ? [selectionColumn, ...props.columns] : props.columns));
+    const allColumns = computed(() => {
+        const withFilters = props.columns.map((column) => {
+            const meta = column.meta as DataTableColumnMeta | undefined;
+            return meta?.filter && !column.filterFn ? { ...column, filterFn: 'matchMode' as const } : column;
+        });
+        return props.selectable ? [selectionColumn, ...withFilters] : withFilters;
+    });
 
     const table = useTable({
         features,
@@ -81,9 +99,14 @@
         getRowId: (row: TData) => String(row[props.rowKey]),
         getSubRows: (row: TData) => (props.subRowsKey ? (row[props.subRowsKey] as TData[] | undefined) : undefined),
         globalFilterFn: 'includesString',
+        // TanStack ANDs this with the column's own enableGlobalFilter, so only the allow-list is decided here.
+        getColumnCanGlobalFilter: (column) => (props.globalFilterFields ? props.globalFilterFields.includes(column.id) : true),
         state: {
             get sorting() {
                 return sorting.value;
+            },
+            get columnFilters() {
+                return columnFilters.value;
             },
             get globalFilter() {
                 return globalFilter.value;
@@ -99,6 +122,7 @@
             }
         },
         onSortingChange: (updater) => apply(sorting, updater),
+        onColumnFiltersChange: (updater) => apply(columnFilters, updater),
         onGlobalFilterChange: (updater) => apply(globalFilter, updater),
         onRowSelectionChange: (updater) => apply(rowSelection, updater),
         onExpandedChange: (updater) => apply(expanded, updater),
@@ -108,9 +132,17 @@
     watch(rowSelection, () => {
         selection.value = table.getSelectedRowModel().rows.map((row) => row.original);
     });
-    watch(selection, (value) => {
-        if ((!value || value.length === 0) && Object.keys(rowSelection.value).length > 0) rowSelection.value = {};
-    });
+    // Rows are keyed by rowKey on both sides, so a parent can pre-select or extend the model and see the checkboxes follow.
+    watch(
+        selection,
+        (value) => {
+            const next: RowSelectionState = {};
+            for (const row of value ?? []) next[String(row[props.rowKey])] = true;
+            const same = Object.keys(next).length === Object.keys(rowSelection.value).length && Object.keys(next).every((key) => rowSelection.value[key]);
+            if (!same) rowSelection.value = next;
+        },
+        { immediate: true, deep: true }
+    );
     watch(
         () => props.pageSize,
         (size) => table.setPageSize(size)
@@ -143,39 +175,74 @@
         emit('row-click', row);
     }
 
+    function filterOf(column: Column<DataTableFeatures, TData>): DataTableColumnMeta['filter'] | undefined {
+        return (column.columnDef.meta as DataTableColumnMeta | undefined)?.filter;
+    }
+
+    function headerLabel(header: Header<DataTableFeatures, TData, unknown>): string {
+        return typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : header.column.id;
+    }
+
+    function clearFilters(): void {
+        table.resetColumnFilters();
+        globalFilter.value = '';
+    }
+
     defineExpose({
         table,
         visibleRows: (): TData[] => table.getPrePaginatedRowModel().rows.map((row) => row.original),
-        selectedRows: (): TData[] => table.getSelectedRowModel().rows.map((row) => row.original)
+        selectedRows: (): TData[] => table.getSelectedRowModel().rows.map((row) => row.original),
+        clearFilters
     });
 </script>
 
 <template>
-    <div :class="cn('flex flex-col', props.class)" data-slot="data-table">
+    <div :class="cn('flex flex-col', props.class)" data-slot="data-table" :data-gridlines="props.showGridlines || undefined" :data-row-hover="props.rowHover || undefined">
         <div v-if="$slots.header" class="mb-4"><slot name="header" /></div>
-        <div class="overflow-x-auto rounded-lg border">
+        <div :class="cn('overflow-x-auto rounded-lg border', props.showGridlines && '[&_td]:border [&_th]:border')">
             <Table>
                 <TableHeader>
                     <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-                        <TableHead v-for="header in headerGroup.headers" :key="header.id">
-                            <template v-if="!header.isPlaceholder">
-                                <Button v-if="header.column.getCanSort()" variant="ghost" size="sm" class="-ml-2" @click="header.column.toggleSorting(header.column.getIsSorted() === 'asc')">
+                        <TableHead v-for="header in headerGroup.headers" :key="header.id" :class="(header.column.columnDef.meta as DataTableColumnMeta | undefined)?.headerClass">
+                            <div v-if="!header.isPlaceholder" class="flex items-center gap-1">
+                                <Button v-if="header.column.getCanSort()" variant="ghost" size="sm" class="-ml-2" data-slot="data-table-sort" @click="header.column.toggleSorting(header.column.getIsSorted() === 'asc')">
                                     <FlexRender :header="header" />
                                     <ArrowUp v-if="header.column.getIsSorted() === 'asc'" />
                                     <ArrowDown v-else-if="header.column.getIsSorted() === 'desc'" />
                                     <ArrowUpDown v-else class="opacity-50" />
                                 </Button>
                                 <FlexRender v-else :header="header" />
-                            </template>
+                                <DataTableFilterMenu v-if="filterOf(header.column)" :column="header.column" :filter="filterOf(header.column)!" :label="headerLabel(header)">
+                                    <template v-if="slots[`filter-${header.column.id}`]" #default="scope">
+                                        <slot :name="`filter-${header.column.id}`" v-bind="scope" />
+                                    </template>
+                                </DataTableFilterMenu>
+                            </div>
                         </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableEmpty v-if="table.getRowModel().rows.length === 0" :colspan="allColumns.length">
+                    <TableRow v-if="props.loading">
+                        <TableCell :colspan="allColumns.length" class="py-8 text-center text-muted-foreground" data-slot="data-table-loading"><slot name="loading">Loading.</slot></TableCell>
+                    </TableRow>
+                    <TableEmpty v-else-if="table.getRowModel().rows.length === 0" :colspan="allColumns.length">
                         <slot name="empty">No records found.</slot>
                     </TableEmpty>
-                    <TableRow v-for="row in table.getRowModel().rows" :key="row.id" :data-state="row.getIsSelected() ? 'selected' : undefined" :data-depth="row.depth" @click="onRowClick($event, row.original)">
-                        <TableCell v-for="(cell, index) in row.getVisibleCells()" :key="cell.id" :style="index === 0 && row.depth > 0 ? { paddingLeft: `${row.depth * 1.5 + 0.5}rem` } : undefined">
+                    <TableRow
+                        v-for="row in table.getRowModel().rows"
+                        v-else
+                        :key="row.id"
+                        :class="cn(props.rowHover && 'hover:bg-muted/50')"
+                        :data-state="row.getIsSelected() ? 'selected' : undefined"
+                        :data-depth="row.depth"
+                        @click="onRowClick($event, row.original)"
+                    >
+                        <TableCell
+                            v-for="(cell, index) in row.getVisibleCells()"
+                            :key="cell.id"
+                            :class="(cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.class"
+                            :style="index === 0 && row.depth > 0 ? { paddingLeft: `${row.depth * 1.5 + 0.5}rem` } : undefined"
+                        >
                             <span v-if="index === 0 && row.getCanExpand()" class="inline-flex items-center gap-1">
                                 <Button variant="ghost" size="icon-xs" :aria-label="row.getIsExpanded() ? 'Collapse row' : 'Expand row'" @click="row.toggleExpanded()">
                                     <ChevronRight :class="cn('transition-transform', row.getIsExpanded() && 'rotate-90')" />
