@@ -13,7 +13,7 @@ describe('formatDate', () => {
     });
 
     it('leaves literal text and returns an empty string for null', () => {
-        expect(formatDate(date, "'Week of' dd")).toBe('Week of 06');
+        expect(formatDate(date, "'Day' dd")).toBe('Day 06');
         expect(formatDate(null, 'mm/dd/yy')).toBe('');
     });
 });

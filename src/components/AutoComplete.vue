@@ -31,6 +31,9 @@
 
     function onInput(event: Event): void {
         query.value = (event.target as HTMLInputElement).value;
+        // Emptying the text in single mode drops the selection with it; undefined is this model's empty state.
+        // Non-empty text leaves the model alone until the parent's suggestions produce a pick.
+        if (!props.multiple && query.value === '' && model.value !== undefined && model.value !== null) model.value = undefined;
         open.value = true;
         emit('complete', { query: query.value });
     }

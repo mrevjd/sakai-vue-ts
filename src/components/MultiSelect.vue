@@ -3,7 +3,7 @@
     import { computed } from 'vue';
     import { Checkbox } from '@/components/ui/checkbox';
     import { Combobox, ComboboxAnchor, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxList, ComboboxTrigger } from '@/components/ui/combobox';
-    import { IconAngleDown } from '@/components/icons';
+    import { IconAngleDown, IconTimes } from '@/components/icons';
     import { cn } from '@/lib/utils';
     import { optionLabel as labelOf, optionValue as valueOf, sameOption } from '@/utils/optionAccess';
 
@@ -38,6 +38,10 @@
     const allSelected = computed(() => props.options.length > 0 && props.options.every(isSelected));
     const overLimit = computed(() => props.maxSelectedLabels !== undefined && model.value.length > props.maxSelectedLabels);
 
+    function remove(value: unknown): void {
+        model.value = model.value.filter((selected) => !sameOption(selected, value, props.optionValue ? undefined : props.optionLabel));
+    }
+
     function toggleAll(): void {
         model.value = allSelected.value ? [] : props.options.map((option) => valueOf(option, props.optionValue));
     }
@@ -70,7 +74,23 @@
                     <slot v-else name="value" :value="model">
                         <span v-if="props.display === 'comma'" class="truncate">{{ model.map(labelOfValue).join(', ') }}</span>
                         <span v-else class="flex flex-wrap gap-1">
-                            <span v-for="value in model" :key="labelOfValue(value)" class="rounded-md bg-secondary px-2 py-0.5 text-secondary-foreground" data-slot="multi-select-chip">{{ labelOfValue(value) }}</span>
+                            <span v-for="value in model" :key="labelOfValue(value)" class="flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-secondary-foreground" data-slot="multi-select-chip">
+                                {{ labelOfValue(value) }}
+                                <!-- A span, not a button: it sits inside the trigger button. .stop.prevent keeps the click and keys from reaching the trigger, so the list stays closed. -->
+                                <span
+                                    v-if="!props.disabled"
+                                    role="button"
+                                    tabindex="0"
+                                    class="rounded-sm hover:bg-secondary-foreground/10"
+                                    :aria-label="`Remove ${labelOfValue(value)}`"
+                                    data-slot="multi-select-chip-remove"
+                                    @click.stop.prevent="remove(value)"
+                                    @keydown.enter.stop.prevent="remove(value)"
+                                    @keydown.space.stop.prevent="remove(value)"
+                                >
+                                    <IconTimes class="size-3" />
+                                </span>
+                            </span>
                         </span>
                     </slot>
                     <IconAngleDown class="size-4 shrink-0 opacity-50" />

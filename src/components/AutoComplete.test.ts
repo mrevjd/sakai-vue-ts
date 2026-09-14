@@ -34,6 +34,13 @@ describe('AutoComplete', () => {
         expect(wrapper.emitted('update:modelValue')!.at(-1)).toEqual([[countries[1]]]);
     });
 
+    it('clears a single selection when the input is emptied', async () => {
+        const wrapper = mount(AutoComplete, { props: { modelValue: { name: 'Ada' }, suggestions: [], optionLabel: 'name' } });
+        await wrapper.get('input').setValue('');
+        expect(wrapper.emitted('update:modelValue')!.at(-1)).toEqual([undefined]);
+        expect(wrapper.emitted('complete')!.at(-1)).toEqual([{ query: '' }]);
+    });
+
     it('shows the dropdown button only when asked', () => {
         expect(
             mount(AutoComplete, { props: { modelValue: null, suggestions: [] } })

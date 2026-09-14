@@ -45,6 +45,16 @@ describe('MultiSelect', () => {
         wrapper.unmount();
     });
 
+    it('removes a chip from its control without opening the list', async () => {
+        const wrapper = mount(MultiSelect, { props: { modelValue: [options[0], options[1]], options, optionLabel: 'name', display: 'chip' }, attachTo: document.body });
+        await wrapper.findAll('[data-slot=multi-select-chip-remove]')[0]!.trigger('click');
+        await nextTick();
+        expect(wrapper.emitted('update:modelValue')!.at(-1)).toEqual([[options[1]]]);
+        expect(wrapper.get('[data-slot=multi-select-trigger]').attributes('aria-expanded')).not.toBe('true');
+        expect(items()).toHaveLength(0);
+        wrapper.unmount();
+    });
+
     it('renders the option slot', async () => {
         const wrapper = mount(MultiSelect, {
             props: { modelValue: [], options, optionLabel: 'name' },
