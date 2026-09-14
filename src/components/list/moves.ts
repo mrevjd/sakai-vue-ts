@@ -6,20 +6,34 @@ function selectedIndexes<T>(items: T[], selected: string[], keyOf: KeyOf<T>): nu
 }
 
 export function moveUp<T>(items: T[], selected: string[], keyOf: KeyOf<T>): T[] {
-    const indexes = selectedIndexes(items, selected, keyOf);
-    if (indexes.length === 0 || indexes[0] === 0) return items;
     const next = [...items];
-    // Walk top down so a contiguous block shifts as one.
-    for (const index of indexes) [next[index - 1], next[index]] = [next[index]!, next[index - 1]!];
-    return next;
+    let moved = false;
+    // Selected items already stacked at the top cannot move, and they block the ones directly under them; anything past the block shifts up one slot.
+    let blocked = 0;
+    for (const index of selectedIndexes(items, selected, keyOf)) {
+        if (index > blocked) {
+            [next[index - 1], next[index]] = [next[index]!, next[index - 1]!];
+            moved = true;
+        } else {
+            blocked = index + 1;
+        }
+    }
+    return moved ? next : items;
 }
 
 export function moveDown<T>(items: T[], selected: string[], keyOf: KeyOf<T>): T[] {
-    const indexes = selectedIndexes(items, selected, keyOf);
-    if (indexes.length === 0 || indexes[indexes.length - 1] === items.length - 1) return items;
     const next = [...items];
-    for (const index of [...indexes].reverse()) [next[index + 1], next[index]] = [next[index]!, next[index + 1]!];
-    return next;
+    let moved = false;
+    let blocked = items.length - 1;
+    for (const index of selectedIndexes(items, selected, keyOf).reverse()) {
+        if (index < blocked) {
+            [next[index + 1], next[index]] = [next[index]!, next[index + 1]!];
+            moved = true;
+        } else {
+            blocked = index - 1;
+        }
+    }
+    return moved ? next : items;
 }
 
 export function moveTop<T>(items: T[], selected: string[], keyOf: KeyOf<T>): T[] {

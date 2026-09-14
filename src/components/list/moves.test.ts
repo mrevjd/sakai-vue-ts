@@ -15,6 +15,13 @@ describe('list moves', () => {
         expect(moveDown(items, ['e'], id)).toEqual(items);
     });
 
+    it('moves only the movable items when the selection touches the edge', () => {
+        expect(moveUp(items, ['a', 'c'], id)).toEqual(['a', 'c', 'b', 'd', 'e']);
+        expect(moveUp(items, ['a', 'b'], id)).toBe(items);
+        expect(moveDown(items, ['c', 'e'], id)).toEqual(['a', 'b', 'd', 'c', 'e']);
+        expect(moveDown(items, ['d', 'e'], id)).toBe(items);
+    });
+
     it('moves a selection to the top and bottom in its original order', () => {
         expect(moveTop(items, ['d', 'b'], id)).toEqual(['b', 'd', 'a', 'c', 'e']);
         expect(moveBottom(items, ['a', 'c'], id)).toEqual(['b', 'd', 'e', 'a', 'c']);
