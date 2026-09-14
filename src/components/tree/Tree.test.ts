@@ -56,6 +56,14 @@ describe('Tree', () => {
         expect(wrapper.emitted('node-select')![0]![0]).toEqual({ node: value[1] });
     });
 
+    it('clicking a parent row body selects it without toggling expansion', async () => {
+        const wrapper = mount(Tree, { props: { value, selectionMode: 'single' } });
+        await rows(wrapper)[0]!.trigger('click');
+        expect(lastSelection(wrapper)).toEqual({ '0': true });
+        expect(wrapper.emitted('update:expandedKeys')).toBeUndefined();
+        expect(rows(wrapper).map((r) => r.text())).toEqual(['Documents', 'Events']);
+    });
+
     it('checkbox mode propagates to descendants and reports partial parents', async () => {
         const wrapper = mount(Tree, { props: { value, selectionMode: 'checkbox', expandedKeys: { '0': true, '0-0': true } } });
         await wrapper.findAll('[data-slot=tree-checkbox]')[2]!.trigger('click');

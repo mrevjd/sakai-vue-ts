@@ -82,6 +82,13 @@
         if (!props.selectionMode) event.preventDefault();
     }
 
+    // Reka fires toggle alongside select on a row click, which would expand a parent whenever its
+    // label is picked; PrimeVue toggles only from the chevron. The arrow keys route through the same
+    // event, so only pointer-originated toggles are cancelled. The chevron calls handleToggle directly.
+    function onItemToggle(event: CustomEvent<{ originalEvent: PointerEvent | KeyboardEvent }>): void {
+        if (!(event.detail?.originalEvent instanceof KeyboardEvent)) event.preventDefault();
+    }
+
     function iconOf(node: TreeNodeLike): Component | undefined {
         return typeof node.icon === 'string' ? resolveIcon(node.icon) : node.icon;
     }
@@ -123,6 +130,7 @@
                 :class="cn('flex items-center gap-1 rounded-md px-1 py-1 text-sm outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring data-[selected]:bg-accent', !props.selectionMode && 'cursor-default')"
                 data-slot="tree-node"
                 @select="onItemSelect"
+                @toggle="onItemToggle"
             >
                 <button v-if="item.hasChildren" type="button" class="flex size-6 items-center justify-center rounded-sm hover:bg-muted" :aria-label="`Toggle ${item.value.label}`" @click.stop="handleToggle()">
                     <IconAngleDown v-if="isExpanded" class="size-4" />
