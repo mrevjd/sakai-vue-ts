@@ -35,7 +35,7 @@
             <DropdownMenuContent align="end" class="min-w-40">
                 <template v-for="(item, index) in props.model.filter(isVisible)" :key="index">
                     <DropdownMenuSeparator v-if="item.separator" />
-                    <DropdownMenuItem v-else :disabled="item.disabled" @select="runCommand(item, $event)"><MenuItemContent :item="item" /></DropdownMenuItem>
+                    <DropdownMenuItem v-else as-child :disabled="item.disabled" @select="runCommand(item, $event)"><MenuItemContent :item="item" /></DropdownMenuItem>
                 </template>
             </DropdownMenuContent>
         </DropdownMenu>

@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { mount, RouterLinkStub } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
 import MenuList from './MenuList.vue';
@@ -33,5 +33,32 @@ describe('MenuList', () => {
         const wrapper = mount(MenuList, { props: { model: [{ label: 'Shown' }, { label: 'Hidden', visible: false }, { label: 'Off', disabled: true }] } });
         expect(wrapper.findAll('[role=menuitem]').map((i) => i.text())).toEqual(['Shown', 'Off']);
         expect(wrapper.findAll('[role=menuitem]')[1]!.attributes('aria-disabled')).toBe('true');
+    });
+
+    it('renders an inline routed item as the single menuitem element and runs its command once', async () => {
+        const command = vi.fn();
+        const item: MenuModelItem = { label: 'Router', to: '/x', command };
+        const wrapper = mount(MenuList, { props: { model: [item] }, global: { stubs: { RouterLink: RouterLinkStub } } });
+        const menuitem = wrapper.get('[role=menuitem]');
+        expect(menuitem.element.tagName).toBe('A');
+        expect(wrapper.find('[role=menuitem] a, [role=menuitem] button, button a, a button').exists()).toBe(false);
+        await menuitem.trigger('click');
+        expect(command).toHaveBeenCalledTimes(1);
+        expect(command).toHaveBeenCalledWith(expect.objectContaining({ item }));
+    });
+
+    it('in popup mode a routed item is the menuitem itself and a click runs its command once', async () => {
+        const command = vi.fn();
+        const item: MenuModelItem = { label: 'Router', to: '/x', command };
+        const wrapper = mount(MenuList, { props: { model: [item], popup: true }, slots: { trigger: '<button data-testid="open">Options</button>' }, global: { stubs: { RouterLink: RouterLinkStub } }, attachTo: document.body });
+        await wrapper.get('[data-testid=open]').trigger('click');
+        await nextTick();
+        const menuitem = document.body.querySelector<HTMLElement>('[role=menuitem]');
+        expect(menuitem?.tagName).toBe('A');
+        expect(document.body.querySelector('[role=menuitem] a, [role=menuitem] button')).toBeNull();
+        menuitem!.click();
+        await nextTick();
+        expect(command).toHaveBeenCalledTimes(1);
+        wrapper.unmount();
     });
 });

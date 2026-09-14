@@ -13,6 +13,8 @@
     function toggle(index: number): void {
         openIndex.value = openIndex.value === index ? null : index;
     }
+
+    const itemClass = 'flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm hover:bg-muted focus-visible:bg-muted focus-visible:outline-none disabled:opacity-50';
 </script>
 
 <template>
@@ -29,21 +31,16 @@
     >
         <template v-for="(item, index) in props.model.filter(isVisible)" :key="index">
             <li v-if="item.separator" role="separator" class="my-1 border-t border-border" />
-            <li v-else class="group/tiered relative" :data-open="openIndex === index || undefined">
-                <button
-                    type="button"
-                    role="menuitem"
-                    :aria-haspopup="item.items ? 'menu' : undefined"
-                    :aria-expanded="item.items ? openIndex === index : undefined"
-                    :aria-disabled="item.disabled || undefined"
-                    :disabled="item.disabled"
-                    :class="cn('flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm hover:bg-muted focus-visible:bg-muted focus-visible:outline-none disabled:opacity-50')"
-                    @click="item.items ? toggle(index) : runCommand(item, $event)"
-                >
-                    <MenuItemContent :item="item" />
-                    <IconAngleRight v-if="item.items" class="size-4 shrink-0" />
+            <li v-else-if="item.items" class="group/tiered relative" :data-open="openIndex === index || undefined">
+                <!-- A parent only opens its submenu; its own to/url/command are ignored, as PrimeVue's are. -->
+                <button type="button" role="menuitem" aria-haspopup="menu" :aria-expanded="openIndex === index" :aria-disabled="item.disabled || undefined" :disabled="item.disabled" :class="cn(itemClass, 'justify-between')" @click="toggle(index)">
+                    <MenuItemContent :item="item" label-only />
+                    <IconAngleRight class="size-4 shrink-0" />
                 </button>
-                <TieredMenu v-if="item.items" :model="item.items" nested data-slot="tiered-menu-submenu" :data-open="openIndex === index || undefined" />
+                <TieredMenu :model="item.items" nested data-slot="tiered-menu-submenu" :data-open="openIndex === index || undefined" />
+            </li>
+            <li v-else role="none">
+                <MenuItemContent :item="item" role="menuitem" :class="itemClass" @click="runCommand(item, $event)" />
             </li>
         </template>
     </ul>

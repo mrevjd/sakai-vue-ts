@@ -14,12 +14,12 @@
             <template v-for="(item, index) in props.model.filter(isVisible)" :key="index">
                 <ContextMenuSeparator v-if="item.separator" />
                 <ContextMenuSub v-else-if="item.items">
-                    <ContextMenuSubTrigger><MenuItemContent :item="item" /></ContextMenuSubTrigger>
+                    <ContextMenuSubTrigger><MenuItemContent :item="item" label-only /></ContextMenuSubTrigger>
                     <ContextMenuSubContent>
-                        <ContextMenuItem v-for="(child, childIndex) in item.items.filter(isVisible)" :key="childIndex" :disabled="child.disabled" @select="runCommand(child, $event)"><MenuItemContent :item="child" /></ContextMenuItem>
+                        <ContextMenuItem v-for="(child, childIndex) in item.items.filter(isVisible)" :key="childIndex" as-child :disabled="child.disabled" @select="runCommand(child, $event)"><MenuItemContent :item="child" /></ContextMenuItem>
                     </ContextMenuSubContent>
                 </ContextMenuSub>
-                <ContextMenuItem v-else :disabled="item.disabled" @select="runCommand(item, $event)"><MenuItemContent :item="item" /></ContextMenuItem>
+                <ContextMenuItem v-else as-child :disabled="item.disabled" @select="runCommand(item, $event)"><MenuItemContent :item="item" /></ContextMenuItem>
             </template>
         </ContextMenuContent>
     </ContextMenu>

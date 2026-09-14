@@ -14,4 +14,12 @@ describe('AppBreadcrumb', () => {
         expect(wrapper.get('[aria-current=page]').text()).toBe('Item');
         expect(wrapper.findAll('[data-slot=breadcrumb-separator]')).toHaveLength(3);
     });
+
+    it('marks the last visible item as the page and skips hidden ones', () => {
+        const wrapper = mount(AppBreadcrumb, { props: { home: { icon: IconHome, to: '/' }, model: [{ label: 'Library' }, { label: 'Data', visible: false }, { label: 'Table' }] }, global: { plugins: [router] } });
+        expect(wrapper.get('[data-slot=breadcrumb-page]').text()).toBe('Table');
+        expect(wrapper.text()).not.toContain('Data');
+        expect(wrapper.findAll('[data-slot=breadcrumb-link]')).toHaveLength(2);
+        expect(wrapper.findAll('[data-slot=breadcrumb-separator]')).toHaveLength(2);
+    });
 });
