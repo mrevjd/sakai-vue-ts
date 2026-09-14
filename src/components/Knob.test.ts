@@ -12,6 +12,13 @@ describe('Knob', () => {
         expect(dial.attributes('aria-valuenow')).toBe('20');
     });
 
+    it('clamps an out-of-range bound value for display and ARIA without emitting', () => {
+        const wrapper = mount(Knob, { props: { modelValue: 150, max: 100 } });
+        expect(wrapper.get('[role=slider]').attributes('aria-valuenow')).toBe('100');
+        expect(wrapper.get('[data-slot=knob-value]').text()).toBe('100');
+        expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    });
+
     it('steps with the keyboard and clamps at the ends', async () => {
         const wrapper = mount(Knob, { props: { modelValue: 45, min: 0, max: 50, step: 10 } });
         const dial = wrapper.get('[role=slider]');

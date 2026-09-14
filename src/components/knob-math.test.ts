@@ -7,12 +7,14 @@ describe('knob math', () => {
         expect(clampStep(-20, -50, 50, 10)).toBe(-20);
         expect(clampStep(120, 0, 100, 1)).toBe(100);
         expect(clampStep(-3, 0, 100, 1)).toBe(0);
+        expect(clampStep(37, 0, 100, 0)).toBe(37);
     });
 
     it('maps the pointer angle to a value across the dial, ignoring the dead zone at the bottom', () => {
         expect(angleToValue((4 * Math.PI) / 3, 0, 100, 1)).toBe(0);
         expect(angleToValue(-Math.PI / 3, 0, 100, 1)).toBe(100);
         expect(angleToValue(Math.PI / 2, 0, 100, 1)).toBe(50);
+        expect(angleToValue((-2 * Math.PI) / 3, 0, 100, 1)).toBe(0);
         expect(angleToValue(-Math.PI / 2, 0, 100, 1)).toBeUndefined();
     });
 

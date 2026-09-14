@@ -18,16 +18,18 @@ function point(radians: number, radius: number): { x: number; y: number } {
 
 export function clampStep(value: number, min: number, max: number, step: number): number {
     const clamped = Math.min(max, Math.max(min, value));
+    // A zero or non-finite step cannot snap (it would divide to NaN), so only the clamp applies.
+    if (!Number.isFinite(step) || step <= 0) return clamped;
     return Math.round((clamped - min) / step) * step + min;
 }
 
 // Returns undefined when the pointer sits in the gap below the dial, where PrimeVue also ignores it.
-// The max end is inclusive so a pointer exactly on the dial's end maps to max rather than the gap.
+// Both ends are inclusive so a pointer exactly on either end of the dial maps to min or max rather than the gap.
 export function angleToValue(angle: number, min: number, max: number, step: number): number | undefined {
     const start = -Math.PI / 2 - Math.PI / 6;
     let mapped: number;
     if (angle >= MAX_RADIANS) mapped = mapRange(angle, MIN_RADIANS, MAX_RADIANS, min, max);
-    else if (angle < start) mapped = mapRange(angle + 2 * Math.PI, MIN_RADIANS, MAX_RADIANS, min, max);
+    else if (angle <= start) mapped = mapRange(angle + 2 * Math.PI, MIN_RADIANS, MAX_RADIANS, min, max);
     else return undefined;
     return clampStep(mapped, min, max, step);
 }

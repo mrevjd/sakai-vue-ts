@@ -25,8 +25,11 @@
     const model = defineModel<number>({ default: 0 });
     const inert = computed(() => props.readonly || props.disabled);
     const radius = 40;
-    const arc = computed(() => knobArc({ value: clampStep(model.value, props.min, props.max, props.step), min: props.min, max: props.max, radius }));
-    const label = computed(() => props.valueTemplate.replace('{value}', String(model.value)));
+    // The arc, label and ARIA all read the clamped value so a bound value outside the range never
+    // reports beyond aria-valuemin/max; the model itself is only rewritten by user interaction.
+    const displayValue = computed(() => clampStep(model.value, props.min, props.max, props.step));
+    const arc = computed(() => knobArc({ value: displayValue.value, min: props.min, max: props.max, radius }));
+    const label = computed(() => props.valueTemplate.replace('{value}', String(displayValue.value)));
 
     function set(value: number): void {
         const next = clampStep(value, props.min, props.max, props.step);
@@ -82,7 +85,7 @@
             :tabindex="inert ? -1 : 0"
             :aria-valuemin="props.min"
             :aria-valuemax="props.max"
-            :aria-valuenow="model"
+            :aria-valuenow="displayValue"
             :aria-valuetext="label"
             :aria-disabled="props.disabled || undefined"
             :aria-readonly="props.readonly || undefined"
