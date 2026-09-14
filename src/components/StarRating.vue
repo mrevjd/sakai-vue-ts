@@ -16,7 +16,8 @@
     const model = defineModel<number | null>({ default: null });
 
     const inert = computed(() => props.readonly || props.disabled);
-    const values = computed(() => Array.from({ length: Math.max(1, Math.floor(props.stars)) }, (_, index) => index + 1));
+    // A non-finite stars count (NaN from a bad template expression, say) would otherwise render an empty group; fall back to the default.
+    const values = computed(() => Array.from({ length: Number.isFinite(props.stars) ? Math.max(1, Math.floor(props.stars)) : 5 }, (_, index) => index + 1));
 
     // Keyed by star value rather than an array ref because Vue does not guarantee array-ref order.
     const buttons = new Map<number, HTMLButtonElement>();
@@ -38,8 +39,10 @@
         let next: number | null = null;
         if (event.key === 'ArrowRight' || event.key === 'ArrowUp') next = Math.min(values.value.length, current + 1);
         if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') next = Math.max(1, current - 1);
-        if (next === null || next === current) return;
+        if (next === null) return;
+        // Cancel the arrow key even at the ends of the range so the page does not scroll under a focused group.
         event.preventDefault();
+        if (next === current) return;
         model.value = next;
         // The ARIA radiogroup pattern moves focus with the checked radio, and the map avoids waiting on a parent to echo the v-model before the tabindex updates.
         buttons.get(next)?.focus();

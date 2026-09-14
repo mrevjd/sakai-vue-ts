@@ -42,4 +42,17 @@ describe('PasswordInput', () => {
         await toggle.trigger('click');
         expect(wrapper.get('input').attributes('type')).toBe('password');
     });
+
+    it('defaults autocomplete to current-password and forwards an override', () => {
+        expect(
+            mount(PasswordInput, { props: { modelValue: '' } })
+                .get('input')
+                .attributes('autocomplete')
+        ).toBe('current-password');
+        expect(
+            mount(PasswordInput, { props: { modelValue: '', autocomplete: 'new-password' } })
+                .get('input')
+                .attributes('autocomplete')
+        ).toBe('new-password');
+    });
 });

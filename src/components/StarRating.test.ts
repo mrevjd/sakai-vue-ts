@@ -49,4 +49,17 @@ describe('StarRating', () => {
         expect(wrapper.emitted('update:modelValue')).toBeUndefined();
         expect(wrapper.findAll('[role=radio]')[0]!.attributes('tabindex')).toBe('-1');
     });
+
+    it('falls back to five stars when stars is not a finite number', () => {
+        expect(mount(StarRating, { props: { modelValue: null, stars: Number.NaN } }).findAll('[role=radio]')).toHaveLength(5);
+        expect(mount(StarRating, { props: { modelValue: null, stars: 0 } }).findAll('[role=radio]')).toHaveLength(1);
+    });
+
+    it('prevents the default arrow-key scroll at the boundaries too', async () => {
+        const wrapper = mount(StarRating, { props: { modelValue: 5 } });
+        const event = new KeyboardEvent('keydown', { key: 'ArrowRight', cancelable: true, bubbles: true });
+        wrapper.get('[role=radiogroup]').element.dispatchEvent(event);
+        expect(event.defaultPrevented).toBe(true);
+        expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    });
 });

@@ -13,9 +13,10 @@
             toggleMask?: boolean;
             feedback?: boolean;
             disabled?: boolean;
+            autocomplete?: string;
             class?: HTMLAttributes['class'];
         }>(),
-        { id: undefined, placeholder: '', toggleMask: true, feedback: true, disabled: false, class: undefined }
+        { id: undefined, placeholder: '', toggleMask: true, feedback: true, disabled: false, autocomplete: 'current-password', class: undefined }
     );
 
     const model = defineModel<string>({ default: '' });
@@ -30,7 +31,7 @@
 <template>
     <div :class="cn('flex flex-col gap-2', props.class)" data-slot="password-input">
         <div class="relative">
-            <Input :id="props.id" v-model="model" :type="revealed ? 'text' : 'password'" :placeholder="props.placeholder" :disabled="props.disabled" :class="props.toggleMask ? 'pr-9' : undefined" autocomplete="current-password" />
+            <Input :id="props.id" v-model="model" :type="revealed ? 'text' : 'password'" :placeholder="props.placeholder" :disabled="props.disabled" :class="props.toggleMask ? 'pr-9' : undefined" :autocomplete="props.autocomplete" />
             <Button
                 v-if="props.toggleMask"
                 type="button"
