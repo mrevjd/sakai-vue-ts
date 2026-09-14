@@ -9,8 +9,10 @@
     const props = withDefaults(defineProps<{ model: MenuModelItem[]; nested?: boolean; class?: string }>(), { nested: false, class: undefined });
 
     // Click toggles a submenu for touch; hover and focus-within open it through the group classes.
+    // A parent's to and url are ignored; its command runs once per click before the toggle, as PrimeVue's does.
     const openIndex = ref<number | null>(null);
-    function toggle(index: number): void {
+    function toggle(item: MenuModelItem, index: number, event: Event): void {
+        runCommand(item, event);
         openIndex.value = openIndex.value === index ? null : index;
     }
 
@@ -32,8 +34,16 @@
         <template v-for="(item, index) in props.model.filter(isVisible)" :key="index">
             <li v-if="item.separator" role="separator" class="my-1 border-t border-border" />
             <li v-else-if="item.items" class="group/tiered relative" :data-open="openIndex === index || undefined">
-                <!-- A parent only opens its submenu; its own to/url/command are ignored, as PrimeVue's are. -->
-                <button type="button" role="menuitem" aria-haspopup="menu" :aria-expanded="openIndex === index" :aria-disabled="item.disabled || undefined" :disabled="item.disabled" :class="cn(itemClass, 'justify-between')" @click="toggle(index)">
+                <button
+                    type="button"
+                    role="menuitem"
+                    aria-haspopup="menu"
+                    :aria-expanded="openIndex === index"
+                    :aria-disabled="item.disabled || undefined"
+                    :disabled="item.disabled"
+                    :class="cn(itemClass, 'justify-between')"
+                    @click="toggle(item, index, $event)"
+                >
                     <MenuItemContent :item="item" label-only />
                     <IconAngleRight class="size-4 shrink-0" />
                 </button>

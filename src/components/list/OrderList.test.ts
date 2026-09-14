@@ -13,8 +13,8 @@ const items: Item[] = [
     { id: '3', name: 'Blue Band' }
 ];
 
-function make(modelValue = items) {
-    return mount(OrderList<Item>, { props: { modelValue, dataKey: 'id' }, slots: { option: `<template #option="{ option }">{{ option.name }}</template>` } });
+function make(modelValue = items, options: { attachTo?: Element } = {}) {
+    return mount(OrderList<Item>, { props: { modelValue, dataKey: 'id' }, slots: { option: `<template #option="{ option }">{{ option.name }}</template>` }, ...options });
 }
 
 function lastModel(wrapper: ReturnType<typeof make>): Item[] {
@@ -54,5 +54,30 @@ describe('OrderList', () => {
         const wrapper = make();
         await wrapper.get('[aria-label="Move up"]').trigger('click');
         expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    });
+
+    it('moves focus with ArrowDown and selects the focused option with Space', async () => {
+        const wrapper = make(items, { attachTo: document.body });
+        const options = wrapper.findAll('[data-slot=list-item]');
+        expect(options.map((o) => o.attributes('tabindex'))).toEqual(['0', '-1', '-1']);
+        (options[0]!.element as HTMLElement).focus();
+        await options[0]!.trigger('keydown', { key: 'ArrowDown' });
+        expect(document.activeElement).toBe(options[1]!.element);
+        expect(options.map((o) => o.attributes('tabindex'))).toEqual(['-1', '0', '-1']);
+        await options[1]!.trigger('keydown', { key: ' ' });
+        expect(options[1]!.attributes('aria-selected')).toBe('true');
+        expect(wrapper.findAll('[role=option][aria-selected=true]')).toHaveLength(1);
+        wrapper.unmount();
+    });
+
+    it('extends the selection with Shift+ArrowDown from a selected option', async () => {
+        const wrapper = make(items, { attachTo: document.body });
+        const options = wrapper.findAll('[data-slot=list-item]');
+        await options[0]!.trigger('click');
+        (options[0]!.element as HTMLElement).focus();
+        await options[0]!.trigger('keydown', { key: 'ArrowDown', shiftKey: true });
+        expect(document.activeElement).toBe(options[1]!.element);
+        expect(options.map((o) => o.attributes('aria-selected'))).toEqual(['true', 'true', 'false']);
+        wrapper.unmount();
     });
 });

@@ -148,7 +148,10 @@ describe('DataTable', () => {
         await nextTick();
         document.body.querySelector<HTMLButtonElement>('[data-slot=data-table-filter-apply]')!.click();
         await nextTick();
-        expect(wrapper.findAll('tbody tr').map((r) => r.text().includes('$'))).toHaveLength(2);
+        expect(wrapper.findAll('tbody tr').map((r) => r.findAll('td').map((c) => c.text()))).toEqual([
+            ['banana', '$3', 'Mon Jan 01 2024'],
+            ['cherry', '$2', 'Fri Mar 01 2024']
+        ]);
         wrapper.unmount();
     });
 

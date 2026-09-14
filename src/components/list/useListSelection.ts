@@ -1,11 +1,11 @@
 import { ref, type Ref } from 'vue';
 
 // Click selects, ctrl or meta toggles, shift selects the range from the last plain click; the same rules PrimeVue's lists use.
-export function useListSelection(): { selected: Ref<string[]>; onItemClick: (event: MouseEvent, key: string, orderedKeys: string[]) => void; clear: () => void; isSelected: (key: string) => boolean } {
+export function useListSelection(): { selected: Ref<string[]>; onItemClick: (event: MouseEvent | KeyboardEvent, key: string, orderedKeys: string[]) => void; clear: () => void; isSelected: (key: string) => boolean } {
     const selected = ref<string[]>([]);
     let anchor: string | null = null;
 
-    function onItemClick(event: MouseEvent, key: string, orderedKeys: string[]): void {
+    function onItemClick(event: MouseEvent | KeyboardEvent, key: string, orderedKeys: string[]): void {
         if (event.shiftKey && anchor !== null) {
             const start = orderedKeys.indexOf(anchor);
             const end = orderedKeys.indexOf(key);
