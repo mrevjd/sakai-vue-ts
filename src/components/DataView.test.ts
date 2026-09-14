@@ -42,6 +42,20 @@ describe('DataView', () => {
         expect(wrapper.findAll('[data-testid=list] li').map((li) => li.text())).toEqual(['Blue Band']);
     });
 
+    it('resets to the first page when rows changes', async () => {
+        const wrapper = mount(DataView<Item>, { props: { value: items, paginator: true, rows: 2 }, slots });
+        await wrapper.get('[aria-label="Next page"]').trigger('click');
+        await wrapper.setProps({ rows: 10 });
+        expect(wrapper.findAll('[data-testid=list] li').map((li) => li.text())).toEqual(['Bamboo Watch', 'Black Watch', 'Blue Band']);
+        expect(wrapper.get('[data-testid=data-table-report]').text()).toBe('Showing 1 to 3 of 3 entries');
+    });
+
+    it('falls back to the default page size when rows is zero', () => {
+        const wrapper = mount(DataView<Item>, { props: { value: items, paginator: true, rows: 0 }, slots });
+        expect(wrapper.get('[data-testid=data-table-report]').text()).toBe('Showing 1 to 3 of 3 entries');
+        expect(wrapper.findAll('[data-testid=list] li')).toHaveLength(3);
+    });
+
     it('renders the empty slot with no items', () => {
         const wrapper = mount(DataView<Item>, { props: { value: [] }, slots: { ...slots, empty: 'Nothing to show' } });
         expect(wrapper.text()).toContain('Nothing to show');

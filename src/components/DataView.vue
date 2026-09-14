@@ -17,11 +17,17 @@
         { layout: 'list', sortField: undefined, sortOrder: 1, paginator: false, rows: 10, rowsPerPageOptions: () => [5, 10, 25], class: undefined }
     );
 
+    // A paginator cannot page by zero, and the Paginator select already guards the same way.
+    const validPageSize = (rows: number): number => (Number.isFinite(rows) && rows > 0 ? rows : 10);
+
     const page = ref(0);
-    const pageSize = ref(props.rows);
+    const pageSize = ref(validPageSize(props.rows));
     watch(
         () => props.rows,
-        (rows) => (pageSize.value = rows)
+        (rows) => {
+            pageSize.value = validPageSize(rows);
+            page.value = 0;
+        }
     );
     // A new value or sort resets to the first page, as PrimeVue does.
     watch([() => props.value, () => props.sortField, () => props.sortOrder], () => (page.value = 0));
