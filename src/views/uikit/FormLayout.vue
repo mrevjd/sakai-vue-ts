@@ -12,7 +12,7 @@
     const dropdownItem = ref(null);
     const editorValue = ref('');
 
-    // Quill's HTML output is untrusted — never render it raw. Use the
+    // Quill's HTML output is untrusted: never render it raw. Use the
     // shared sanitizer helper (DOMPurify with a Quill-tuned tag/attr
     // allowlist) before passing it to v-html or persisting it server-side.
     const sanitizedEditorHtml = computed(() => sanitizeHtml(editorValue.value));
