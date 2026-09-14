@@ -20,7 +20,15 @@
         <div
             v-for="(item, index) in props.value"
             :key="index"
-            :class="cn('flex min-h-16 flex-1', horizontal ? 'flex-col' : 'flex-row', side(index) === 'right' && (horizontal ? 'flex-col-reverse' : 'flex-row-reverse'))"
+            :class="
+                cn(
+                    'flex min-h-16 flex-1',
+                    horizontal ? 'flex-col' : 'flex-row',
+                    side(index) === 'right' && (horizontal ? 'flex-col-reverse' : 'flex-row-reverse'),
+                    // PrimeVue zeroes the last event's min-height (and its flex share when horizontal) so nothing trails the final marker.
+                    index === props.value.length - 1 && (horizontal ? 'min-h-0 flex-none' : 'min-h-0')
+                )
+            "
             data-slot="timeline-event"
             :data-side="side(index)"
         >
