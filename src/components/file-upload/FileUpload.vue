@@ -66,6 +66,8 @@
         rejected.value = result.rejected;
         if (result.rejected.length > 0) emit('error', { messages: result.rejected.map((r) => r.message) });
         if (result.accepted.length === 0) return;
+        // A single-file swap drops the outgoing file, so release its object URL now rather than at unmount.
+        if (!props.multiple) files.value.forEach(revoke);
         files.value = props.multiple ? [...files.value, ...result.accepted] : result.accepted.slice(0, 1);
         emit('select', { files: files.value });
         if (props.auto) upload();
@@ -97,6 +99,7 @@
     }
 
     function remove(index: number): void {
+        if (props.disabled) return;
         const file = files.value[index];
         if (!file) return;
         revoke(file);
@@ -147,7 +150,7 @@
                             <span class="truncate font-medium">{{ file.name }}</span>
                             <span class="text-sm text-muted-foreground">{{ formatSize(file.size) }}</span>
                         </div>
-                        <Button type="button" variant="ghost" size="icon-sm" :aria-label="`Remove ${file.name}`" @click="remove(index)"><IconTimes class="size-4" /></Button>
+                        <Button type="button" variant="ghost" size="icon-sm" :disabled="props.disabled" :aria-label="`Remove ${file.name}`" @click="remove(index)"><IconTimes class="size-4" /></Button>
                     </div>
                 </div>
                 <div v-else class="flex flex-1 flex-col items-center justify-center gap-2 text-muted-foreground">

@@ -59,6 +59,28 @@ describe('FileUpload', () => {
         expect(wrapper.emitted('uploader')).toHaveLength(1);
     });
 
+    it('disables per-file removal along with the rest of the controls', async () => {
+        const wrapper = mount(FileUpload, { props: { multiple: true } });
+        await choose(wrapper, [file('a.txt', 'text/plain', 1), file('b.txt', 'text/plain', 1)]);
+        await wrapper.setProps({ disabled: true });
+        const removeButton = wrapper.get('[aria-label="Remove a.txt"]');
+        expect(removeButton.attributes('disabled')).toBeDefined();
+        await removeButton.trigger('click');
+        expect(wrapper.emitted('remove')).toBeUndefined();
+        expect(wrapper.findAll('[data-slot=file-upload-file]')).toHaveLength(2);
+    });
+
+    it('revokes the replaced preview when a single-file selection is swapped', async () => {
+        const wrapper = mount(FileUpload);
+        await choose(wrapper, [file('a.png', 'image/png', 1)]);
+        expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
+        expect(URL.revokeObjectURL).not.toHaveBeenCalled();
+        await choose(wrapper, [file('b.png', 'image/png', 1)]);
+        expect(URL.revokeObjectURL).toHaveBeenCalledTimes(1);
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview');
+        expect(wrapper.findAll('[data-slot=file-upload-file]').map((row) => row.text())).toEqual([expect.stringContaining('b.png')]);
+    });
+
     it('accepts files dropped on the content area', async () => {
         const wrapper = mount(FileUpload, { props: { multiple: true } });
         const zone = wrapper.get('[data-slot=file-upload-content]');
