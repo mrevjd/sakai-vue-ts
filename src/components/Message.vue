@@ -24,7 +24,8 @@
 </script>
 
 <template>
-    <Alert v-if="visible" :variant="variant" :class="cn('items-center', props.class)" :data-variant="variant">
+    <!-- The close button is absolutely positioned, so the alert reserves room for it or long text runs underneath. -->
+    <Alert v-if="visible" :variant="variant" :class="cn('items-center', props.closable && 'pr-9', props.class)" :data-variant="variant">
         <component :is="icon" v-if="icon" />
         <AlertDescription class="flex-1"><slot /></AlertDescription>
         <Button v-if="props.closable" variant="ghost" size="icon-xs" class="absolute top-1.5 right-1.5" aria-label="Close" @click="close"><IconTimes class="size-3.5" /></Button>
