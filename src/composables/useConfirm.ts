@@ -1,7 +1,7 @@
 import { shallowReactive, shallowReadonly, type Component } from 'vue';
 
 export interface ConfirmOptions {
-    /** Element to anchor a popover to. Plan 2 adds ConfirmPopover; until then the dialog is used for every request. */
+    /** Element to anchor a popover to; without it the alert dialog is used. */
     target?: HTMLElement;
     message?: string;
     header?: string;
@@ -9,6 +9,7 @@ export interface ConfirmOptions {
     acceptLabel?: string;
     rejectLabel?: string;
     acceptVariant?: 'default' | 'destructive';
+    rejectVariant?: 'outline' | 'ghost' | 'secondary';
     accept?: () => void;
     reject?: () => void;
 }

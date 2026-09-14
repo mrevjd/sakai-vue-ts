@@ -54,4 +54,23 @@ describe('ConfirmDialogHost', () => {
         expect(isProxy(confirmState.options?.icon)).toBe(false);
         wrapper.unmount();
     });
+
+    it('anchors a popover to the target element instead of opening the dialog', async () => {
+        const anchor = document.createElement('button');
+        anchor.textContent = 'Confirm';
+        document.body.appendChild(anchor);
+        const accept = vi.fn();
+        const wrapper = mount(ConfirmDialogHost, { attachTo: document.body });
+        requireConfirm({ target: anchor, message: 'Are you sure you want to proceed?', acceptLabel: 'Save', rejectLabel: 'Cancel', rejectVariant: 'ghost', accept });
+        await settle();
+        expect(document.body.querySelector('[role=alertdialog]')).toBeNull();
+        const popover = document.body.querySelector<HTMLElement>('[data-slot=confirm-popover]')!;
+        expect(popover.textContent).toContain('Are you sure you want to proceed?');
+        expect(document.body.querySelector('[data-testid=confirm-reject]')?.textContent).toContain('Cancel');
+        document.body.querySelector<HTMLButtonElement>('[data-testid=confirm-accept]')!.click();
+        await settle();
+        expect(accept).toHaveBeenCalledTimes(1);
+        expect(confirmState.visible).toBe(false);
+        wrapper.unmount();
+    });
 });
