@@ -263,4 +263,43 @@ describe('DataTable', () => {
         expect(bodyRows[1]!.text()).toContain('10');
         expect(bodyRows[2]!.text()).toContain('30');
     });
+
+    describe('selectable rows with sub-rows', () => {
+        // banana (id 1) carries one child, 1a. Expanded and unpaginated, the body checkboxes run banana, 1a, apple, ...
+        async function expanded() {
+            const wrapper = make({ selectable: true, subRowsKey: 'children', paginator: false });
+            await wrapper.get('[aria-label="Expand row"]').trigger('click');
+            return wrapper;
+        }
+
+        function lastSelection(wrapper: ReturnType<typeof make>): string[] {
+            const emitted = wrapper.emitted('update:selection')!;
+            return (emitted[emitted.length - 1]![0] as Product[]).map((row) => row.id).sort();
+        }
+
+        it('keeps a selected sub-row selected and reports it in the model', async () => {
+            const wrapper = await expanded();
+            await wrapper.findAll('tbody [data-slot=checkbox]')[1]!.trigger('click');
+            await nextTick();
+            expect(lastSelection(wrapper)).toEqual(['1a']);
+            expect(wrapper.findAll('tbody tr[data-state=selected]')).toHaveLength(1);
+        });
+
+        it('selects a parent together with its sub-rows and keeps both', async () => {
+            const wrapper = await expanded();
+            await wrapper.findAll('tbody [data-slot=checkbox]')[0]!.trigger('click');
+            await nextTick();
+            expect(lastSelection(wrapper)).toEqual(['1', '1a']);
+            expect(wrapper.findAll('tbody tr[data-state=selected]')).toHaveLength(2);
+        });
+
+        it('puts the expander and the depth indent in the first data column, not the checkbox cell', async () => {
+            const wrapper = await expanded();
+            const [parent, child] = wrapper.findAll('tbody tr');
+            expect(parent!.findAll('td')[0]!.find('[aria-label="Collapse row"]').exists()).toBe(false);
+            expect(parent!.findAll('td')[1]!.find('[aria-label="Collapse row"]').exists()).toBe(true);
+            expect(child!.findAll('td')[0]!.attributes('style') ?? '').not.toContain('padding-left');
+            expect(child!.findAll('td')[1]!.attributes('style')).toContain('padding-left');
+        });
+    });
 });

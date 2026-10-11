@@ -166,8 +166,14 @@
         onPaginationChange: (updater) => apply(pagination, updater)
     });
 
+    // The expander and depth indent belong in the first data column. The checkbox column is pinned to the start, so
+    // when rows are selectable it occupies cell 0.
+    const treeCellIndex = computed(() => (props.selectable ? 1 : 0));
+
+    // flatRows, not rows: rows holds only top-level selections, so a selected sub-row would be missing from the model
+    // and the inbound watcher below would then clear it from rowSelection.
     watch(rowSelection, () => {
-        selection.value = table.getSelectedRowModel().rows.map((row) => row.original);
+        selection.value = table.getSelectedRowModel().flatRows.map((row) => row.original);
     });
     // Rows are keyed by rowKey on both sides, so a parent can pre-select or extend the model and see the checkboxes follow.
     watch(
@@ -251,7 +257,7 @@
                 .getPrePaginatedRowModel()
                 .rows.filter((row) => !row.getIsGrouped())
                 .map((row) => row.original),
-        selectedRows: (): TData[] => table.getSelectedRowModel().rows.map((row) => row.original),
+        selectedRows: (): TData[] => table.getSelectedRowModel().flatRows.map((row) => row.original),
         clearFilters,
         expandAll,
         collapseAll
@@ -319,9 +325,9 @@
                                         :key="cell.id"
                                         :class="cn(pinnedSide(cell.column) && 'sticky z-10 bg-card', (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.class)"
                                         :data-pinned="pinnedSide(cell.column)"
-                                        :style="{ ...pinStyle(cell.column), ...(cellIndex === 0 && props.subRowsKey && row.depth > 0 ? { paddingLeft: `${row.depth * 1.5 + 0.5}rem` } : undefined) }"
+                                        :style="{ ...pinStyle(cell.column), ...(cellIndex === treeCellIndex && props.subRowsKey && row.depth > 0 ? { paddingLeft: `${row.depth * 1.5 + 0.5}rem` } : undefined) }"
                                     >
-                                        <span v-if="cellIndex === 0 && row.getCanExpand()" class="inline-flex items-center gap-1">
+                                        <span v-if="cellIndex === treeCellIndex && row.getCanExpand()" class="inline-flex items-center gap-1">
                                             <Button variant="ghost" size="icon-xs" :aria-label="row.getIsExpanded() ? 'Collapse row' : 'Expand row'" @click="row.toggleExpanded()">
                                                 <IconAngleRight :class="cn('transition-transform', row.getIsExpanded() && 'rotate-90')" />
                                             </Button>
