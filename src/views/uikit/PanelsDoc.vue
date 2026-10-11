@@ -209,8 +209,8 @@
                 </ResizablePanel>
                 <ResizableHandle with-handle />
                 <ResizablePanel :default-size="70">
-                    <!-- The PrimeVue page sized these 15 and 50. Reka requires a group to total 100 and otherwise logs a
-                         warning on every load, production included, before rescaling; 23 and 77 is that same 15:50 split. -->
+                    <!-- Reka requires a group's sizes to total 100; otherwise it logs a warning on every load, production
+                         included, and rescales them. 23 and 77 keep the intended 15:50 split without the warning. -->
                     <ResizablePanelGroup direction="vertical">
                         <ResizablePanel :default-size="23">
                             <div class="flex h-full items-center justify-center">Panel 2</div>
