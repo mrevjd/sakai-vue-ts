@@ -77,7 +77,7 @@
                     <Button variant="outline" class="border-border text-secondary-foreground">Secondary</Button>
                     <Button variant="outline" class="border-green-600 text-green-600">Success</Button>
                     <Button variant="outline" class="border-sky-500 text-sky-500">Info</Button>
-                    <Button variant="outline" class="border-amber-500 text-amber-500">warn</Button>
+                    <Button variant="outline" class="border-amber-500 text-amber-500">Warn</Button>
                     <Button variant="outline" class="border-purple-500 text-purple-500">Help</Button>
                     <Button variant="outline" class="border-destructive text-destructive">Danger</Button>
                     <Button variant="outline" class="border-foreground text-foreground">Contrast</Button>
