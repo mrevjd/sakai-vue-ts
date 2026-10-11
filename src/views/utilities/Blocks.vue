@@ -197,7 +197,7 @@
 
         <!-- Pricing Block -->
         <BlockViewer header="Pricing" :code="blocksCode.pricing" free>
-            <div class="bg-card px-6 py-20 md:px-12 lg:px-20">
+            <div class="bg-muted dark:bg-background px-6 py-20 md:px-12 lg:px-20">
                 <div class="flex flex-col gap-4 items-center justify-center mb-12">
                     <div class="text-foreground font-bold text-4xl lg:text-5xl text-center leading-tight">Pricing Plans</div>
                     <div class="text-muted-foreground text-lg text-center leading-normal">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Velit numquam eligendi quos.</div>
@@ -318,14 +318,14 @@
 
         <!-- Banner Block -->
         <BlockViewer header="Banner" :code="blocksCode.banner" containerClass="bg-card" free>
-            <div class="pb-20 bg-card">
-                <div class="bg-foreground text-background py-4 px-6 lg:px-20 flex justify-between items-center flex-wrap">
+            <div class="pb-20 bg-card dark:bg-background">
+                <div class="bg-foreground text-background dark:bg-card dark:text-card-foreground py-4 px-6 lg:px-20 flex justify-between items-center flex-wrap">
                     <div class="font-bold">🔥 Hot Deals!</div>
                     <div class="inline-flex gap-1 items-center">
                         <span class="hidden lg:flex leading-normal">Libero voluptatum atque exercitationem praesentium provident odit.</span>
-                        <a class="text-background underline font-bold" href="#">Learn More</a>
+                        <a class="text-background dark:text-card-foreground underline font-bold" href="#">Learn More</a>
                     </div>
-                    <Button variant="ghost" size="icon" class="rounded-full text-background! hover:bg-muted-foreground/20!" aria-label="Dismiss"><IconTimes /></Button>
+                    <Button variant="ghost" size="icon" class="rounded-full text-background! dark:text-card-foreground! hover:bg-muted-foreground/20!" aria-label="Dismiss"><IconTimes /></Button>
                 </div>
             </div>
         </BlockViewer>
@@ -372,7 +372,7 @@
 
         <!-- Stats Block -->
         <BlockViewer header="Stats" :code="blocksCode.stats" free>
-            <div class="bg-card px-6 py-8 md:px-12 lg:px-20">
+            <div class="bg-muted dark:bg-background px-6 py-8 md:px-12 lg:px-20">
                 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
                     <div class="bg-card shadow-sm p-5 rounded-2xl">
                         <div class="flex justify-between gap-4">
@@ -442,7 +442,7 @@
 
         <!-- Sign-In Block -->
         <BlockViewer header="Sign-In" :code="blocksCode['sign-in']" containerClass="" free>
-            <div class="bg-card px-6 py-20 md:px-12 lg:px-20 flex items-center justify-center">
+            <div class="bg-muted dark:bg-background px-6 py-20 md:px-12 lg:px-20 flex items-center justify-center">
                 <div class="bg-card p-8 md:p-12 shadow-sm rounded-2xl w-full max-w-xl mx-auto flex flex-col gap-8">
                     <div class="flex flex-col items-center gap-4">
                         <div class="flex items-center gap-4">
@@ -503,7 +503,7 @@
                                 <div class="flex-1 text-foreground text-base leading-tight">Heat</div>
                             </div>
                             <div class="flex justify-end">
-                                <Button variant="outline" size="icon" class="shrink-0 rounded-full" aria-label="Edit title"><IconPenToSquare /></Button>
+                                <Button variant="outline" size="icon" class="shrink-0 rounded-full border-border text-secondary-foreground" aria-label="Edit title"><IconPenToSquare /></Button>
                             </div>
                         </div>
 
@@ -519,7 +519,7 @@
                                 </div>
                             </div>
                             <div class="flex justify-end">
-                                <Button variant="outline" size="icon" class="shrink-0 rounded-full" aria-label="Edit genre"><IconPenToSquare /></Button>
+                                <Button variant="outline" size="icon" class="shrink-0 rounded-full border-border text-secondary-foreground" aria-label="Edit genre"><IconPenToSquare /></Button>
                             </div>
                         </div>
 
@@ -531,7 +531,7 @@
                                 <div class="flex-1 text-foreground text-base leading-tight">Michael Mann</div>
                             </div>
                             <div class="flex justify-end">
-                                <Button variant="outline" size="icon" class="shrink-0 rounded-full" aria-label="Edit director"><IconPenToSquare /></Button>
+                                <Button variant="outline" size="icon" class="shrink-0 rounded-full border-border text-secondary-foreground" aria-label="Edit director"><IconPenToSquare /></Button>
                             </div>
                         </div>
 
@@ -543,7 +543,7 @@
                                 <div class="flex-1 text-foreground text-base leading-tight">Michael Mann</div>
                             </div>
                             <div class="flex justify-end">
-                                <Button variant="outline" size="icon" class="shrink-0 rounded-full" aria-label="Edit writer"><IconPenToSquare /></Button>
+                                <Button variant="outline" size="icon" class="shrink-0 rounded-full border-border text-secondary-foreground" aria-label="Edit writer"><IconPenToSquare /></Button>
                             </div>
                         </div>
 
@@ -555,7 +555,7 @@
                                 <div class="flex-1 text-foreground text-base leading-normal">A group of professional bank robbers start to feel the heat from police when they unknowingly leave a clue at their latest heist.</div>
                             </div>
                             <div class="flex justify-end">
-                                <Button variant="outline" size="icon" class="shrink-0 rounded-full" aria-label="Edit plot"><IconPenToSquare /></Button>
+                                <Button variant="outline" size="icon" class="shrink-0 rounded-full border-border text-secondary-foreground" aria-label="Edit plot"><IconPenToSquare /></Button>
                             </div>
                         </div>
 
@@ -567,7 +567,7 @@
 
         <!-- Card Block -->
         <BlockViewer header="Card" :code="blocksCode.card" free>
-            <div class="bg-card px-6 py-20 md:px-12 lg:px-20">
+            <div class="bg-muted dark:bg-background px-6 py-20 md:px-12 lg:px-20">
                 <div class="bg-card p-6 shadow rounded-2xl flex flex-col gap-4">
                     <div class="flex gap-4">
                         <div class="flex flex-col gap-2 flex-1">
