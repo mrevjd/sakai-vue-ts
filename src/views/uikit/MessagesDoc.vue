@@ -52,11 +52,11 @@
 
                 <div class="font-semibold text-xl mt-4 mb-4">Inline</div>
                 <div class="flex flex-wrap mb-4 gap-2">
-                    <Input v-model="username" placeholder="Username" aria-label="username" aria-invalid="true" />
+                    <Input v-model="username" placeholder="Username" aria-label="username" aria-invalid="true" class="w-auto" />
                     <Message severity="error">Username is required</Message>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <Input v-model="email" placeholder="Email" aria-label="email" aria-invalid="true" />
+                    <Input v-model="email" placeholder="Email" aria-label="email" aria-invalid="true" class="w-auto" />
                     <Message severity="error" :icon="IconTimesCircle" />
                 </div>
             </div>
