@@ -1,19 +1,43 @@
-<script setup>
+<script setup lang="ts">
+    import { computed, h, onBeforeMount, ref } from 'vue';
+    import DatePicker from '@/components/DatePicker.vue';
+    import MultiSelect from '@/components/MultiSelect.vue';
+    import StarRating from '@/components/StarRating.vue';
+    import ToggleButton from '@/components/ToggleButton.vue';
+    import { createColumns, DataTable, type DataTableColumn } from '@/components/data-table';
+    import { Badge, type BadgeVariants } from '@/components/ui/badge';
+    import { Button } from '@/components/ui/button';
+    import { Checkbox } from '@/components/ui/checkbox';
+    import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+    import { Label } from '@/components/ui/label';
+    import { Progress } from '@/components/ui/progress';
+    import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+    import { Slider } from '@/components/ui/slider';
+    import { IconCheckCircle, IconFilterSlash, IconLock, IconLockOpen, IconMinus, IconPlus, IconSearch, IconTimesCircle } from '@/components/icons';
     import { CustomerService } from '@/service/CustomerService';
     import { ProductService } from '@/service/ProductService';
-    import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
-    import { onBeforeMount, reactive, ref } from 'vue';
+    import type { Customer, Product, ProductOrder, Representative } from '@/service/types';
+    import { formatCurrency } from '@/utils/currency';
+    import { formatDate } from '@/utils/dateFormat';
 
-    const customers1 = ref(null);
-    const customers2 = ref(null);
-    const customers3 = ref(null);
-    const filters1 = ref(null);
-    const loading1 = ref(null);
+    type CustomerRow = Customer & Record<string, unknown>;
+    type ProductRow = Product & Record<string, unknown>;
+    type OrderRow = ProductOrder & Record<string, unknown>;
+
+    // Generic SFCs compile to a function type, so InstanceType cannot name the exposed surface; these are the parts used here.
+    const table = ref<{ clearFilters: () => void } | null>(null);
+    const expansionTable = ref<{ expandAll: () => void; collapseAll: () => void } | null>(null);
+
+    const customers1 = ref<CustomerRow[]>([]);
+    const customers2 = ref<CustomerRow[]>([]);
+    const customers3 = ref<CustomerRow[]>([]);
+    const products = ref<ProductRow[]>([]);
+    const loading1 = ref<boolean>(true);
+    const globalFilter = ref('');
     const balanceFrozen = ref(false);
-    const products = ref(null);
-    const expandedRows = ref([]);
-    const statuses = reactive(['unqualified', 'qualified', 'new', 'negotiation', 'renewal', 'proposal']);
-    const representatives = reactive([
+
+    const statuses = ['unqualified', 'qualified', 'new', 'negotiation', 'renewal', 'proposal'];
+    const representatives: Representative[] = [
         { name: 'Amy Elsner', image: 'amyelsner.png' },
         { name: 'Anna Fali', image: 'annafali.png' },
         { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
@@ -24,327 +48,293 @@
         { name: 'Onyama Limba', image: 'onyamalimba.png' },
         { name: 'Stephen Shaw', image: 'stephenshaw.png' },
         { name: 'XuXue Feng', image: 'xuxuefeng.png' }
-    ]);
+    ];
 
-    function getOrderSeverity(order) {
-        switch (order.status) {
-            case 'DELIVERED':
-                return 'success';
-
-            case 'CANCELLED':
-                return 'danger';
-
-            case 'PENDING':
-                return 'warn';
-
-            case 'RETURNED':
-                return 'info';
-
-            default:
-                return null;
-        }
+    function getOrderSeverity(order: ProductOrder): BadgeVariants['variant'] {
+        if (order.status === 'DELIVERED') return 'success';
+        if (order.status === 'CANCELLED') return 'destructive';
+        if (order.status === 'PENDING') return 'warning';
+        if (order.status === 'RETURNED') return 'info';
+        return 'default';
     }
 
-    function getSeverity(status) {
-        switch (status) {
-            case 'unqualified':
-                return 'danger';
-
-            case 'qualified':
-                return 'success';
-
-            case 'new':
-                return 'info';
-
-            case 'negotiation':
-                return 'warn';
-
-            case 'renewal':
-                return null;
-        }
+    function statusVariant(status: string): BadgeVariants['variant'] {
+        if (status === 'unqualified') return 'destructive';
+        if (status === 'qualified') return 'success';
+        if (status === 'new') return 'info';
+        if (status === 'negotiation') return 'warning';
+        return 'default';
     }
 
-    function getStockSeverity(product) {
-        switch (product.inventoryStatus) {
-            case 'INSTOCK':
-                return 'success';
-
-            case 'LOWSTOCK':
-                return 'warn';
-
-            case 'OUTOFSTOCK':
-                return 'danger';
-
-            default:
-                return null;
-        }
+    function getStockSeverity(product: Product): BadgeVariants['variant'] {
+        if (product.inventoryStatus === 'INSTOCK') return 'success';
+        if (product.inventoryStatus === 'LOWSTOCK') return 'warning';
+        if (product.inventoryStatus === 'OUTOFSTOCK') return 'destructive';
+        return 'default';
     }
 
     onBeforeMount(() => {
-        ProductService.getProductsWithOrdersSmall().then((data) => (products.value = data));
+        ProductService.getProductsWithOrdersSmall().then((data) => (products.value = data as ProductRow[]));
         CustomerService.getCustomersLarge().then((data) => {
             customers1.value = data;
             loading1.value = false;
-            customers1.value.forEach((customer) => (customer.date = new Date(customer.date)));
         });
         CustomerService.getCustomersLarge().then((data) => (customers2.value = data));
         CustomerService.getCustomersMedium().then((data) => (customers3.value = data));
-
-        initFilters1();
     });
 
-    function initFilters1() {
-        filters1.value = {
-            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'country.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            representative: { value: null, matchMode: FilterMatchMode.IN },
-            date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-            balance: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            activity: { value: [0, 100], matchMode: FilterMatchMode.BETWEEN },
-            verified: { value: null, matchMode: FilterMatchMode.EQUALS }
-        };
+    function clearFilters(): void {
+        table.value?.clearFilters();
     }
 
-    function expandAll() {
-        expandedRows.value = products.value.reduce((acc, p) => {
-            acc[p.id] = true;
-            return acc;
-        }, {});
+    function expandAll(): void {
+        expansionTable.value?.expandAll();
     }
 
-    function collapseAll() {
-        expandedRows.value = null;
+    function collapseAll(): void {
+        expansionTable.value?.collapseAll();
     }
 
-    function formatCurrency(value) {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    // The filter menu keeps its draft as `unknown`; these narrow it for each control rather than casting.
+    function asArray(value: unknown): unknown[] {
+        return Array.isArray(value) ? value : [];
     }
 
-    function formatDate(value) {
-        return value.toLocaleDateString('en-US', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
+    function asString(value: unknown): string {
+        return typeof value === 'string' ? value : '';
     }
 
-    function calculateCustomerTotal(name) {
-        let total = 0;
-        if (customers3.value) {
-            for (const customer of customers3.value) {
-                if (customer.representative.name === name) {
-                    total++;
-                }
-            }
-        }
-
-        return total;
+    function asRange(value: unknown): number[] {
+        return Array.isArray(value) && value.length === 2 && value.every((n): n is number => typeof n === 'number') ? value : [0, 100];
     }
+
+    function asDate(value: unknown): Date | null {
+        return value instanceof Date ? value : null;
+    }
+
+    // No value yet means no filter, which PrimeVue showed as the indeterminate state.
+    function asCheckState(value: unknown): boolean | 'indeterminate' {
+        return typeof value === 'boolean' ? value : 'indeterminate';
+    }
+
+    function isRepresentative(option: unknown): option is Representative {
+        return typeof option === 'object' && option !== null && 'name' in option && 'image' in option;
+    }
+
+    // TanStack makes every accessor column sortable unless told otherwise; upstream only sorted the nested orders table.
+    function unsortable<TData extends Record<string, unknown>>(columns: DataTableColumn<TData>[]): DataTableColumn<TData>[] {
+        return columns.map((column) => ({ ...column, enableSorting: false }));
+    }
+
+    function flagCell(country: Customer['country']) {
+        return h('div', { class: 'flex items-center gap-2' }, [
+            h('img', { alt: 'flag', src: 'https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png', class: `flag flag-${country.code}`, style: 'width: 24px' }),
+            h('span', country.name)
+        ]);
+    }
+
+    const customerHelper = createColumns<CustomerRow>();
+
+    const filterColumns = unsortable(
+        customerHelper.columns([
+            customerHelper.accessor('name', { header: 'Name', meta: { filter: { type: 'text', placeholder: 'Search by name' }, class: 'min-w-48' } }),
+            customerHelper.accessor((row) => row.country.name, {
+                id: 'country',
+                header: 'Country',
+                cell: ({ row }) => flagCell(row.original.country),
+                meta: { filter: { type: 'text', placeholder: 'Search by country' }, class: 'min-w-48' }
+            }),
+            customerHelper.accessor((row) => row.representative.name, {
+                id: 'representative',
+                header: 'Agent',
+                cell: ({ row }) =>
+                    h('div', { class: 'flex items-center gap-2' }, [
+                        h('img', { alt: row.original.representative.name, src: `https://primefaces.org/cdn/primevue/images/avatar/${row.original.representative.image}`, style: 'width: 32px' }),
+                        h('span', row.original.representative.name)
+                    ]),
+                meta: { filter: { type: 'custom', matchModes: ['in'], showMatchModes: false }, class: 'min-w-56' }
+            }),
+            customerHelper.accessor('date', { header: 'Date', cell: (ctx) => formatDate(new Date(ctx.getValue()), 'mm/dd/yy'), meta: { filter: { type: 'date' }, class: 'min-w-40' } }),
+            customerHelper.accessor('balance', { header: 'Balance', cell: (ctx) => formatCurrency(ctx.getValue()), meta: { filter: { type: 'numeric' }, class: 'min-w-40' } }),
+            customerHelper.accessor('status', {
+                header: 'Status',
+                cell: (ctx) => h(Badge, { variant: statusVariant(ctx.getValue()) }, () => ctx.getValue()),
+                meta: { filter: { type: 'custom', matchModes: ['equals'], showMatchModes: false }, class: 'min-w-48' }
+            }),
+            customerHelper.accessor('activity', {
+                header: 'Activity',
+                cell: (ctx) => h(Progress, { modelValue: ctx.getValue(), class: 'h-1.5' }),
+                meta: { filter: { type: 'custom', matchModes: ['between'], showMatchModes: false }, class: 'min-w-48' }
+            }),
+            customerHelper.accessor('verified', {
+                header: 'Verified',
+                // Preflight makes svg a block, so it needs inline-block for the cell's text-center to reach it.
+                cell: (ctx) => (ctx.getValue() ? h(IconCheckCircle, { class: 'inline-block size-4 text-green-500' }) : h(IconTimesCircle, { class: 'inline-block size-4 text-red-500' })),
+                meta: { filter: { type: 'custom', matchModes: ['equals'], showMatchModes: false }, class: 'min-w-32 text-center' }
+            })
+        ])
+    );
+
+    // A computed, not a constant: the wrapper derives pinning from column meta on each read, and Balance follows the toggle.
+    const frozenColumns = computed(() =>
+        unsortable(
+            customerHelper.columns([
+                customerHelper.accessor('name', { id: 'frozenName', header: 'Name', size: 200, meta: { frozen: 'left', class: 'font-bold', headerClass: 'font-bold' } }),
+                customerHelper.accessor('id', { header: 'Id', size: 100 }),
+                customerHelper.accessor('name', { header: 'Name', size: 200 }),
+                customerHelper.accessor((row) => row.country.name, { id: 'country', header: 'Country', size: 200 }),
+                customerHelper.accessor('date', { header: 'Date', size: 200 }),
+                customerHelper.accessor('company', { header: 'Company', size: 200 }),
+                customerHelper.accessor('status', { header: 'Status', size: 200 }),
+                customerHelper.accessor('activity', { header: 'Activity', size: 200 }),
+                customerHelper.accessor((row) => row.representative.name, { id: 'representative', header: 'Representative', size: 200 }),
+                customerHelper.accessor('balance', {
+                    header: 'Balance',
+                    size: 200,
+                    cell: (ctx) => formatCurrency(ctx.getValue()),
+                    meta: balanceFrozen.value ? { frozen: 'right', class: 'font-bold', headerClass: 'font-bold' } : { class: 'font-bold' }
+                })
+            ])
+        )
+    );
+
+    const productHelper = createColumns<ProductRow>();
+
+    const productColumns = unsortable(
+        productHelper.columns([
+            productHelper.accessor('name', { header: 'Name' }),
+            productHelper.display({
+                id: 'image',
+                header: 'Image',
+                cell: ({ row }) => h('img', { src: `https://primefaces.org/cdn/primevue/images/product/${row.original.image}`, alt: row.original.image, class: 'shadow-lg', width: 64 })
+            }),
+            productHelper.accessor('price', { header: 'Price', cell: (ctx) => formatCurrency(ctx.getValue()) }),
+            productHelper.accessor('category', { header: 'Category' }),
+            productHelper.accessor('rating', { header: 'Reviews', cell: (ctx) => h(StarRating, { modelValue: ctx.getValue(), readonly: true }) }),
+            productHelper.accessor('inventoryStatus', { header: 'Status', cell: ({ row }) => h(Badge, { variant: getStockSeverity(row.original) }, () => row.original.inventoryStatus) })
+        ])
+    );
+
+    const orderHelper = createColumns<OrderRow>();
+
+    // Left sortable: upstream marked every orders column sortable, and no other column on the page.
+    const orderColumns = orderHelper.columns([
+        orderHelper.accessor('id', { header: 'Id' }),
+        orderHelper.accessor('customer', { header: 'Customer' }),
+        orderHelper.accessor('date', { header: 'Date' }),
+        orderHelper.accessor('amount', { header: 'Amount', cell: (ctx) => formatCurrency(ctx.getValue()) }),
+        orderHelper.accessor('status', { header: 'Status', cell: ({ row }) => h(Badge, { variant: getOrderSeverity(row.original) }, () => row.original.status.toLowerCase()) }),
+        orderHelper.display({
+            id: 'actions',
+            header: '',
+            cell: () => h(Button, { size: 'icon', 'aria-label': 'View order' }, () => h(IconSearch)),
+            meta: { headerClass: 'w-16' }
+        })
+    ]);
+
+    const groupColumns = customerHelper.columns([
+        // Left sortable: TanStack drops initialSorting entries for columns that cannot sort, and the groups are ordered by this one.
+        customerHelper.accessor((row) => row.representative.name, { id: 'representative', header: 'Representative' }),
+        ...unsortable(
+            customerHelper.columns([
+                customerHelper.accessor('name', { header: 'Name', meta: { class: 'min-w-50' } }),
+                customerHelper.accessor((row) => row.country.name, { id: 'country', header: 'Country', cell: ({ row }) => flagCell(row.original.country), meta: { class: 'min-w-50' } }),
+                customerHelper.accessor('company', { header: 'Company', meta: { class: 'min-w-50' } }),
+                customerHelper.accessor('status', { header: 'Status', cell: (ctx) => h(Badge, { variant: statusVariant(ctx.getValue()) }, () => ctx.getValue()), meta: { class: 'min-w-50' } }),
+                customerHelper.accessor('date', { header: 'Date', meta: { class: 'min-w-50' } })
+            ])
+        )
+    ]);
 </script>
 
 <template>
     <div class="card">
         <div class="font-semibold text-xl mb-4">Filtering</div>
         <DataTable
-            :value="customers1"
-            :paginator="true"
-            :rows="10"
-            dataKey="id"
-            :rowHover="true"
-            v-model:filters="filters1"
-            filterDisplay="menu"
+            ref="table"
+            v-model:global-filter="globalFilter"
+            :columns="filterColumns"
+            :data="customers1"
+            row-key="id"
+            paginator
+            :page-size="10"
+            row-hover
+            show-gridlines
             :loading="loading1"
-            :filters="filters1"
-            :globalFilterFields="['name', 'country.name', 'representative.name', 'balance', 'status']"
-            showGridlines
+            :global-filter-fields="['name', 'country', 'representative', 'balance', 'status']"
         >
             <template #header>
                 <div class="flex justify-between">
-                    <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />
-                    <IconField>
-                        <InputIcon>
-                            <i class="pi pi-search" />
-                        </InputIcon>
-                        <InputText v-model="filters1['global'].value" placeholder="Keyword Search" />
-                    </IconField>
+                    <Button variant="outline" @click="clearFilters"><IconFilterSlash />Clear</Button>
+                    <InputGroup class="w-56">
+                        <InputGroupAddon><IconSearch /></InputGroupAddon>
+                        <InputGroupInput v-model="globalFilter" placeholder="Keyword Search" />
+                    </InputGroup>
                 </div>
             </template>
-            <template #empty> No customers found. </template>
-            <template #loading> Loading customers data. Please wait. </template>
-            <Column field="name" header="Name" style="min-width: 12rem">
-                <template #body="{ data }">
-                    {{ data.name }}
-                </template>
-                <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
-                </template>
-            </Column>
-            <Column header="Country" filterField="country.name" style="min-width: 12rem">
-                <template #body="{ data }">
-                    <div class="flex items-center gap-2">
-                        <img alt="flag" src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png" :class="`flag flag-${data.country.code}`" style="width: 24px" />
-                        <span>{{ data.country.name }}</span>
+            <template #empty>No customers found.</template>
+            <template #loading>Loading customers data. Please wait.</template>
+            <template #filter-representative="{ value, setValue }">
+                <MultiSelect :model-value="asArray(value)" :options="representatives" option-label="name" option-value="name" placeholder="Any" @update:model-value="setValue">
+                    <template #option="{ option }">
+                        <div v-if="isRepresentative(option)" class="flex items-center gap-2">
+                            <img :alt="option.name" :src="`https://primefaces.org/cdn/primevue/images/avatar/${option.image}`" style="width: 32px" />
+                            <span>{{ option.name }}</span>
+                        </div>
+                    </template>
+                </MultiSelect>
+            </template>
+            <template #filter-date="{ value, setValue }">
+                <DatePicker :model-value="asDate(value)" placeholder="mm/dd/yyyy" @update:model-value="setValue" />
+            </template>
+            <template #filter-status="{ value, setValue }">
+                <Select :model-value="asString(value)" @update:model-value="setValue">
+                    <SelectTrigger class="w-full"><SelectValue placeholder="Select One" /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem v-for="status in statuses" :key="status" :value="status">
+                            <Badge :variant="statusVariant(status)">{{ status }}</Badge>
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+            </template>
+            <template #filter-activity="{ value, setValue }">
+                <div class="flex flex-col gap-2">
+                    <Slider :model-value="asRange(value)" :min="0" :max="100" @update:model-value="setValue" />
+                    <div class="flex justify-between text-sm text-muted-foreground">
+                        <span>{{ asRange(value)[0] }}</span>
+                        <span>{{ asRange(value)[1] }}</span>
                     </div>
-                </template>
-                <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" placeholder="Search by country" />
-                </template>
-                <template #filterclear="{ filterCallback }">
-                    <Button type="button" icon="pi pi-times" @click="filterCallback()" severity="secondary"></Button>
-                </template>
-                <template #filterapply="{ filterCallback }">
-                    <Button type="button" icon="pi pi-check" @click="filterCallback()" severity="success"></Button>
-                </template>
-            </Column>
-            <Column header="Agent" filterField="representative" :showFilterMatchModes="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 14rem">
-                <template #body="{ data }">
-                    <div class="flex items-center gap-2">
-                        <img :alt="data.representative.name" :src="`https://primefaces.org/cdn/primevue/images/avatar/${data.representative.image}`" style="width: 32px" />
-                        <span>{{ data.representative.name }}</span>
-                    </div>
-                </template>
-                <template #filter="{ filterModel }">
-                    <MultiSelect v-model="filterModel.value" :options="representatives" optionLabel="name" placeholder="Any">
-                        <template #option="slotProps">
-                            <div class="flex items-center gap-2">
-                                <img :alt="slotProps.option.name" :src="`https://primefaces.org/cdn/primevue/images/avatar/${slotProps.option.image}`" style="width: 32px" />
-                                <span>{{ slotProps.option.name }}</span>
-                            </div>
-                        </template>
-                    </MultiSelect>
-                </template>
-            </Column>
-            <Column header="Date" filterField="date" dataType="date" style="min-width: 10rem">
-                <template #body="{ data }">
-                    {{ formatDate(data.date) }}
-                </template>
-                <template #filter="{ filterModel }">
-                    <DatePicker v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
-                </template>
-            </Column>
-            <Column header="Balance" filterField="balance" dataType="numeric" style="min-width: 10rem">
-                <template #body="{ data }">
-                    {{ formatCurrency(data.balance) }}
-                </template>
-                <template #filter="{ filterModel }">
-                    <InputNumber v-model="filterModel.value" mode="currency" currency="USD" locale="en-US" />
-                </template>
-            </Column>
-            <Column header="Status" field="status" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
-                <template #body="{ data }">
-                    <Tag :value="data.status" :severity="getSeverity(data.status)" />
-                </template>
-                <template #filter="{ filterModel }">
-                    <Select v-model="filterModel.value" :options="statuses" placeholder="Select One" showClear>
-                        <template #option="slotProps">
-                            <Tag :value="slotProps.option" :severity="getSeverity(slotProps.option)" />
-                        </template>
-                    </Select>
-                </template>
-            </Column>
-            <Column field="activity" header="Activity" :showFilterMatchModes="false" style="min-width: 12rem">
-                <template #body="{ data }">
-                    <ProgressBar :value="data.activity" :showValue="false" style="height: 6px"></ProgressBar>
-                </template>
-                <template #filter="{ filterModel }">
-                    <Slider v-model="filterModel.value" range class="m-4"></Slider>
-                    <div class="flex items-center justify-between px-2">
-                        <span>{{ filterModel.value ? filterModel.value[0] : 0 }}</span>
-                        <span>{{ filterModel.value ? filterModel.value[1] : 100 }}</span>
-                    </div>
-                </template>
-            </Column>
-            <Column field="verified" header="Verified" dataType="boolean" bodyClass="text-center" style="min-width: 8rem">
-                <template #body="{ data }">
-                    <i class="pi" :class="{ 'pi-check-circle text-green-500 ': data.verified, 'pi-times-circle text-red-500': !data.verified }"></i>
-                </template>
-                <template #filter="{ filterModel }">
-                    <label for="verified-filter" class="font-bold"> Verified </label>
-                    <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary inputId="verified-filter" />
-                </template>
-            </Column>
+                </div>
+            </template>
+            <template #filter-verified="{ value, setValue }">
+                <div class="flex items-center gap-2">
+                    <Label for="verified-filter" class="font-bold">Verified</Label>
+                    <Checkbox id="verified-filter" :model-value="asCheckState(value)" @update:model-value="setValue" />
+                </div>
+            </template>
         </DataTable>
     </div>
 
     <div class="card">
         <div class="font-semibold text-xl mb-4">Frozen Columns</div>
-        <ToggleButton v-model="balanceFrozen" onIcon="pi pi-lock" offIcon="pi pi-lock-open" onLabel="Balance" offLabel="Balance" />
+        <ToggleButton v-model="balanceFrozen" on-label="Balance" off-label="Balance" :on-icon="IconLock" :off-icon="IconLockOpen" />
 
-        <DataTable :value="customers2" scrollable scrollHeight="400px" class="mt-6">
-            <Column field="name" header="Name" style="min-width: 200px" frozen class="font-bold"></Column>
-            <Column field="id" header="Id" style="min-width: 100px"></Column>
-            <Column field="name" header="Name" style="min-width: 200px"></Column>
-            <Column field="country.name" header="Country" style="min-width: 200px"></Column>
-            <Column field="date" header="Date" style="min-width: 200px"></Column>
-            <Column field="company" header="Company" style="min-width: 200px"></Column>
-            <Column field="status" header="Status" style="min-width: 200px"></Column>
-            <Column field="activity" header="Activity" style="min-width: 200px"></Column>
-            <Column field="representative.name" header="Representative" style="min-width: 200px"></Column>
-            <Column field="balance" header="Balance" style="min-width: 200px" alignFrozen="right" :frozen="balanceFrozen">
-                <template #body="{ data }">
-                    <span class="font-bold">{{ formatCurrency(data.balance) }}</span>
-                </template>
-            </Column>
-        </DataTable>
+        <DataTable :columns="frozenColumns" :data="customers2" row-key="id" scroll-height="400px" class="mt-6" />
     </div>
 
     <div class="card">
         <div class="font-semibold text-xl mb-4">Row Expansion</div>
-        <DataTable v-model:expandedRows="expandedRows" :value="products" dataKey="id" tableStyle="min-width: 60rem">
+        <DataTable ref="expansionTable" :columns="productColumns" :data="products" row-key="id" expandable class="[&>[data-slot=data-table-scroller]>div>table]:min-w-240">
             <template #header>
                 <div class="flex flex-wrap justify-end gap-2">
-                    <Button text icon="pi pi-plus" label="Expand All" @click="expandAll" />
-                    <Button text icon="pi pi-minus" label="Collapse All" @click="collapseAll" />
+                    <Button variant="ghost" @click="expandAll"><IconPlus />Expand All</Button>
+                    <Button variant="ghost" @click="collapseAll"><IconMinus />Collapse All</Button>
                 </div>
             </template>
-            <Column expander style="width: 5rem" />
-            <Column field="name" header="Name"></Column>
-            <Column header="Image">
-                <template #body="slotProps">
-                    <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`" :alt="slotProps.data.image" class="shadow-lg" width="64" />
-                </template>
-            </Column>
-            <Column field="price" header="Price">
-                <template #body="slotProps">
-                    {{ formatCurrency(slotProps.data.price) }}
-                </template>
-            </Column>
-            <Column field="category" header="Category"></Column>
-            <Column field="rating" header="Reviews">
-                <template #body="slotProps">
-                    <Rating :modelValue="slotProps.data.rating" readonly />
-                </template>
-            </Column>
-            <Column header="Status">
-                <template #body="slotProps">
-                    <Tag :value="slotProps.data.inventoryStatus" :severity="getStockSeverity(slotProps.data)" />
-                </template>
-            </Column>
-            <template #expansion="slotProps">
+            <template #expansion="{ row }">
                 <div class="p-4">
-                    <h5>Orders for {{ slotProps.data.name }}</h5>
-                    <DataTable :value="slotProps.data.orders">
-                        <Column field="id" header="Id" sortable></Column>
-                        <Column field="customer" header="Customer" sortable></Column>
-                        <Column field="date" header="Date" sortable></Column>
-                        <Column field="amount" header="Amount" sortable>
-                            <template #body="slotProps">
-                                {{ formatCurrency(slotProps.data.amount) }}
-                            </template>
-                        </Column>
-                        <Column field="status" header="Status" sortable>
-                            <template #body="slotProps">
-                                <Tag :value="slotProps.data.status.toLowerCase()" :severity="getOrderSeverity(slotProps.data)" />
-                            </template>
-                        </Column>
-                        <Column headerStyle="width:4rem">
-                            <template #body>
-                                <Button icon="pi pi-search" />
-                            </template>
-                        </Column>
-                    </DataTable>
+                    <div class="mb-2 font-semibold">Orders for {{ row.name }}</div>
+                    <DataTable :columns="orderColumns" :data="(row.orders ?? []) as OrderRow[]" row-key="id" />
                 </div>
             </template>
         </DataTable>
@@ -352,43 +342,16 @@
 
     <div class="card">
         <div class="font-semibold text-xl mb-4">Grouping</div>
-        <DataTable :value="customers3" rowGroupMode="subheader" groupRowsBy="representative.name" sortMode="single" sortField="representative.name" :sortOrder="1" scrollable scrollHeight="400px" tableStyle="min-width: 50rem">
-            <template #groupheader="slotProps">
+        <DataTable :columns="groupColumns" :data="customers3" row-key="id" group-by="representative" :initial-sorting="[{ id: 'representative', desc: false }]" scroll-height="400px" class="[&_table]:min-w-200">
+            <template #groupHeader="{ row, value }">
                 <div class="flex items-center gap-2">
-                    <img :alt="slotProps.data.representative.name" :src="`https://primefaces.org/cdn/primevue/images/avatar/${slotProps.data.representative.image}`" width="32" style="vertical-align: middle" />
-                    <span>{{ slotProps.data.representative.name }}</span>
+                    <img :alt="row.representative.name" :src="`https://primefaces.org/cdn/primevue/images/avatar/${row.representative.image}`" width="32" />
+                    <span>{{ value }}</span>
                 </div>
             </template>
-            <Column field="representative.name" header="Representative"></Column>
-            <Column field="name" header="Name" style="min-width: 200px"></Column>
-            <Column field="country" header="Country" style="min-width: 200px">
-                <template #body="slotProps">
-                    <div class="flex items-center gap-2">
-                        <img alt="flag" src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png" :class="`flag flag-${slotProps.data.country.code}`" style="width: 24px" />
-                        <span>{{ slotProps.data.country.name }}</span>
-                    </div>
-                </template>
-            </Column>
-            <Column field="company" header="Company" style="min-width: 200px"></Column>
-            <Column field="status" header="Status" style="min-width: 200px">
-                <template #body="slotProps">
-                    <Tag :value="slotProps.data.status" :severity="getSeverity(slotProps.data.status)" />
-                </template>
-            </Column>
-            <Column field="date" header="Date" style="min-width: 200px"></Column>
-            <template #groupfooter="slotProps">
-                <div class="flex justify-end font-bold w-full">Total Customers: {{ calculateCustomerTotal(slotProps.data.representative.name) }}</div>
+            <template #groupFooter="{ count }">
+                <div class="flex w-full justify-end font-bold">Total Customers: {{ count }}</div>
             </template>
         </DataTable>
     </div>
 </template>
-
-<style scoped lang="scss">
-    :deep(.p-datatable-frozen-tbody) {
-        font-weight: bold;
-    }
-
-    :deep(.p-datatable-scrollable .p-frozen-column) {
-        font-weight: bold;
-    }
-</style>
