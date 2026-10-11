@@ -106,7 +106,8 @@
                 <slot />
             </div>
             <div v-if="blockView === BLOCK_VIEW.CODE">
-                <pre class="overflow-x-auto rounded-lg border border-border bg-muted p-4"><code class="text-sm text-muted-foreground">{{ code }}</code></pre>
+                <!-- Fixed zinc rather than theme tokens: every token flips with the mode, and the code panel stays dark in both. -->
+                <pre class="overflow-x-auto rounded-lg border border-border bg-zinc-900 p-4"><code class="text-sm text-zinc-50">{{ code }}</code></pre>
             </div>
         </div>
     </div>

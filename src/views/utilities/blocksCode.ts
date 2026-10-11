@@ -36,7 +36,7 @@ export const blocksCode: Record<BlockKey, string> = {
     </div>
 </div>`,
 
-    feature: `<div class="bg-card px-6 md:px-12 lg:px-20 py-20 text-center">
+    feature: `<div class="bg-card dark:bg-background px-6 md:px-12 lg:px-20 py-20 text-center">
     <div class="flex flex-col gap-6">
         <div class="flex flex-col items-center gap-4">
             <div class="font-bold text-3xl leading-tight">
