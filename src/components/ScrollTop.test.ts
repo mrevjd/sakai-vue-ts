@@ -23,4 +23,22 @@ describe('ScrollTop', () => {
         expect(scroller.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
         wrapper.unmount();
     });
+
+    it('watches the window and scrolls it in the default target mode', async () => {
+        // The two modes position differently and only one of them had a test, so this pins the other.
+        const scrollTo = vi.fn();
+        Object.defineProperty(window, 'scrollTo', { value: scrollTo, writable: true });
+        const wrapper = mount(ScrollTop, { props: { threshold: 100, behavior: 'auto' }, attachTo: document.body });
+        await nextTick();
+        expect(wrapper.find('[data-slot=scroll-top]').exists()).toBe(false);
+        // A browser targets a window scroll at the document and useScroll reads the offset off
+        // documentElement, so the event is dispatched there and bubbled up to the window listener.
+        Object.defineProperty(document.documentElement, 'scrollTop', { value: 500, writable: true, configurable: true });
+        document.dispatchEvent(new Event('scroll', { bubbles: true }));
+        await nextTick();
+        expect(wrapper.find('[data-slot=scroll-top]').exists()).toBe(true);
+        await wrapper.get('[data-slot=scroll-top]').trigger('click');
+        expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'auto' });
+        wrapper.unmount();
+    });
 });
