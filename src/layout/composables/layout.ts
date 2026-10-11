@@ -29,7 +29,7 @@ function readStoredConfig(): string | null {
     }
 }
 
-export const layoutConfig = reactive<LayoutConfig>(parseLayoutConfig(readStoredConfig()));
+const layoutConfig = reactive<LayoutConfig>(parseLayoutConfig(readStoredConfig()));
 
 const layoutState = reactive<LayoutState>({
     staticMenuInactive: false,
