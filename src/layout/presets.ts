@@ -1,5 +1,5 @@
-// Values read on 2026-09-12 from node_modules/@primeuix/themes/dist/<preset>/base/index.mjs and
-// dist/<preset>/button/index.mjs, before the package is removed in Plan 3:
+// Values read on 2026-09-12 from @primeuix/themes 2.0.3 (the <preset> base and button tokens),
+// copied here because the package has since been removed:
 //   content.borderRadius   Aura {border.radius.md} = 6px, Lara md = 6px, Nora {border.radius.xs} = 2px
 //   formField.paddingY     Aura 0.5rem, Lara 0.625rem, Nora 0.5rem (control height = 2 * paddingY + 1.25rem line)
 //   button fontWeight      Aura 500, Lara 600, Nora 700

@@ -10,8 +10,8 @@ export interface RejectedFile {
 
 const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-// PrimeVue 4's formatSize verbatim (node_modules/primevue/fileupload/index.mjs, k = 1024, dm = 3,
-// parseFloat drops trailing zeros), so the rejection message reads as it did before the migration.
+// PrimeVue 4.5.5's FileUpload formatSize verbatim (k = 1024, dm = 3, parseFloat drops trailing
+// zeros), so the rejection message reads as it did before the migration.
 export function formatSize(bytes: number): string {
     if (bytes <= 0) return '0 B';
     const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), UNITS.length - 1);

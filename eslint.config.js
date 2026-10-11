@@ -12,7 +12,7 @@ export default defineConfigWithVueTs(
     },
     {
         name: 'app/files-to-ignore',
-        ignores: ['**/node_modules/**', '**/.bun/**', '**/dist/**', '**/dist-ssr/**', '**/coverage/**', 'components.d.ts', '*.tsbuildinfo']
+        ignores: ['**/node_modules/**', '**/.bun/**', '**/dist/**', '**/dist-ssr/**', '**/coverage/**', '*.tsbuildinfo']
     },
     js.configs.recommended,
     pluginVue.configs['flat/essential'],

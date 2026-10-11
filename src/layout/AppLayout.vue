@@ -30,5 +30,4 @@
         </div>
         <div class="layout-mask animate-in fade-in" @click="hideMobileMenu" />
     </div>
-    <Toast />
 </template>

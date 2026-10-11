@@ -79,7 +79,7 @@
                 {
                     label: 'All Blocks',
                     icon: IconGlobe,
-                    url: 'https://blocks.primevue.org/',
+                    url: 'https://www.shadcn-vue.com/blocks',
                     target: '_blank'
                 }
             ]

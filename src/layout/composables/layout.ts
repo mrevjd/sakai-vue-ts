@@ -2,7 +2,6 @@
 import type { ComputedRef } from 'vue';
 import { computed, onMounted, reactive, watch } from 'vue';
 import { applyTheme } from '@/layout/composables/theme';
-import { syncPrimeVueTheme } from '@/layout/composables/primevueBridge';
 import { parseLayoutConfig, type LayoutConfig, type MenuMode } from '@/utils/layoutConfig';
 
 const STORAGE_KEY = 'layoutConfig';
@@ -61,8 +60,6 @@ const themeInput = () => ({ preset: layoutConfig.preset, primary: layoutConfig.p
 
 // Synchronous flush so the new colours are already on <html> inside the view transition callback.
 watch(themeInput, applyTheme, { immediate: true, flush: 'sync' });
-// Not immediate: PrimeVue is not installed yet when this module first evaluates; main.ts runs the first sync.
-watch(themeInput, syncPrimeVueTheme, { flush: 'sync' });
 
 interface MenuModeChangeEvent {
     value: MenuMode;
