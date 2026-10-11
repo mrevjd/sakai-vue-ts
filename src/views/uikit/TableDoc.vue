@@ -10,6 +10,7 @@
     import { Checkbox } from '@/components/ui/checkbox';
     import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
     import { Label } from '@/components/ui/label';
+    import { NumberField, NumberFieldContent, NumberFieldInput } from '@/components/ui/number-field';
     import { Progress } from '@/components/ui/progress';
     import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
     import { Slider } from '@/components/ui/slider';
@@ -110,6 +111,10 @@
 
     function asDate(value: unknown): Date | null {
         return value instanceof Date ? value : null;
+    }
+
+    function asNumber(value: unknown): number | undefined {
+        return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
     }
 
     // No value yet means no filter, which PrimeVue showed as the indeterminate state.
@@ -286,6 +291,15 @@
             </template>
             <template #filter-date="{ value, setValue }">
                 <DatePicker :model-value="asDate(value)" placeholder="mm/dd/yyyy" @update:model-value="setValue" />
+            </template>
+            <!-- The column stays type numeric so its match modes survive; the slot only swaps the plain number
+                 input for the currency field the balance filter showed before. -->
+            <template #filter-balance="{ value, setValue }">
+                <NumberField :model-value="asNumber(value)" :format-options="{ style: 'currency', currency: 'USD' }" locale="en-US" @update:model-value="setValue">
+                    <NumberFieldContent>
+                        <NumberFieldInput />
+                    </NumberFieldContent>
+                </NumberField>
             </template>
             <template #filter-status="{ value, setValue }">
                 <Select :model-value="asString(value)" @update:model-value="setValue">
