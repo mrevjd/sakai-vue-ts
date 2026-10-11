@@ -59,7 +59,7 @@
         <Carousel :opts="{ align: 'start' }" class="w-full">
             <CarouselContent>
                 <CarouselItem v-for="product in products" :key="product.id" class="basis-full sm:basis-1/2 lg:basis-1/3">
-                    <div class="border border-border rounded-lg m-2 p-4">
+                    <div class="border border-border rounded-lg p-4">
                         <div class="mb-4">
                             <div class="relative mx-auto">
                                 <img :src="'https://primefaces.org/cdn/primevue/images/product/' + product.image" :alt="product.name" class="w-full rounded" />
@@ -79,8 +79,9 @@
                     </div>
                 </CarouselItem>
             </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
+            <!-- Inside the track, as Galleria does: the default -left-12 hangs past the card padding and scrolls a phone sideways. -->
+            <CarouselPrevious class="left-2" />
+            <CarouselNext class="right-2" />
         </Carousel>
     </div>
 
