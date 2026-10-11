@@ -49,6 +49,24 @@ describe('MaskedInput', () => {
         expect((input.element as HTMLInputElement).value).toBe('12__');
     });
 
+    it('keeps a literal digit in the mask out of the typed value as keys are appended', async () => {
+        const wrapper = mount(MaskedInput, { props: { mask: '+1 (999) 999-9999', modelValue: '' } });
+        let element = wrapper.get('[data-slot=masked-input]').element as HTMLInputElement;
+        for (const key of ['5', '5', '5']) element = await type(wrapper, element.value + key);
+        expect(element.value).toBe('+1 (555) ___-____');
+        expect(wrapper.emitted('update:modelValue')!.at(-1)).toEqual(['+1 (555) ___-____']);
+    });
+
+    it('in unmask mode keeps a typed digit that equals the literal at the same index of the mask', async () => {
+        // The emitted '21' flows back in through the model watcher; read as a display string its 1 would
+        // match the mask's literal 1 and be dropped, erasing the keystroke.
+        const wrapper = mount(MaskedInput, { props: { mask: '+1 (999) 999-9999', modelValue: '', unmask: true, 'onUpdate:modelValue': (value: string) => wrapper.setProps({ modelValue: value }) } });
+        let element = wrapper.get('[data-slot=masked-input]').element as HTMLInputElement;
+        for (const key of ['2', '1']) element = await type(wrapper, element.value + key);
+        expect(element.value).toBe('+1 (21_) ___-____');
+        expect(wrapper.emitted('update:modelValue')!.at(-1)).toEqual(['21']);
+    });
+
     it('falls back to the mask as the placeholder and marks an incomplete value invalid', () => {
         const wrapper = mount(MaskedInput, { props: { mask: '99/99', modelValue: '12' } });
         const element = wrapper.get('[data-slot=masked-input]').element as HTMLInputElement;

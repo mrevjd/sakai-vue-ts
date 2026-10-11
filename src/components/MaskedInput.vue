@@ -2,7 +2,7 @@
     import { computed, nextTick, ref, watch, type HTMLAttributes } from 'vue';
     import { Input } from '@/components/ui/input';
     import { cn } from '@/lib/utils';
-    import { applyMask, isMaskComplete } from '@/utils/mask';
+    import { applyMask, isMaskComplete, maskUnmasked } from '@/utils/mask';
 
     const props = withDefaults(
         defineProps<{
@@ -23,10 +23,16 @@
         return applyMask(value, props.mask, props.slotChar).display;
     }
 
+    // With `unmask` the model holds typed characters only, which applyMask would misread as a display
+    // string wherever one equals the literal at its index.
+    function fromModel(value: string): string {
+        return props.unmask ? maskUnmasked(value, props.mask, props.slotChar).display : toDisplay(value);
+    }
+
     // `shown` is the single source of truth for the field. Deriving it from the model instead would
     // give the value two writers, and the one driven by the model wins the tick, so a keystroke that
     // the mask rejects or reshapes never reaches the element.
-    const shown = ref(toDisplay(model.value));
+    const shown = ref(fromModel(model.value));
     const complete = computed(() => isMaskComplete(shown.value, props.mask, props.slotChar));
 
     watch(
@@ -46,7 +52,7 @@
 
     // A model change from outside (a parent clearing the field) flows in; the echo of our own write does not.
     watch(model, (next) => {
-        const incoming = toDisplay(next ?? '');
+        const incoming = fromModel(next ?? '');
         if (incoming !== toDisplay(shown.value)) shown.value = incoming;
     });
 </script>

@@ -11,14 +11,10 @@ export interface MaskResult {
     unmasked: string;
 }
 
-export function applyMask(raw: string, mask: string, slotChar = '_'): MaskResult {
+function fill(typed: string[], mask: string, slotChar: string): MaskResult {
     const pattern = mask.replace(/\?/g, '');
     // Index in `pattern` where the optional tail starts; past the end when the mask has no `?`.
     const optionalFrom = mask.includes('?') ? mask.indexOf('?') : pattern.length;
-    // Slot characters in the incoming value are re-derived from the mask, never carried over, so that
-    // feeding applyMask its own output is idempotent. Literals need no stripping: a literal cannot
-    // satisfy the placeholder it sits next to, so the scan below skips past it on its own.
-    const typed = [...raw].filter((char) => char !== slotChar);
     let source = 0;
     let display = '';
     const unmasked: string[] = [];
@@ -50,6 +46,22 @@ export function applyMask(raw: string, mask: string, slotChar = '_'): MaskResult
     // An optional tail nobody has typed into is not shown at all, literals included.
     if (optionalFrom < pattern.length && !optionalFilled) display = display.slice(0, optionalFrom);
     return { display, unmasked: unmasked.join('') };
+}
+
+// Masks a field's current text: a previous display with keystrokes added, or plain typed characters.
+export function applyMask(raw: string, mask: string, slotChar = '_'): MaskResult {
+    const pattern = mask.replace(/\?/g, '');
+    // Literals and slot characters are re-derived from the mask, never carried over, so feeding applyMask
+    // its own output is idempotent. A literal is dropped only where it sits at its own index: a mask such
+    // as `+1 (999) 999-9999` has a digit literal that a digit placeholder would otherwise take as input.
+    const typed = [...raw].filter((char, i) => char !== slotChar && !(i < pattern.length && !isPlaceholder(pattern[i]!) && char === pattern[i]));
+    return fill(typed, mask, slotChar);
+}
+
+// Masks a value that already holds only typed characters, such as an unmask-mode model. It must not go
+// through applyMask: there a typed digit that happens to equal the literal at its index would be dropped.
+export function maskUnmasked(unmasked: string, mask: string, slotChar = '_'): MaskResult {
+    return fill([...unmasked], mask, slotChar);
 }
 
 export function isMaskComplete(display: string, mask: string, slotChar = '_'): boolean {
