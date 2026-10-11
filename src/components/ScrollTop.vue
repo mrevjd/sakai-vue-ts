@@ -13,7 +13,7 @@
         class: undefined
     });
 
-    // The anchor span is only there to find the parent; the button itself is fixed or absolute and outside flow.
+    // The anchor span is only there to find the parent.
     const anchor = ref<HTMLElement | null>(null);
     const element = ref<HTMLElement | Window | null>(null);
     onMounted(() => {
@@ -30,14 +30,12 @@
 
 <template>
     <span ref="anchor" class="hidden" aria-hidden="true" />
-    <Button
-        v-if="visible"
-        size="icon-lg"
-        :class="cn('z-40 rounded-full shadow-md', props.target === 'parent' ? 'absolute right-4 bottom-4' : 'fixed right-8 bottom-8', props.class)"
-        aria-label="Scroll to top"
-        data-slot="scroll-top"
-        @click="scrollToTop"
-    >
-        <component :is="props.icon ?? IconArrowUp" class="size-5" />
-    </Button>
+    <!-- Parent mode sticks rather than absolutely positioning: an absolute child of a scroller is laid
+         out against the unscrolled box and scrolls away with the content, which is exactly when the
+         button is meant to appear. Window mode stays fixed to the viewport. -->
+    <div v-if="visible" :class="cn('z-40', props.target === 'parent' ? 'sticky bottom-4 flex justify-end' : 'fixed right-8 bottom-8')">
+        <Button size="icon-lg" :class="cn('rounded-full shadow-md', props.class)" aria-label="Scroll to top" data-slot="scroll-top" @click="scrollToTop">
+            <component :is="props.icon ?? IconArrowUp" class="size-5" />
+        </Button>
+    </div>
 </template>
