@@ -2,7 +2,7 @@
     import { computed, nextTick, ref, watch, type HTMLAttributes } from 'vue';
     import { Input } from '@/components/ui/input';
     import { cn } from '@/lib/utils';
-    import { applyMask, isMaskComplete, maskUnmasked } from '@/utils/mask';
+    import { applyMask, isMaskComplete, maskUnmasked, type MaskResult } from '@/utils/mask';
 
     const props = withDefaults(
         defineProps<{
@@ -19,14 +19,24 @@
 
     const model = defineModel<string>({ default: '' });
 
+    // Nothing typed means an empty field, as in PrimeVue: the bare slot string would hide the placeholder, read
+    // as an incomplete (invalid) value, and reach the model of a field the user has cleared.
+    function orEmpty(result: MaskResult): MaskResult {
+        return result.unmasked === '' ? { display: '', unmasked: '' } : result;
+    }
+
+    function masked(value: string): MaskResult {
+        return orEmpty(applyMask(value, props.mask, props.slotChar));
+    }
+
     function toDisplay(value: string): string {
-        return applyMask(value, props.mask, props.slotChar).display;
+        return masked(value).display;
     }
 
     // With `unmask` the model holds typed characters only, which applyMask would misread as a display
     // string wherever one equals the literal at its index.
     function fromModel(value: string): string {
-        return props.unmask ? maskUnmasked(value, props.mask, props.slotChar).display : toDisplay(value);
+        return props.unmask ? orEmpty(maskUnmasked(value, props.mask, props.slotChar)).display : toDisplay(value);
     }
 
     // `shown` is the single source of truth for the field. Deriving it from the model instead would
@@ -38,7 +48,7 @@
     watch(
         shown,
         async (next) => {
-            const result = applyMask(next, props.mask, props.slotChar);
+            const result = masked(next);
             model.value = props.unmask ? result.unmasked : result.display;
             if (next === result.display) return;
             // The vendored Input holds its value through useVModel in passive mode, whose prop watcher
@@ -54,6 +64,12 @@
     watch(model, (next) => {
         const incoming = fromModel(next ?? '');
         if (incoming !== toDisplay(shown.value)) shown.value = incoming;
+    });
+
+    // A new mask re-shapes the current value now rather than at the next keystroke; the shown watcher then
+    // writes the re-shaped value back to the model.
+    watch([() => props.mask, () => props.slotChar], () => {
+        shown.value = fromModel(model.value ?? '');
     });
 </script>
 

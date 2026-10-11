@@ -7,8 +7,8 @@ describe('paletteShade', () => {
         expect(paletteShade('purple', '400')).toBe('#c084fc');
     });
 
-    it('falls back to the foreground token for an unknown palette', () => {
-        expect(paletteShade('nope', '500')).toBe('var(--foreground)');
+    it('falls back to a concrete colour a canvas can draw for an unknown palette', () => {
+        expect(paletteShade('nope', '500')).toMatch(/^#[0-9a-f]{6}$/);
     });
 });
 

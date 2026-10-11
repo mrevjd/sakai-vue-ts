@@ -67,6 +67,27 @@ describe('MaskedInput', () => {
         expect(wrapper.emitted('update:modelValue')!.at(-1)).toEqual(['21']);
     });
 
+    it('starts an empty model as an empty field: placeholder visible, not marked invalid', () => {
+        const wrapper = mount(MaskedInput, { props: { mask: '(999) 999-9999', modelValue: '' } });
+        const element = wrapper.get('[data-slot=masked-input]').element as HTMLInputElement;
+        expect(element.value).toBe('');
+        expect(element.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('empties the model when the field is cleared', async () => {
+        const wrapper = mount(MaskedInput, { props: { mask: '(999) 999-9999', modelValue: '(912) 345-____' } });
+        const element = await type(wrapper, '');
+        expect(element.value).toBe('');
+        expect(wrapper.emitted('update:modelValue')!.at(-1)).toEqual(['']);
+    });
+
+    it('re-masks the current value when the mask changes', async () => {
+        const wrapper = mount(MaskedInput, { props: { mask: '999-999', modelValue: '123456', unmask: true } });
+        await wrapper.setProps({ mask: '99/99/99' });
+        await flushPromises();
+        expect((wrapper.get('[data-slot=masked-input]').element as HTMLInputElement).value).toBe('12/34/56');
+    });
+
     it('falls back to the mask as the placeholder and marks an incomplete value invalid', () => {
         const wrapper = mount(MaskedInput, { props: { mask: '99/99', modelValue: '12' } });
         const element = wrapper.get('[data-slot=masked-input]').element as HTMLInputElement;
