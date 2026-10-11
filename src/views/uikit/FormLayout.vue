@@ -73,15 +73,15 @@
                 <div class="font-semibold text-xl">Vertical</div>
                 <div class="flex flex-col gap-2">
                     <Label for="name1">Name</Label>
-                    <Input id="name1" v-model="name1" type="text" class="w-full" />
+                    <Input id="name1" v-model="name1" type="text" />
                 </div>
                 <div class="flex flex-col gap-2">
                     <Label for="email1">Email</Label>
-                    <Input id="email1" v-model="email1" type="text" class="w-full" />
+                    <Input id="email1" v-model="email1" type="text" />
                 </div>
                 <div class="flex flex-col gap-2">
                     <Label for="age1">Age</Label>
-                    <Input id="age1" v-model="age1" type="text" class="w-full" />
+                    <Input id="age1" v-model="age1" type="text" />
                 </div>
             </div>
 
@@ -90,11 +90,11 @@
                 <div class="flex flex-wrap gap-4">
                     <div class="flex flex-col grow basis-0 gap-2">
                         <Label for="name2">Name</Label>
-                        <Input id="name2" v-model="name2" type="text" class="w-full" />
+                        <Input id="name2" v-model="name2" type="text" />
                     </div>
                     <div class="flex flex-col grow basis-0 gap-2">
                         <Label for="email2">Email</Label>
-                        <Input id="email2" v-model="email2" type="text" class="w-full" />
+                        <Input id="email2" v-model="email2" type="text" />
                     </div>
                 </div>
             </div>
@@ -105,13 +105,13 @@
                 <div class="grid grid-cols-12 gap-2">
                     <Label for="name3" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Name</Label>
                     <div class="col-span-12 md:col-span-10">
-                        <Input id="name3" v-model="name3" type="text" class="w-full" />
+                        <Input id="name3" v-model="name3" type="text" />
                     </div>
                 </div>
                 <div class="grid grid-cols-12 gap-2">
                     <Label for="email3" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Email</Label>
                     <div class="col-span-12 md:col-span-10">
-                        <Input id="email3" v-model="email3" type="text" class="w-full" />
+                        <Input id="email3" v-model="email3" type="text" />
                     </div>
                 </div>
             </div>
@@ -121,11 +121,11 @@
                 <div class="flex flex-wrap items-start gap-4">
                     <div class="field">
                         <Label for="firstname1" class="sr-only">Firstname</Label>
-                        <Input id="firstname1" v-model="firstname1" type="text" placeholder="Firstname" class="w-full" />
+                        <Input id="firstname1" v-model="firstname1" type="text" placeholder="Firstname" />
                     </div>
                     <div class="field">
                         <Label for="lastname1" class="sr-only">Lastname</Label>
-                        <Input id="lastname1" v-model="lastname1" type="text" placeholder="Lastname" class="w-full" />
+                        <Input id="lastname1" v-model="lastname1" type="text" placeholder="Lastname" />
                     </div>
                     <Button>Submit</Button>
                 </div>
@@ -134,7 +134,7 @@
                 <div class="font-semibold text-xl">Help Text</div>
                 <div class="flex flex-wrap gap-2">
                     <Label for="username">Username</Label>
-                    <Input id="username" v-model="username" type="text" class="w-full" />
+                    <Input id="username" v-model="username" type="text" />
                     <small>Enter your username to reset your password.</small>
                 </div>
             </div>
@@ -147,17 +147,17 @@
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex flex-wrap gap-2 w-full">
                     <Label for="firstname2">Firstname</Label>
-                    <Input id="firstname2" v-model="firstname2" type="text" class="w-full" />
+                    <Input id="firstname2" v-model="firstname2" type="text" />
                 </div>
                 <div class="flex flex-wrap gap-2 w-full">
                     <Label for="lastname2">Lastname</Label>
-                    <Input id="lastname2" v-model="lastname2" type="text" class="w-full" />
+                    <Input id="lastname2" v-model="lastname2" type="text" />
                 </div>
             </div>
 
             <div class="flex flex-wrap">
                 <Label for="address">Address</Label>
-                <Textarea id="address" v-model="address" rows="4" class="w-full" />
+                <Textarea id="address" v-model="address" rows="4" />
             </div>
 
             <div class="flex flex-col md:flex-row gap-4">
@@ -172,7 +172,7 @@
                 </div>
                 <div class="flex flex-wrap gap-2 w-full">
                     <Label for="zip">Zip</Label>
-                    <Input id="zip" v-model="zip" type="text" class="w-full" />
+                    <Input id="zip" v-model="zip" type="text" />
                 </div>
             </div>
         </div>
@@ -193,7 +193,7 @@
                 <FormField v-slot="{ componentField }" name="email">
                     <FormItem>
                         <FormLabel>Email</FormLabel>
-                        <FormControl><Input type="email" placeholder="you@example.com" class="w-full" v-bind="componentField" /></FormControl>
+                        <FormControl><Input type="email" placeholder="you@example.com" v-bind="componentField" /></FormControl>
                         <FormDescription>We never share it.</FormDescription>
                         <FormMessage />
                     </FormItem>

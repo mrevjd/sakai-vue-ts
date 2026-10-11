@@ -71,7 +71,7 @@
                                     <div class="flex flex-col md:items-end gap-8">
                                         <span class="text-xl font-semibold">${{ item.price }}</span>
                                         <div class="flex flex-row-reverse md:flex-row gap-2">
-                                            <Button variant="outline" size="icon"><IconHeart /></Button>
+                                            <Button variant="outline" size="icon" aria-label="Add to favourites"><IconHeart /></Button>
                                             <Button class="flex-auto whitespace-nowrap md:flex-initial" :disabled="item.inventoryStatus === 'OUTOFSTOCK'"><IconShoppingCart />Buy Now</Button>
                                         </div>
                                     </div>
@@ -108,7 +108,7 @@
                                         <span class="text-xl font-semibold">${{ item.price }}</span>
                                         <div class="flex gap-2">
                                             <Button class="flex-auto whitespace-nowrap" :disabled="item.inventoryStatus === 'OUTOFSTOCK'"><IconShoppingCart />Buy Now</Button>
-                                            <Button variant="outline" size="icon"><IconHeart /></Button>
+                                            <Button variant="outline" size="icon" aria-label="Add to favourites"><IconHeart /></Button>
                                         </div>
                                     </div>
                                 </div>

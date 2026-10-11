@@ -34,7 +34,7 @@
 
 <template>
     <div class="card">
-        <div class="font-semibold text-xl">Tree</div>
+        <div class="font-semibold text-xl mb-4">Tree</div>
         <Tree :value="treeValue" selection-mode="checkbox" v-model:selection-keys="selectedTreeValue" />
     </div>
 

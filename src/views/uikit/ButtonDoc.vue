@@ -123,7 +123,7 @@
             <div class="card flex flex-col gap-4">
                 <div class="font-semibold text-xl">Icons</div>
                 <div class="flex flex-wrap gap-2">
-                    <Button size="icon"><IconStar class="fill-current" /></Button>
+                    <Button size="icon" aria-label="Star"><IconStar class="fill-current" /></Button>
                     <Button><IconBookmark />Bookmark</Button>
                     <Button>Bookmark<IconBookmark /></Button>
                 </div>
@@ -157,37 +157,37 @@
             <div class="card flex flex-col gap-4">
                 <div class="font-semibold text-xl">Rounded Icons</div>
                 <div class="flex flex-wrap gap-2">
-                    <Button size="icon" class="rounded-full"><IconCheck /></Button>
-                    <Button variant="secondary" size="icon" class="rounded-full"><IconBookmark /></Button>
-                    <Button variant="success" size="icon" class="rounded-full"><IconSearch /></Button>
-                    <Button variant="info" size="icon" class="rounded-full"><IconUser /></Button>
-                    <Button variant="warning" size="icon" class="rounded-full"><IconBell /></Button>
-                    <Button variant="help" size="icon" class="rounded-full"><IconHeart /></Button>
-                    <Button variant="destructive" size="icon" class="rounded-full"><IconTimes /></Button>
+                    <Button size="icon" class="rounded-full" aria-label="Check"><IconCheck /></Button>
+                    <Button variant="secondary" size="icon" class="rounded-full" aria-label="Bookmark"><IconBookmark /></Button>
+                    <Button variant="success" size="icon" class="rounded-full" aria-label="Search"><IconSearch /></Button>
+                    <Button variant="info" size="icon" class="rounded-full" aria-label="User"><IconUser /></Button>
+                    <Button variant="warning" size="icon" class="rounded-full" aria-label="Bell"><IconBell /></Button>
+                    <Button variant="help" size="icon" class="rounded-full" aria-label="Heart"><IconHeart /></Button>
+                    <Button variant="destructive" size="icon" class="rounded-full" aria-label="Close"><IconTimes /></Button>
                 </div>
             </div>
             <div class="card flex flex-col gap-4">
                 <div class="font-semibold text-xl">Rounded Text</div>
                 <div class="flex flex-wrap gap-2">
-                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-primary"><IconCheck /></Button>
-                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-secondary-foreground"><IconBookmark /></Button>
-                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-green-600"><IconSearch /></Button>
-                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-sky-500"><IconUser /></Button>
-                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-amber-500"><IconBell /></Button>
-                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-purple-500"><IconHeart /></Button>
-                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-destructive"><IconTimes /></Button>
+                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-primary" aria-label="Check"><IconCheck /></Button>
+                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-secondary-foreground" aria-label="Bookmark"><IconBookmark /></Button>
+                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-green-600" aria-label="Search"><IconSearch /></Button>
+                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-sky-500" aria-label="User"><IconUser /></Button>
+                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-amber-500" aria-label="Bell"><IconBell /></Button>
+                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-purple-500" aria-label="Heart"><IconHeart /></Button>
+                    <Button variant="ghost" size="icon" class="rounded-full shadow-md text-destructive" aria-label="Close"><IconTimes /></Button>
                 </div>
             </div>
             <div class="card flex flex-col gap-4">
                 <div class="font-semibold text-xl">Rounded Outlined</div>
                 <div class="flex flex-wrap gap-2">
-                    <Button variant="outline" size="icon" class="rounded-full border-primary text-primary"><IconCheck /></Button>
-                    <Button variant="outline" size="icon" class="rounded-full border-border text-secondary-foreground"><IconBookmark /></Button>
-                    <Button variant="outline" size="icon" class="rounded-full border-green-600 text-green-600"><IconSearch /></Button>
-                    <Button variant="outline" size="icon" class="rounded-full border-sky-500 text-sky-500"><IconUser /></Button>
-                    <Button variant="outline" size="icon" class="rounded-full border-amber-500 text-amber-500"><IconBell /></Button>
-                    <Button variant="outline" size="icon" class="rounded-full border-purple-500 text-purple-500"><IconHeart /></Button>
-                    <Button variant="outline" size="icon" class="rounded-full border-destructive text-destructive"><IconTimes /></Button>
+                    <Button variant="outline" size="icon" class="rounded-full border-primary text-primary" aria-label="Check"><IconCheck /></Button>
+                    <Button variant="outline" size="icon" class="rounded-full border-border text-secondary-foreground" aria-label="Bookmark"><IconBookmark /></Button>
+                    <Button variant="outline" size="icon" class="rounded-full border-green-600 text-green-600" aria-label="Search"><IconSearch /></Button>
+                    <Button variant="outline" size="icon" class="rounded-full border-sky-500 text-sky-500" aria-label="User"><IconUser /></Button>
+                    <Button variant="outline" size="icon" class="rounded-full border-amber-500 text-amber-500" aria-label="Bell"><IconBell /></Button>
+                    <Button variant="outline" size="icon" class="rounded-full border-purple-500 text-purple-500" aria-label="Heart"><IconHeart /></Button>
+                    <Button variant="outline" size="icon" class="rounded-full border-destructive text-destructive" aria-label="Close"><IconTimes /></Button>
                 </div>
             </div>
             <div class="card flex flex-col gap-4">
@@ -195,7 +195,7 @@
                 <div class="flex flex-wrap gap-2">
                     <Button type="button" :disabled="loading[0]" @click="load(0)"><Spinner v-if="loading[0]" /><IconSearch v-else />Search</Button>
                     <Button type="button" :disabled="loading[1]" @click="load(1)">Search<Spinner v-if="loading[1]" /><IconSearch v-else /></Button>
-                    <Button type="button" size="icon" :disabled="loading[2]" @click="load(2)"><Spinner v-if="loading[2]" /><IconSearch v-else /></Button>
+                    <Button type="button" size="icon" aria-label="Search" :disabled="loading[2]" @click="load(2)"><Spinner v-if="loading[2]" /><IconSearch v-else /></Button>
                     <Button type="button" :disabled="loading[3]" @click="load(3)">Search</Button>
                 </div>
             </div>
