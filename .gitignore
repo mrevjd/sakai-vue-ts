@@ -28,6 +28,9 @@ coverage
 *.sln
 *.sw?
 
+# Superpowers agent workspaces (plans' ledgers, briefs, review packages)
+.superpowers
+
 # Bun
 .bun
 bun.lockb

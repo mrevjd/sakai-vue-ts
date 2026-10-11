@@ -1,6 +1,7 @@
 # CLAUDE.md
 
-Vue 3 application template based on the Sakai admin template and PrimeVue.
+Vue 3 application template based on the Sakai admin template, ported from PrimeVue to shadcn-vue
+(Reka UI and Tailwind).
 
 **This repo is used as a template copied into other projects.** Changes here propagate by being
 copied, so keep it generic and keep the tooling set up rather than stripping it out.
@@ -28,14 +29,18 @@ bun run test -t "strips <script>"
 - **Never `v-html` Quill output directly.** Quill (`src/views/uikit/FormLayout.vue`) emits raw HTML.
   Pass untrusted or editor HTML through `sanitizeHtml()` from `src/utils/sanitize.ts` first: it runs
   DOMPurify with a Quill-tuned tag and attribute allowlist.
-- **PrimeVue components are auto-imported** via `unplugin-vue-components` with `PrimeVueResolver` in
-  `vite.config.ts`. Do not add redundant imports for them.
+- **Every component is imported explicitly.** There is no auto-import plugin, so a missing import
+  is not caught by `vue-tsc`: Vue only warns "Failed to resolve component" at runtime. Vendored
+  shadcn-vue components live in `src/components/ui` (alias in `components.json`), local wrappers in
+  `src/components`, and icons come from `src/components/icons.ts`.
 - **Layout state lives in `useLayout()`**, not Pinia. `src/layout/composables/layout.ts` holds a
   reactive `layoutConfig` (`preset`, `primary`, `surface`, `darkTheme`, `menuMode`), deep-watched and
   serialised to the `layoutConfig` localStorage key. Pinia is a dependency but defines no stores.
 - **Dark mode** toggles the `.dark` class on `document.documentElement`, wrapped in
-  `document.startViewTransition` where available. The Aura preset registers it in `src/main.ts` via
-  `darkModeSelector: '.dark'`. Override SCSS tokens in `src/assets/layout/variables/`.
+  `document.startViewTransition` where available; Tailwind's `dark:` variant keys on that class
+  (`@custom-variant dark` in `src/assets/tailwind.css`). Preset, primary and surface colours are
+  written as CSS variables by `applyTheme()` in `src/layout/composables/theme.ts`. Override SCSS
+  tokens in `src/assets/layout/variables/`.
 - **Routing**: all routes in `src/router/index.ts`. Main app routes are children of `/` under
   `AppLayout`; auth (`/auth/*`) and `/landing` are standalone and render without the admin chrome.
   Catch-all redirects to `/pages/notfound`.
