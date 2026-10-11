@@ -195,8 +195,8 @@
                     </SheetContent>
                 </Sheet>
 
-                <!-- Prefixed to match SheetContent's own side-scoped width classes: bare w-screen loses to their attribute selector,
-                     while matching modifiers let tailwind-merge drop the vendored widths instead. -->
+                <!-- Full screen needs the data-[side=right] prefix. SheetContent sets its width as data-[side=right]:w-3/4, and an
+                     attribute selector outranks a bare w-screen; with the same prefix, tailwind-merge drops the vendored width instead. -->
                 <Sheet v-model:open="visibleFull">
                     <SheetContent side="right" class="data-[side=right]:w-screen data-[side=right]:sm:max-w-none">
                         <SheetHeader>
