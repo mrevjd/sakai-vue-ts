@@ -1,47 +1,107 @@
-<script setup>
-    import { useLayout } from '@/layout/composables/layout';
+<script setup lang="ts">
+    import type { ChartData, ChartOptions } from 'chart.js';
     import { onMounted, ref, watch } from 'vue';
+    import AppChart from '@/components/AppChart.vue';
+    import { useLayout } from '@/layout/composables/layout';
+    import { chartShade, paletteShade } from '@/utils/chartColors';
+    import type { Shade } from '@/layout/palettes';
 
     const { layoutConfig, isDarkTheme } = useLayout();
-    const lineData = ref(null);
-    const pieData = ref(null);
-    const polarData = ref(null);
-    const barData = ref(null);
-    const radarData = ref(null);
-    const lineOptions = ref(null);
-    const pieOptions = ref(null);
-    const polarOptions = ref(null);
-    const barOptions = ref(null);
-    const radarOptions = ref(null);
 
-    onMounted(() => {
-        setColorOptions();
-    });
+    function primary(key: Shade): string {
+        return chartShade(layoutConfig.primary, layoutConfig.surface, isDarkTheme.value ? 'dark' : 'light', key);
+    }
 
-    function setColorOptions() {
+    function buildLineData(): ChartData {
+        return {
+            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            datasets: [
+                {
+                    label: 'First Dataset',
+                    data: [65, 59, 80, 81, 56, 55, 40],
+                    fill: false,
+                    backgroundColor: primary('500'),
+                    borderColor: primary('500'),
+                    tension: 0.4
+                },
+                {
+                    label: 'Second Dataset',
+                    data: [28, 48, 40, 19, 86, 27, 90],
+                    fill: false,
+                    backgroundColor: primary('200'),
+                    borderColor: primary('200'),
+                    tension: 0.4
+                }
+            ]
+        };
+    }
+
+    function buildLineOptions(): ChartOptions {
         const documentStyle = getComputedStyle(document.documentElement);
-        const textColor = documentStyle.getPropertyValue('--text-color');
-        const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-        const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+        const textColor = documentStyle.getPropertyValue('--foreground');
+        const textColorSecondary = documentStyle.getPropertyValue('--muted-foreground');
+        const surfaceBorder = documentStyle.getPropertyValue('--border');
+        // chart.js 4 ignores `drawBorder` and reads `color` rather than `fontColor`, but correcting the
+        // showcase options is out of scope for a port, so both keys stay as the PrimeVue page had them.
+        // The cast is what carries the two dead keys past the compiler.
+        return {
+            plugins: {
+                legend: {
+                    labels: {
+                        fontColor: textColor
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: textColorSecondary
+                    },
+                    grid: {
+                        color: surfaceBorder,
+                        drawBorder: false
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: textColorSecondary
+                    },
+                    grid: {
+                        color: surfaceBorder,
+                        drawBorder: false
+                    }
+                }
+            }
+        } as ChartOptions;
+    }
 
-        barData.value = {
+    function buildBarData(): ChartData {
+        return {
             labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
             datasets: [
                 {
                     label: 'My First dataset',
-                    backgroundColor: documentStyle.getPropertyValue('--p-primary-500'),
-                    borderColor: documentStyle.getPropertyValue('--p-primary-500'),
+                    backgroundColor: primary('500'),
+                    borderColor: primary('500'),
                     data: [65, 59, 80, 81, 56, 55, 40]
                 },
                 {
                     label: 'My Second dataset',
-                    backgroundColor: documentStyle.getPropertyValue('--p-primary-200'),
-                    borderColor: documentStyle.getPropertyValue('--p-primary-200'),
+                    backgroundColor: primary('200'),
+                    borderColor: primary('200'),
                     data: [28, 48, 40, 19, 86, 27, 90]
                 }
             ]
         };
-        barOptions.value = {
+    }
+
+    function buildBarOptions(): ChartOptions {
+        const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--foreground');
+        const textColorSecondary = documentStyle.getPropertyValue('--muted-foreground');
+        const surfaceBorder = documentStyle.getPropertyValue('--border');
+        // See buildLineOptions: `fontColor` and `drawBorder` are kept as the PrimeVue page had them.
+        return {
             plugins: {
                 legend: {
                     labels: {
@@ -72,20 +132,25 @@
                     }
                 }
             }
-        };
+        } as ChartOptions;
+    }
 
-        pieData.value = {
+    function buildPieData(): ChartData {
+        return {
             labels: ['A', 'B', 'C'],
             datasets: [
                 {
                     data: [540, 325, 702],
-                    backgroundColor: [documentStyle.getPropertyValue('--p-indigo-500'), documentStyle.getPropertyValue('--p-purple-500'), documentStyle.getPropertyValue('--p-teal-500')],
-                    hoverBackgroundColor: [documentStyle.getPropertyValue('--p-indigo-400'), documentStyle.getPropertyValue('--p-purple-400'), documentStyle.getPropertyValue('--p-teal-400')]
+                    backgroundColor: [paletteShade('indigo', '500'), paletteShade('purple', '500'), paletteShade('teal', '500')],
+                    hoverBackgroundColor: [paletteShade('indigo', '400'), paletteShade('purple', '400'), paletteShade('teal', '400')]
                 }
             ]
         };
+    }
 
-        pieOptions.value = {
+    function buildPieOptions(): ChartOptions {
+        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--foreground');
+        return {
             plugins: {
                 legend: {
                     labels: {
@@ -95,71 +160,26 @@
                 }
             }
         };
+    }
 
-        lineData.value = {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [
-                {
-                    label: 'First Dataset',
-                    data: [65, 59, 80, 81, 56, 55, 40],
-                    fill: false,
-                    backgroundColor: documentStyle.getPropertyValue('--p-primary-500'),
-                    borderColor: documentStyle.getPropertyValue('--p-primary-500'),
-                    tension: 0.4
-                },
-                {
-                    label: 'Second Dataset',
-                    data: [28, 48, 40, 19, 86, 27, 90],
-                    fill: false,
-                    backgroundColor: documentStyle.getPropertyValue('--p-primary-200'),
-                    borderColor: documentStyle.getPropertyValue('--p-primary-200'),
-                    tension: 0.4
-                }
-            ]
-        };
-
-        lineOptions.value = {
-            plugins: {
-                legend: {
-                    labels: {
-                        fontColor: textColor
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        color: textColorSecondary
-                    },
-                    grid: {
-                        color: surfaceBorder,
-                        drawBorder: false
-                    }
-                },
-                y: {
-                    ticks: {
-                        color: textColorSecondary
-                    },
-                    grid: {
-                        color: surfaceBorder,
-                        drawBorder: false
-                    }
-                }
-            }
-        };
-
-        polarData.value = {
+    function buildPolarData(): ChartData {
+        return {
             datasets: [
                 {
                     data: [11, 16, 7, 3],
-                    backgroundColor: [documentStyle.getPropertyValue('--p-indigo-500'), documentStyle.getPropertyValue('--p-purple-500'), documentStyle.getPropertyValue('--p-teal-500'), documentStyle.getPropertyValue('--p-orange-500')],
+                    backgroundColor: [paletteShade('indigo', '500'), paletteShade('purple', '500'), paletteShade('teal', '500'), paletteShade('orange', '500')],
                     label: 'My dataset'
                 }
             ],
             labels: ['Indigo', 'Purple', 'Teal', 'Orange']
         };
+    }
 
-        polarOptions.value = {
+    function buildPolarOptions(): ChartOptions {
+        const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--foreground');
+        const surfaceBorder = documentStyle.getPropertyValue('--border');
+        return {
             plugins: {
                 legend: {
                     labels: {
@@ -175,32 +195,41 @@
                 }
             }
         };
+    }
 
-        radarData.value = {
+    function buildRadarData(): ChartData {
+        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--foreground');
+        return {
             labels: ['Eating', 'Drinking', 'Sleeping', 'Designing', 'Coding', 'Cycling', 'Running'],
             datasets: [
                 {
                     label: 'My First dataset',
-                    borderColor: documentStyle.getPropertyValue('--p-indigo-400'),
-                    pointBackgroundColor: documentStyle.getPropertyValue('--p-indigo-400'),
-                    pointBorderColor: documentStyle.getPropertyValue('--p-indigo-400'),
+                    borderColor: paletteShade('indigo', '400'),
+                    pointBackgroundColor: paletteShade('indigo', '400'),
+                    pointBorderColor: paletteShade('indigo', '400'),
                     pointHoverBackgroundColor: textColor,
-                    pointHoverBorderColor: documentStyle.getPropertyValue('--p-indigo-400'),
+                    pointHoverBorderColor: paletteShade('indigo', '400'),
                     data: [65, 59, 90, 81, 56, 55, 40]
                 },
                 {
                     label: 'My Second dataset',
-                    borderColor: documentStyle.getPropertyValue('--p-purple-400'),
-                    pointBackgroundColor: documentStyle.getPropertyValue('--p-purple-400'),
-                    pointBorderColor: documentStyle.getPropertyValue('--p-purple-400'),
+                    borderColor: paletteShade('purple', '400'),
+                    pointBackgroundColor: paletteShade('purple', '400'),
+                    pointBorderColor: paletteShade('purple', '400'),
                     pointHoverBackgroundColor: textColor,
-                    pointHoverBorderColor: documentStyle.getPropertyValue('--p-purple-400'),
+                    pointHoverBorderColor: paletteShade('purple', '400'),
                     data: [28, 48, 40, 19, 96, 27, 100]
                 }
             ]
         };
+    }
 
-        radarOptions.value = {
+    function buildRadarOptions(): ChartOptions {
+        const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--foreground');
+        const textColorSecondary = documentStyle.getPropertyValue('--muted-foreground');
+        // See buildLineOptions: `fontColor` is kept as the PrimeVue page had it.
+        return {
             plugins: {
                 legend: {
                     labels: {
@@ -215,55 +244,75 @@
                     }
                 }
             }
-        };
+        } as ChartOptions;
     }
 
-    watch(
-        [() => layoutConfig.primary, () => layoutConfig.surface, isDarkTheme],
-        () => {
-            setColorOptions();
-        },
-        { immediate: true }
-    );
+    // AppChart requires data, so each ref starts with a real object and is reassigned once the DOM tokens are readable.
+    const lineData = ref<ChartData>(buildLineData());
+    const lineOptions = ref<ChartOptions>(buildLineOptions());
+    const barData = ref<ChartData>(buildBarData());
+    const barOptions = ref<ChartOptions>(buildBarOptions());
+    const pieData = ref<ChartData>(buildPieData());
+    const pieOptions = ref<ChartOptions>(buildPieOptions());
+    const polarData = ref<ChartData>(buildPolarData());
+    const polarOptions = ref<ChartOptions>(buildPolarOptions());
+    const radarData = ref<ChartData>(buildRadarData());
+    const radarOptions = ref<ChartOptions>(buildRadarOptions());
+
+    function refresh(): void {
+        lineData.value = buildLineData();
+        lineOptions.value = buildLineOptions();
+        barData.value = buildBarData();
+        barOptions.value = buildBarOptions();
+        pieData.value = buildPieData();
+        pieOptions.value = buildPieOptions();
+        polarData.value = buildPolarData();
+        polarOptions.value = buildPolarOptions();
+        radarData.value = buildRadarData();
+        radarOptions.value = buildRadarOptions();
+    }
+
+    watch([() => layoutConfig.primary, () => layoutConfig.surface, () => layoutConfig.preset, isDarkTheme], refresh);
+    onMounted(refresh);
 </script>
 
 <template>
-    <Fluid class="grid grid-cols-12 gap-8">
+    <div class="grid grid-cols-12 gap-8">
         <div class="col-span-12 xl:col-span-6">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Linear</div>
-                <Chart type="line" :data="lineData" :options="lineOptions"></Chart>
+                <AppChart type="line" :data="lineData" :options="lineOptions" class="h-80" />
             </div>
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Bar</div>
-                <Chart type="bar" :data="barData" :options="barOptions"></Chart>
+                <AppChart type="bar" :data="barData" :options="barOptions" class="h-80" />
             </div>
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card flex flex-col items-center">
                 <div class="font-semibold text-xl mb-4">Pie</div>
-                <Chart type="pie" :data="pieData" :options="pieOptions"></Chart>
+                <AppChart type="pie" :data="pieData" :options="pieOptions" class="h-80" />
             </div>
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card flex flex-col items-center">
                 <div class="font-semibold text-xl mb-4">Doughnut</div>
-                <Chart type="doughnut" :data="pieData" :options="pieOptions"></Chart>
+                <AppChart type="doughnut" :data="pieData" :options="pieOptions" class="h-80" />
             </div>
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card flex flex-col items-center">
                 <div class="font-semibold text-xl mb-4">Polar Area</div>
-                <Chart type="polarArea" :data="polarData" :options="polarOptions"></Chart>
+                <AppChart type="polarArea" :data="polarData" :options="polarOptions" class="h-80" />
             </div>
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card flex flex-col items-center">
                 <div class="font-semibold text-xl mb-4">Radar</div>
-                <Chart type="radar" :data="radarData" :options="radarOptions"></Chart>
+                <AppChart type="radar" :data="radarData" :options="radarOptions" class="h-80" />
             </div>
         </div>
-    </Fluid>
+    </div>
 </template>
