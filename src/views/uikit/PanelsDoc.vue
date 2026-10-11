@@ -156,7 +156,7 @@
                 <Card>
                     <CardHeader>
                         <div class="flex items-center justify-between">
-                            <CardTitle>Card</CardTitle>
+                            <CardTitle class="text-xl font-semibold">Card</CardTitle>
                             <MenuList :model="cardMenu" popup>
                                 <template #trigger>
                                     <Button variant="ghost" size="icon" aria-label="Card options"><IconPlus /></Button>
@@ -203,18 +203,20 @@
 
         <div class="card">
             <div class="font-semibold text-xl mb-4">Splitter</div>
-            <ResizablePanelGroup direction="horizontal" class="h-75 rounded-lg border border-border">
+            <ResizablePanelGroup direction="horizontal" class="mb-8 h-75 rounded-lg border border-border">
                 <ResizablePanel :default-size="30" :min-size="10">
                     <div class="flex h-full items-center justify-center">Panel 1</div>
                 </ResizablePanel>
                 <ResizableHandle with-handle />
                 <ResizablePanel :default-size="70">
+                    <!-- The PrimeVue page sized these 15 and 50. Reka requires a group to total 100 and otherwise logs a
+                         warning on every load, production included, before rescaling; 23 and 77 is that same 15:50 split. -->
                     <ResizablePanelGroup direction="vertical">
-                        <ResizablePanel :default-size="15">
+                        <ResizablePanel :default-size="23">
                             <div class="flex h-full items-center justify-center">Panel 2</div>
                         </ResizablePanel>
                         <ResizableHandle />
-                        <ResizablePanel :default-size="50">
+                        <ResizablePanel :default-size="77">
                             <div class="flex h-full items-center justify-center">Panel 3</div>
                         </ResizablePanel>
                     </ResizablePanelGroup>
