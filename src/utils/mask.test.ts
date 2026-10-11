@@ -57,6 +57,27 @@ describe('applyMask', () => {
         it('still accepts a 1 typed into a placeholder position', () => {
             expect(applyMask('+1 (5__) ___-____1', mask).display).toBe('+1 (51_) ___-____');
         });
+
+        it('keeps every digit of pasted raw input, including a 1 where the mask has its literal 1', () => {
+            expect(applyMask('415551234567', mask).display).toBe('+1 (415) 551-2345');
+            expect(applyMask('21', mask).display).toBe('+1 (21_) ___-____');
+        });
+
+        it('strips the country code from a pasted number written with its prefix', () => {
+            expect(applyMask('+14155551234', mask).display).toBe('+1 (415) 555-1234');
+            expect(applyMask('+1 415 555 1234', mask).display).toBe('+1 (415) 555-1234');
+            expect(applyMask('+1 (415) 555-1234', mask).display).toBe('+1 (415) 555-1234');
+        });
+
+        it('keeps the digits when a character deleted inside the display shifts the literals', () => {
+            expect(applyMask('+1 (55) ___-____', mask).display).toBe('+1 (55_) ___-____');
+        });
+    });
+
+    it('takes a first keystroke equal to a leading digit literal as input', () => {
+        let display = '';
+        for (const key of ['1', '2', '3']) display = applyMask(display + key, '1-999').display;
+        expect(display).toBe('1-123');
     });
 });
 
