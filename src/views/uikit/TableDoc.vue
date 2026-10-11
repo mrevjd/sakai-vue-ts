@@ -270,7 +270,7 @@
         >
             <template #header>
                 <div class="flex justify-between">
-                    <Button variant="outline" @click="clearFilters"><IconFilterSlash />Clear</Button>
+                    <Button type="button" variant="outline" @click="clearFilters"><IconFilterSlash />Clear</Button>
                     <InputGroup class="w-56">
                         <InputGroupAddon><IconSearch /></InputGroupAddon>
                         <InputGroupInput v-model="globalFilter" placeholder="Keyword Search" />
@@ -293,9 +293,10 @@
                 <DatePicker :model-value="asDate(value)" placeholder="mm/dd/yyyy" @update:model-value="setValue" />
             </template>
             <!-- The column stays type numeric so its match modes survive; the slot only swaps the plain number
-                 input for the currency field the balance filter showed before. -->
+                 input for a currency field. The step is a cent because NumberField snaps typed values to its
+                 step, and the default of 1 would round 70663.50 to 70664 and miss an equals match. -->
             <template #filter-balance="{ value, setValue }">
-                <NumberField :model-value="asNumber(value)" :format-options="{ style: 'currency', currency: 'USD' }" locale="en-US" @update:model-value="setValue">
+                <NumberField :model-value="asNumber(value)" :format-options="{ style: 'currency', currency: 'USD' }" locale="en-US" :step="0.01" @update:model-value="setValue">
                     <NumberFieldContent>
                         <NumberFieldInput />
                     </NumberFieldContent>
