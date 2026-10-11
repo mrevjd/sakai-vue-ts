@@ -1,10 +1,19 @@
-<script setup>
+<script setup lang="ts">
     import { onBeforeUnmount, onMounted, ref } from 'vue';
+    import Chip from '@/components/Chip.vue';
+    import OverlayBadge from '@/components/OverlayBadge.vue';
+    import ScrollTop from '@/components/ScrollTop.vue';
+    import { Avatar, AvatarFallback, AvatarGroup, AvatarImage } from '@/components/ui/avatar';
+    import { Badge } from '@/components/ui/badge';
+    import { Button } from '@/components/ui/button';
+    import { Progress } from '@/components/ui/progress';
+    import { Skeleton } from '@/components/ui/skeleton';
+    import { IconApple, IconArrowUp, IconBell, IconCalendar, IconCheck, IconEnvelope, IconExclamationTriangle, IconFacebook, IconGoogle, IconInfoCircle, IconMicrosoft, IconTimes, IconUser, IconUsers } from '@/components/icons';
 
-    const value = ref(0);
-    let interval = null;
+    const value = ref<number>(0);
+    let interval: ReturnType<typeof setInterval> | null = null;
 
-    function startProgress() {
+    function startProgress(): void {
         interval = setInterval(() => {
             let newValue = value.value + Math.floor(Math.random() * 10) + 1;
             if (newValue >= 100) {
@@ -14,9 +23,11 @@
         }, 2000);
     }
 
-    function endProgress() {
-        clearInterval(interval);
-        interval = null;
+    function endProgress(): void {
+        if (interval !== null) {
+            clearInterval(interval);
+            interval = null;
+        }
     }
 
     onMounted(() => {
@@ -33,10 +44,13 @@
         <div class="font-semibold text-xl mb-4">ProgressBar</div>
         <div class="flex flex-col md:flex-row gap-4">
             <div class="md:w-1/2">
-                <ProgressBar :value="value"></ProgressBar>
+                <div class="flex items-center gap-2">
+                    <Progress :model-value="value" class="flex-1" />
+                    <span class="text-sm text-muted-foreground">{{ value }}%</span>
+                </div>
             </div>
             <div class="md:w-1/2">
-                <ProgressBar :value="50" :showValue="false"></ProgressBar>
+                <Progress :model-value="50" />
             </div>
         </div>
     </div>
@@ -46,37 +60,37 @@
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Badge</div>
                 <div class="flex gap-2">
-                    <Badge :value="2"></Badge>
-                    <Badge :value="8" severity="success"></Badge>
-                    <Badge :value="4" severity="info"></Badge>
-                    <Badge :value="12" severity="Warn"></Badge>
-                    <Badge :value="3" severity="danger"></Badge>
+                    <Badge>2</Badge>
+                    <Badge variant="success">8</Badge>
+                    <Badge variant="info">4</Badge>
+                    <Badge variant="warning">12</Badge>
+                    <Badge variant="destructive">3</Badge>
                 </div>
 
                 <div class="font-semibold my-4">Overlay</div>
                 <div class="flex gap-6">
                     <OverlayBadge value="2">
-                        <i class="pi pi-bell" style="font-size: 2rem" />
+                        <IconBell class="size-8" />
                     </OverlayBadge>
                     <OverlayBadge value="4" severity="danger">
-                        <i class="pi pi-calendar" style="font-size: 2rem" />
+                        <IconCalendar class="size-8" />
                     </OverlayBadge>
                     <OverlayBadge severity="danger">
-                        <i class="pi pi-envelope" style="font-size: 2rem" />
+                        <IconEnvelope class="size-8" />
                     </OverlayBadge>
                 </div>
 
                 <div class="font-semibold my-4">Button</div>
                 <div class="flex gap-2">
-                    <Button label="Emails" badge="8" class="mr-2"></Button>
-                    <Button label="Messages" icon="pi pi-users" severity="warn" badge="8" badgeClass="p-badge-danger"></Button>
+                    <Button>Emails <Badge variant="secondary">8</Badge></Button>
+                    <Button variant="warning"><IconUsers />Messages<Badge variant="destructive">8</Badge></Button>
                 </div>
 
                 <div class="font-semibold my-4">Sizes</div>
                 <div class="flex items-start gap-2">
-                    <Badge :value="2"></Badge>
-                    <Badge :value="4" size="large" severity="warn"></Badge>
-                    <Badge :value="6" size="xlarge" severity="success"></Badge>
+                    <Badge>2</Badge>
+                    <Badge variant="warning" class="h-6 px-2.5 text-sm">4</Badge>
+                    <Badge variant="success" class="h-7 px-3 text-base">6</Badge>
                 </div>
             </div>
 
@@ -84,28 +98,57 @@
                 <div class="font-semibold text-xl mb-4">Avatar</div>
                 <div class="font-semibold mb-4">Group</div>
                 <AvatarGroup>
-                    <Avatar :image="'https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png'" size="large" shape="circle"></Avatar>
-                    <Avatar :image="'https://primefaces.org/cdn/primevue/images/avatar/asiyajavayant.png'" size="large" shape="circle"></Avatar>
-                    <Avatar :image="'https://primefaces.org/cdn/primevue/images/avatar/onyamalimba.png'" size="large" shape="circle"></Avatar>
-                    <Avatar :image="'https://primefaces.org/cdn/primevue/images/avatar/ionibowcher.png'" size="large" shape="circle"></Avatar>
-                    <Avatar :image="'https://primefaces.org/cdn/primevue/images/avatar/xuxuefeng.png'" size="large" shape="circle"></Avatar>
-                    <Avatar label="+2" shape="circle" size="large" :style="{ 'background-color': '#9c27b0', color: '#ffffff' }"></Avatar>
+                    <Avatar size="lg">
+                        <AvatarImage src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" alt="Amy Elsner" />
+                        <AvatarFallback>AE</AvatarFallback>
+                    </Avatar>
+                    <Avatar size="lg">
+                        <AvatarImage src="https://primefaces.org/cdn/primevue/images/avatar/asiyajavayant.png" alt="Asiya Javayant" />
+                        <AvatarFallback>AJ</AvatarFallback>
+                    </Avatar>
+                    <Avatar size="lg">
+                        <AvatarImage src="https://primefaces.org/cdn/primevue/images/avatar/onyamalimba.png" alt="Onyama Limba" />
+                        <AvatarFallback>OL</AvatarFallback>
+                    </Avatar>
+                    <Avatar size="lg">
+                        <AvatarImage src="https://primefaces.org/cdn/primevue/images/avatar/ionibowcher.png" alt="Ioni Bowcher" />
+                        <AvatarFallback>IB</AvatarFallback>
+                    </Avatar>
+                    <Avatar size="lg">
+                        <AvatarImage src="https://primefaces.org/cdn/primevue/images/avatar/xuxuefeng.png" alt="Xuxue Feng" />
+                        <AvatarFallback>XF</AvatarFallback>
+                    </Avatar>
+                    <Avatar size="lg">
+                        <AvatarFallback class="bg-purple-600 text-white">+2</AvatarFallback>
+                    </Avatar>
                 </AvatarGroup>
 
                 <div class="font-semibold my-4">Label - Circle</div>
-                <Avatar label="P" class="mr-2" size="xlarge" shape="circle"></Avatar>
-                <Avatar label="V" class="mr-2" size="large" :style="{ 'background-color': '#2196F3', color: '#ffffff' }" shape="circle"></Avatar>
-                <Avatar label="U" class="mr-2" :style="{ 'background-color': '#9c27b0', color: '#ffffff' }" shape="circle"></Avatar>
+                <div class="flex items-center gap-2">
+                    <!-- No size="lg" here: data-[size=lg]:size-10 carries an attribute selector, so it outranks a plain size-12 and would cap this at 2.5rem. -->
+                    <Avatar class="size-12">
+                        <AvatarFallback>P</AvatarFallback>
+                    </Avatar>
+                    <Avatar size="lg">
+                        <AvatarFallback class="bg-sky-500 text-white">V</AvatarFallback>
+                    </Avatar>
+                    <Avatar>
+                        <AvatarFallback class="bg-purple-600 text-white">U</AvatarFallback>
+                    </Avatar>
+                </div>
 
                 <div class="font-semibold my-4">Icon - Badge</div>
                 <OverlayBadge value="4" severity="danger" class="inline-flex">
-                    <Avatar label="U" size="xlarge" />
+                    <Avatar class="size-12">
+                        <AvatarFallback>U</AvatarFallback>
+                    </Avatar>
                 </OverlayBadge>
             </div>
 
             <div class="card">
                 <div class="font-semibold text-xl mb-4">ScrollTop</div>
-                <ScrollPanel :style="{ width: '250px', height: '200px' }">
+                <!-- A plain scroller, not ScrollArea: ScrollTop's target="parent" watches its own parentElement, and Reka's viewport puts the slot in a non-scrolling content div. -->
+                <div class="relative h-50 w-62.5 overflow-auto rounded-lg border border-border p-3">
                     <p>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae et leo duis ut diam. Ultricies mi quis hendrerit dolor magna eget est lorem. Amet consectetur
                         adipiscing elit ut. Nam libero justo laoreet sit amet. Pharetra massa massa ultricies mi quis hendrerit dolor magna. Est ultricies integer quis auctor elit sed vulputate. Consequat ac felis donec et. Tellus orci ac auctor
@@ -113,8 +156,8 @@
                         nisl purus. Cursus sit amet dictum sit amet. Tristique senectus et netus et malesuada fames ac turpis egestas. Et tortor consequat id porta nibh venenatis cras sed. Diam maecenas ultricies mi eget mauris. Eget egestas purus
                         viverra accumsan in nisl nisi. Suscipit adipiscing bibendum est ultricies integer. Mattis aliquam faucibus purus in massa tempor nec.
                     </p>
-                    <ScrollTop target="parent" :threshold="100" icon="pi pi-arrow-up"></ScrollTop>
-                </ScrollPanel>
+                    <ScrollTop target="parent" :threshold="100" :icon="IconArrowUp" />
+                </div>
             </div>
         </div>
         <div class="md:w-1/2">
@@ -122,29 +165,29 @@
                 <div class="font-semibold text-xl mb-4">Tag</div>
                 <div class="font-semibold mb-4">Default</div>
                 <div class="flex gap-2">
-                    <Tag value="Primary"></Tag>
-                    <Tag severity="success" value="Success"></Tag>
-                    <Tag severity="info" value="Info"></Tag>
-                    <Tag severity="warn" value="Warn"></Tag>
-                    <Tag severity="danger" value="Danger"></Tag>
+                    <Badge class="rounded-md">Primary</Badge>
+                    <Badge variant="success" class="rounded-md">Success</Badge>
+                    <Badge variant="info" class="rounded-md">Info</Badge>
+                    <Badge variant="warning" class="rounded-md">Warn</Badge>
+                    <Badge variant="destructive" class="rounded-md">Danger</Badge>
                 </div>
 
                 <div class="font-semibold my-4">Pills</div>
                 <div class="flex gap-2">
-                    <Tag value="Primary" :rounded="true"></Tag>
-                    <Tag severity="success" value="Success" :rounded="true"></Tag>
-                    <Tag severity="info" value="Info" :rounded="true"></Tag>
-                    <Tag severity="warn" value="Warn" :rounded="true"></Tag>
-                    <Tag severity="danger" value="Danger" :rounded="true"></Tag>
+                    <Badge>Primary</Badge>
+                    <Badge variant="success">Success</Badge>
+                    <Badge variant="info">Info</Badge>
+                    <Badge variant="warning">Warn</Badge>
+                    <Badge variant="destructive">Danger</Badge>
                 </div>
 
                 <div class="font-semibold my-4">Icons</div>
                 <div class="flex gap-2">
-                    <Tag icon="pi pi-user" value="Primary"></Tag>
-                    <Tag icon="pi pi-check" severity="success" value="Success"></Tag>
-                    <Tag icon="pi pi-info-circle" severity="info" value="Info"></Tag>
-                    <Tag con="pi pi-exclamation-triangle" severity="warn" value="Warn"></Tag>
-                    <Tag icon="pi pi-times" severity="danger" value="Danger"></Tag>
+                    <Badge><IconUser />Primary</Badge>
+                    <Badge variant="success"><IconCheck />Success</Badge>
+                    <Badge variant="info"><IconInfoCircle />Info</Badge>
+                    <Badge variant="warning"><IconExclamationTriangle />Warn</Badge>
+                    <Badge variant="destructive"><IconTimes />Danger</Badge>
                 </div>
             </div>
 
@@ -152,43 +195,43 @@
                 <div class="font-semibold text-xl mb-4">Chip</div>
                 <div class="font-semibold mb-4">Basic</div>
                 <div class="flex items-center flex-col sm:flex-row">
-                    <Chip label="Action" class="mr-2 mb-2"></Chip>
-                    <Chip label="Comedy" class="mr-2 mb-2"></Chip>
-                    <Chip label="Mystery" class="mr-2 mb-2"></Chip>
-                    <Chip label="Thriller" :removable="true" class="mb-2"></Chip>
+                    <Chip label="Action" class="mr-2 mb-2" />
+                    <Chip label="Comedy" class="mr-2 mb-2" />
+                    <Chip label="Mystery" class="mr-2 mb-2" />
+                    <Chip label="Thriller" removable class="mb-2" />
                 </div>
 
                 <div class="font-semibold my-4">Icon</div>
                 <div class="flex items-center flex-col sm:flex-row">
-                    <Chip label="Apple" icon="pi pi-apple" class="mr-2 mb-2"></Chip>
-                    <Chip label="Facebook" icon="pi pi-facebook" class="mr-2 mb-2"></Chip>
-                    <Chip label="Google" icon="pi pi-google" class="mr-2 mb-2"></Chip>
-                    <Chip label="Microsoft" icon="pi pi-microsoft" :removable="true" class="mb-2"></Chip>
+                    <Chip label="Apple" :icon="IconApple" class="mr-2 mb-2" />
+                    <Chip label="Facebook" :icon="IconFacebook" class="mr-2 mb-2" />
+                    <Chip label="Google" :icon="IconGoogle" class="mr-2 mb-2" />
+                    <Chip label="Microsoft" :icon="IconMicrosoft" removable class="mb-2" />
                 </div>
 
                 <div class="font-semibold my-4">Image</div>
                 <div class="flex items-center flex-col sm:flex-row">
-                    <Chip label="Amy Elsner" :image="'https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png'" class="mr-2 mb-2"></Chip>
-                    <Chip label="Asiya Javayant" :image="'https://primefaces.org/cdn/primevue/images/avatar/asiyajavayant.png'" class="mr-2 mb-2"></Chip>
-                    <Chip label="Onyama Limba" :image="'https://primefaces.org/cdn/primevue/images/avatar/onyamalimba.png'" class="mr-2 mb-2"></Chip>
+                    <Chip label="Amy Elsner" image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" class="mr-2 mb-2" />
+                    <Chip label="Asiya Javayant" image="https://primefaces.org/cdn/primevue/images/avatar/asiyajavayant.png" class="mr-2 mb-2" />
+                    <Chip label="Onyama Limba" image="https://primefaces.org/cdn/primevue/images/avatar/onyamalimba.png" class="mr-2 mb-2" />
                 </div>
             </div>
 
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Skeleton</div>
-                <div class="rounded-border border border-surface p-6">
+                <div class="rounded-lg border border-border p-6">
                     <div class="flex mb-4">
-                        <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
+                        <Skeleton class="mr-2 size-16 rounded-full" />
                         <div>
-                            <Skeleton width="10rem" class="mb-2"></Skeleton>
-                            <Skeleton width="5rem" class="mb-2"></Skeleton>
-                            <Skeleton height=".5rem"></Skeleton>
+                            <Skeleton class="mb-2 h-4 w-40" />
+                            <Skeleton class="mb-2 h-4 w-20" />
+                            <Skeleton class="h-2" />
                         </div>
                     </div>
-                    <Skeleton width="100%" height="150px"></Skeleton>
+                    <Skeleton class="h-37.5 w-full" />
                     <div class="flex justify-between mt-4">
-                        <Skeleton width="4rem" height="2rem"></Skeleton>
-                        <Skeleton width="4rem" height="2rem"></Skeleton>
+                        <Skeleton class="h-8 w-16" />
+                        <Skeleton class="h-8 w-16" />
                     </div>
                 </div>
             </div>
