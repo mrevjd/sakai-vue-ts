@@ -81,7 +81,7 @@
         @update:open="open = $event"
     >
         <ComboboxAnchor :class="cn('flex min-h-8 w-full flex-wrap items-center gap-1 rounded-lg border border-input bg-background px-2 py-1 text-sm focus-within:ring-2 focus-within:ring-ring', props.class)" data-slot="auto-complete">
-            <span v-for="item in chips()" :key="labelOf(item, props.optionLabel)" class="flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-secondary-foreground" data-slot="auto-complete-chip">
+            <span v-for="(item, index) in chips()" :key="`${index}-${labelOf(item, props.optionLabel)}`" class="flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-secondary-foreground" data-slot="auto-complete-chip">
                 {{ labelOf(item, props.optionLabel) }}
                 <button type="button" class="rounded-sm hover:bg-secondary-foreground/10" :aria-label="`Remove ${labelOf(item, props.optionLabel)}`" @click.stop="remove(item)"><IconTimes class="size-3" /></button>
             </span>
@@ -105,7 +105,7 @@
         <ComboboxList class="w-(--reka-combobox-trigger-width) p-1">
             <ComboboxEmpty>No results found</ComboboxEmpty>
             <ComboboxGroup>
-                <ComboboxItem v-for="item in rekaSuggestions" :key="labelOf(item, props.optionLabel)" :value="item">
+                <ComboboxItem v-for="(item, index) in rekaSuggestions" :key="`${index}-${labelOf(item, props.optionLabel)}`" :value="item">
                     <slot name="option" :option="item">{{ labelOf(item, props.optionLabel) }}</slot>
                 </ComboboxItem>
             </ComboboxGroup>

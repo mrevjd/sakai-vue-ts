@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, ref, type HTMLAttributes } from 'vue';
+    import { computed, ref, useAttrs, type HTMLAttributes } from 'vue';
     import { Button } from '@/components/ui/button';
     import { Input } from '@/components/ui/input';
     import { IconEye, IconEyeSlash } from '@/components/icons';
@@ -19,6 +19,15 @@
         { id: undefined, placeholder: '', toggleMask: true, feedback: true, disabled: false, autocomplete: 'current-password', class: undefined }
     );
 
+    // A FormControl merges aria-describedby and aria-invalid onto this component; on the wrapper div they never
+    // reached the field, so errors went unannounced. Every attribute but style goes to the input for that reason.
+    defineOptions({ inheritAttrs: false });
+    const attrs = useAttrs();
+    const inputAttrs = computed(() => {
+        const { style: _style, ...rest } = attrs;
+        return rest;
+    });
+
     const model = defineModel<string>({ default: '' });
     const revealed = ref(false);
 
@@ -29,9 +38,18 @@
 </script>
 
 <template>
-    <div :class="cn('flex flex-col gap-2', props.class)" data-slot="password-input">
+    <div :class="cn('flex flex-col gap-2', props.class)" :style="attrs.style as HTMLAttributes['style']" data-slot="password-input">
         <div class="relative">
-            <Input :id="props.id" v-model="model" :type="revealed ? 'text' : 'password'" :placeholder="props.placeholder" :disabled="props.disabled" :class="props.toggleMask ? 'pr-9' : undefined" :autocomplete="props.autocomplete" />
+            <Input
+                v-bind="inputAttrs"
+                :id="props.id"
+                v-model="model"
+                :type="revealed ? 'text' : 'password'"
+                :placeholder="props.placeholder"
+                :disabled="props.disabled"
+                :class="props.toggleMask ? 'pr-9' : undefined"
+                :autocomplete="props.autocomplete"
+            />
             <Button
                 v-if="props.toggleMask"
                 type="button"

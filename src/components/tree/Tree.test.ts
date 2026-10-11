@@ -56,6 +56,29 @@ describe('Tree', () => {
         expect(wrapper.emitted('node-select')![0]![0]).toEqual({ node: value[1] });
     });
 
+    it('ignores a click on a node marked selectable false', async () => {
+        const locked: TreeNodeLike[] = [
+            { key: 'a', label: 'Locked', selectable: false },
+            { key: 'b', label: 'Open' }
+        ];
+        const wrapper = mount(Tree, { props: { value: locked, selectionMode: 'single' } });
+        await rows(wrapper)[0]!.trigger('click');
+        expect(wrapper.emitted('update:selectionKeys')).toBeUndefined();
+        expect(wrapper.emitted('node-select')).toBeUndefined();
+        await rows(wrapper)[1]!.trigger('click');
+        expect(lastSelection(wrapper)).toEqual({ b: true });
+    });
+
+    it('ignores the checkbox of a node marked selectable false', async () => {
+        const locked: TreeNodeLike[] = [
+            { key: 'a', label: 'Locked', selectable: false },
+            { key: 'b', label: 'Open' }
+        ];
+        const wrapper = mount(Tree, { props: { value: locked, selectionMode: 'checkbox' } });
+        await wrapper.findAll('[data-slot=tree-checkbox]')[0]!.trigger('click');
+        expect(wrapper.emitted('update:selectionKeys')).toBeUndefined();
+    });
+
     it('clicking a parent row body selects it without toggling expansion', async () => {
         const wrapper = mount(Tree, { props: { value, selectionMode: 'single' } });
         await rows(wrapper)[0]!.trigger('click');

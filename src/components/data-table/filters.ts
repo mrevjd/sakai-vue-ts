@@ -1,4 +1,5 @@
 import type { FilterFn, Row, RowData, TableFeatures } from '@tanstack/vue-table';
+import { deepEquals } from '@/utils/optionAccess';
 import type { DataTableFeatures } from './features';
 
 export type MatchMode = 'startsWith' | 'contains' | 'notContains' | 'endsWith' | 'equals' | 'notEquals' | 'in' | 'lt' | 'lte' | 'gt' | 'gte' | 'between' | 'dateIs' | 'dateIsNot' | 'dateBefore' | 'dateAfter';
@@ -10,7 +11,7 @@ export interface MatchModeFilterValue {
 
 export interface DataTableColumnFilter {
     type: 'text' | 'numeric' | 'date' | 'custom';
-    /** Match modes offered in the menu; the first is the default. Omit for the type's default list. */
+    /** Match modes offered in the menu; the first is the default. Omit, or pass an empty list, for the type's default list. */
     matchModes?: MatchMode[];
     /** Hide the match-mode select and keep the first (or only) mode. */
     showMatchModes?: boolean;
@@ -67,12 +68,6 @@ function day(value: unknown): number | null {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 }
 
-// Objects from a demo service compare by their fields (PrimeVue's `in` used deep equality); primitives by value.
-function sameValue(a: unknown, b: unknown): boolean {
-    if (a !== null && b !== null && typeof a === 'object' && typeof b === 'object') return JSON.stringify(a) === JSON.stringify(b);
-    return a === b;
-}
-
 const predicates: Record<MatchMode, Predicate> = {
     startsWith: (cell, value) => text(cell).startsWith(text(value)),
     contains: (cell, value) => text(cell).includes(text(value)),
@@ -80,7 +75,7 @@ const predicates: Record<MatchMode, Predicate> = {
     endsWith: (cell, value) => text(cell).endsWith(text(value)),
     equals: (cell, value) => (typeof cell === 'number' || typeof value === 'number' ? num(cell) === num(value) : text(cell) === text(value)),
     notEquals: (cell, value) => !predicates.equals(cell, value),
-    in: (cell, value) => Array.isArray(value) && value.some((option) => sameValue(option, cell)),
+    in: (cell, value) => Array.isArray(value) && value.some((option) => deepEquals(option, cell)),
     lt: (cell, value) => num(cell) < num(value),
     lte: (cell, value) => num(cell) <= num(value),
     gt: (cell, value) => num(cell) > num(value),

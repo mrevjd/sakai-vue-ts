@@ -15,7 +15,8 @@
         label: string;
     }>();
 
-    const modes = computed<MatchMode[]>(() => props.filter.matchModes ?? DEFAULT_MATCH_MODES[props.filter.type]);
+    // An empty list would leave no draft mode at all, and Apply would then look up an undefined predicate.
+    const modes = computed<MatchMode[]>(() => (props.filter.matchModes?.length ? props.filter.matchModes : DEFAULT_MATCH_MODES[props.filter.type]));
     const showModes = computed(() => props.filter.showMatchModes !== false && modes.value.length > 1);
 
     // The draft lives here until Apply, matching PrimeVue's menu display where typing does not filter.

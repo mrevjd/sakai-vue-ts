@@ -49,6 +49,14 @@ describe('matchModeFns', () => {
         expect(run('qualified', { matchMode: 'in', value: ['new', 'qualified'] })).toBe(true);
     });
 
+    it('in compares object options by value, whatever order their fields were written in', () => {
+        const amy = { name: 'Amy Elsner', image: 'amyelsner.png', tags: ['a', 'b'] };
+        expect(run(amy, { matchMode: 'in', value: [{ tags: ['a', 'b'], image: 'amyelsner.png', name: 'Amy Elsner' }] })).toBe(true);
+        expect(run(amy, { matchMode: 'in', value: [{ name: 'Amy Elsner', image: 'amyelsner.png', tags: ['b', 'a'] }] })).toBe(false);
+        expect(run({ day: new Date(2024, 0, 1) }, { matchMode: 'in', value: [{ day: new Date(2024, 0, 2) }] })).toBe(false);
+        expect(run({ day: new Date(2024, 0, 1) }, { matchMode: 'in', value: [{ day: new Date(2024, 0, 1) }] })).toBe(true);
+    });
+
     it('passes every row when the filter value is empty', () => {
         expect(run('anything', { matchMode: 'contains', value: '' })).toBe(true);
         expect(run('anything', { matchMode: 'contains', value: null })).toBe(true);

@@ -3,9 +3,11 @@
     import { cn } from '@/lib/utils';
 
     // PrimeVue severities map onto the Badge variants Plan 2 added.
-    const variants: Record<string, BadgeVariants['variant']> = { secondary: 'secondary', success: 'success', info: 'info', warn: 'warning', warning: 'warning', danger: 'destructive', contrast: 'contrast' };
+    // Record<Severity, ...> forces the map and the union to list the same keys, so a misspelt severity fails type-check.
+    type Severity = 'secondary' | 'success' | 'info' | 'warn' | 'warning' | 'danger' | 'contrast';
+    const variants: Record<Severity, BadgeVariants['variant']> = { secondary: 'secondary', success: 'success', info: 'info', warn: 'warning', warning: 'warning', danger: 'destructive', contrast: 'contrast' };
 
-    const props = withDefaults(defineProps<{ value?: string | number; severity?: string; class?: string }>(), { value: undefined, severity: undefined, class: undefined });
+    const props = withDefaults(defineProps<{ value?: string | number; severity?: Severity; class?: string }>(), { value: undefined, severity: undefined, class: undefined });
 </script>
 
 <template>

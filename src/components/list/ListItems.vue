@@ -28,6 +28,9 @@
     }
 
     function onKeydown(event: KeyboardEvent): void {
+        // Keys from a control inside a consumer's option slot belong to that control, not to the listbox.
+        const target = event.target as HTMLElement | null;
+        if (target?.getAttribute('role') !== 'option' || target.parentElement !== list.value) return;
         if (keys.value.length === 0 || activeKey.value === null) return;
         const current = keys.value.indexOf(activeKey.value);
         let next: number;

@@ -74,7 +74,7 @@
                     <slot v-else name="value" :value="model">
                         <span v-if="props.display === 'comma'" class="truncate">{{ model.map(labelOfValue).join(', ') }}</span>
                         <span v-else class="flex flex-wrap gap-1">
-                            <span v-for="value in model" :key="labelOfValue(value)" class="flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-secondary-foreground" data-slot="multi-select-chip">
+                            <span v-for="(value, index) in model" :key="`${index}-${labelOfValue(value)}`" class="flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-secondary-foreground" data-slot="multi-select-chip">
                                 {{ labelOfValue(value) }}
                                 <!-- A span, not a button: it sits inside the trigger button. .stop.prevent keeps the click and keys from reaching the trigger, so the list stays closed. -->
                                 <span
@@ -104,7 +104,7 @@
             </div>
             <ComboboxEmpty>No results found</ComboboxEmpty>
             <ComboboxGroup>
-                <ComboboxItem v-for="option in props.options" :key="labelOf(option, props.optionLabel)" :value="itemValue(option)" class="gap-2">
+                <ComboboxItem v-for="(option, index) in props.options" :key="`${index}-${labelOf(option, props.optionLabel)}`" :value="itemValue(option)" class="gap-2">
                     <Checkbox :model-value="isSelected(option)" tabindex="-1" aria-hidden="true" class="pointer-events-none" />
                     <slot name="option" :option="option">{{ labelOf(option, props.optionLabel) }}</slot>
                 </ComboboxItem>

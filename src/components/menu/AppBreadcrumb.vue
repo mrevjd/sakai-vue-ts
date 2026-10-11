@@ -16,7 +16,8 @@
             <template v-if="props.home">
                 <!-- A data-slot here would replace the vendored breadcrumb-item value, so the home marker is a testid. -->
                 <BreadcrumbItem data-testid="breadcrumb-home">
-                    <BreadcrumbLink as-child><MenuItemContent :item="props.home" @click="runCommand(props.home, $event)" /></BreadcrumbLink>
+                    <!-- The home item is usually icon-only, which would leave the link with no accessible name. -->
+                    <BreadcrumbLink as-child><MenuItemContent :item="props.home" :aria-label="props.home.label ? undefined : 'Home'" @click="runCommand(props.home, $event)" /></BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
             </template>

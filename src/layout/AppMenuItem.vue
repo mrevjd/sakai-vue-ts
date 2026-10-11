@@ -74,7 +74,16 @@
 <template>
     <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActive }">
         <div v-if="root && item.visible !== false" class="layout-menuitem-root-text">{{ item.label }}</div>
-        <a v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item)" :class="item.class" :target="item.target" tabindex="0" @mouseenter="onMouseEnter">
+        <a
+            v-if="(!item.to || item.items) && item.visible !== false"
+            :href="item.url"
+            @click="itemClick($event, item)"
+            :class="item.class"
+            :target="item.target"
+            :rel="item.target === '_blank' ? 'noopener noreferrer' : undefined"
+            tabindex="0"
+            @mouseenter="onMouseEnter"
+        >
             <component :is="item.icon" v-if="item.icon" class="layout-menuitem-icon size-4 shrink-0" />
             <span class="layout-menuitem-text">{{ item.label }}</span>
             <IconAngleDown v-if="item.items" class="layout-submenu-toggler size-4" />

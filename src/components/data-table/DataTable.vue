@@ -176,15 +176,17 @@
         selection.value = table.getSelectedRowModel().flatRows.map((row) => row.original);
     });
     // Rows are keyed by rowKey on both sides, so a parent can pre-select or extend the model and see the checkboxes follow.
+    // Only the key list is watched: a deep watch would walk every field of every selected row on each change. Reading
+    // the array through map still tracks an in-place push on a reactive model.
     watch(
-        selection,
-        (value) => {
+        () => (selection.value ?? []).map((row) => String(row[props.rowKey])),
+        (keys) => {
             const next: RowSelectionState = {};
-            for (const row of value ?? []) next[String(row[props.rowKey])] = true;
+            for (const key of keys) next[key] = true;
             const same = Object.keys(next).length === Object.keys(rowSelection.value).length && Object.keys(next).every((key) => rowSelection.value[key]);
             if (!same) rowSelection.value = next;
         },
-        { immediate: true, deep: true }
+        { immediate: true }
     );
     watch(
         () => props.pageSize,

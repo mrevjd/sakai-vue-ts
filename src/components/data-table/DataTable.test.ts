@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { nextTick } from 'vue';
+import { defineComponent, h, nextTick, ref } from 'vue';
 import { createColumns, DataTable } from './index';
 
 interface Product extends Record<string, unknown> {
@@ -155,6 +155,23 @@ describe('DataTable', () => {
         wrapper.unmount();
     });
 
+    it('falls back to the type default match modes when a column configures an empty list', async () => {
+        const emptyModes = helper.columns([helper.accessor('name', { header: 'Name', meta: { filter: { type: 'text', matchModes: [] } } })]);
+        const wrapper = mount(DataTable<Product>, { props: { columns: emptyModes, data: products, rowKey: 'id' }, attachTo: document.body });
+        await wrapper.get('[aria-label="Filter Name"]').trigger('click');
+        const select = document.body.querySelector<HTMLSelectElement>('[data-slot=data-table-filter-mode]')!;
+        expect(select.value).toBe('startsWith');
+        const input = document.body.querySelector<HTMLInputElement>('[data-slot=data-table-filter-value]')!;
+        input.value = 'a';
+        input.dispatchEvent(new Event('input'));
+        await nextTick();
+        document.body.querySelector<HTMLButtonElement>('[data-slot=data-table-filter-apply]')!.click();
+        await nextTick();
+        // startsWith keeps only apple; contains would also keep banana and date.
+        expect(wrapper.findAll('tbody tr').map((r) => r.text())).toEqual(['apple']);
+        wrapper.unmount();
+    });
+
     it('renders a custom filter slot with the apply and clear callbacks', async () => {
         const wrapper = mount(DataTable<Product>, {
             props: { columns, data: products, rowKey: 'id' },
@@ -201,6 +218,17 @@ describe('DataTable', () => {
         expect(wrapper.findAll('tbody tr[data-state=selected]')).toHaveLength(1);
         expect(wrapper.findAll('tbody tr[data-state=selected]')[0]!.text()).toContain('apple');
         expect((wrapper.vm as unknown as Exposed).selectedRows().map((p) => p.name)).toEqual(['apple']);
+    });
+
+    it('follows a parent that extends its selection model in place', async () => {
+        const model = ref<Product[]>([products[1]!]);
+        const Parent = defineComponent({ setup: () => () => h(DataTable<Product>, { columns, data: products, rowKey: 'id', selectable: true, selection: model.value, 'onUpdate:selection': (rows: Product[]) => (model.value = rows) }) });
+        const wrapper = mount(Parent);
+        await nextTick();
+        expect(wrapper.findAll('tbody tr[data-state=selected]')).toHaveLength(1);
+        model.value.push(products[3]!);
+        await nextTick();
+        expect(wrapper.findAll('tbody tr[data-state=selected]').map((r) => r.findAll('td')[1]!.text())).toEqual(['apple', 'date']);
     });
 
     it('pins frozen columns with sticky offsets and marks them', () => {

@@ -43,6 +43,17 @@ describe('PasswordInput', () => {
         expect(wrapper.get('input').attributes('type')).toBe('password');
     });
 
+    it('forwards the aria attributes a form control merges onto it to the inner input, and keeps class on the root', () => {
+        const wrapper = mount(PasswordInput, { props: { modelValue: '', class: 'mb-4' }, attrs: { 'aria-describedby': 'x', 'aria-invalid': 'true' } });
+        const input = wrapper.get('input');
+        expect(input.attributes('aria-describedby')).toBe('x');
+        expect(input.attributes('aria-invalid')).toBe('true');
+        expect(wrapper.attributes('aria-describedby')).toBeUndefined();
+        expect(wrapper.attributes('data-slot')).toBe('password-input');
+        expect(wrapper.classes()).toContain('mb-4');
+        expect(input.classes()).not.toContain('mb-4');
+    });
+
     it('defaults autocomplete to current-password and forwards an override', () => {
         expect(
             mount(PasswordInput, { props: { modelValue: '' } })

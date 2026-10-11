@@ -7,7 +7,7 @@ export interface TreeNodeLike {
     icon?: string | Component;
     data?: unknown;
     children?: TreeNodeLike[];
-    leaf?: boolean;
+    /** `false` keeps the node out of the selection: clicks on it do nothing and its checkbox is disabled. */
     selectable?: boolean;
 }
 

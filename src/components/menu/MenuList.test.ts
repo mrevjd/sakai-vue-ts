@@ -35,6 +35,14 @@ describe('MenuList', () => {
         expect(wrapper.findAll('[role=menuitem]')[1]!.attributes('aria-disabled')).toBe('true');
     });
 
+    it('applies an item class to the rendered menuitem alongside its own classes', () => {
+        const wrapper = mount(MenuList, { props: { model: [{ label: 'Delete', class: 'text-destructive' }, { label: 'Keep' }] } });
+        const [remove, keep] = wrapper.findAll('[role=menuitem]');
+        expect(remove!.classes()).toContain('text-destructive');
+        expect(remove!.classes()).toContain('cursor-pointer');
+        expect(keep!.classes()).not.toContain('text-destructive');
+    });
+
     it('renders an inline routed item as the single menuitem element and runs its command once', async () => {
         const command = vi.fn();
         const item: MenuModelItem = { label: 'Router', to: '/x', command };

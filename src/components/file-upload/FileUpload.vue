@@ -114,6 +114,8 @@
     });
 
     const hasFiles = computed(() => files.value.length > 0);
+    // One previewOf call per file per change, rather than one each in the row's v-if and :src on every render.
+    const fileRows = computed(() => files.value.map((file) => ({ file, preview: previewOf(file) })));
 
     onBeforeUnmount(() => {
         files.value.forEach(revoke);
@@ -139,12 +141,12 @@
             </div>
             <div ref="content" :class="cn('flex min-h-40 flex-col gap-3 rounded-b-lg border border-t-0 border-border p-4 transition-colors', isOverDropZone && 'bg-accent')" data-slot="file-upload-content">
                 <Progress v-if="hasFiles" :model-value="0" class="h-1.5" />
-                <Alert v-for="item in rejected" :key="item.message" variant="destructive" data-slot="file-upload-message">
+                <Alert v-for="(item, index) in rejected" :key="`${index}-${item.message}`" variant="destructive" data-slot="file-upload-message">
                     <AlertDescription>{{ item.message }}</AlertDescription>
                 </Alert>
                 <div v-if="hasFiles" class="flex flex-col gap-2">
-                    <div v-for="(file, index) in files" :key="`${file.name}-${file.size}-${index}`" class="flex items-center gap-4 rounded-lg border border-border p-3" data-slot="file-upload-file">
-                        <img v-if="previewOf(file)" :src="previewOf(file)" :alt="file.name" class="size-12 rounded object-cover" />
+                    <div v-for="({ file, preview }, index) in fileRows" :key="`${file.name}-${file.size}-${index}`" class="flex items-center gap-4 rounded-lg border border-border p-3" data-slot="file-upload-file">
+                        <img v-if="preview" :src="preview" :alt="file.name" class="size-12 rounded object-cover" />
                         <IconFile v-else class="size-8 text-muted-foreground" />
                         <div class="flex min-w-0 flex-1 flex-col">
                             <span class="truncate font-medium">{{ file.name }}</span>

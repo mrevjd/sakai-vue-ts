@@ -11,7 +11,10 @@
         menuOpen.value = false;
     });
 
-    function smoothScroll(id: string): void {
+    // The href makes each link keyboard focusable; the browser's own jump to it would be instant and push a fragment
+    // into the URL, so it is cancelled in favour of the smooth scroll.
+    function smoothScroll(event: MouseEvent, id: string): void {
+        event.preventDefault();
         menuOpen.value = false;
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -39,26 +42,26 @@
             </svg>
             <span class="text-foreground font-medium text-xxl leading-normal mr-20">SAKAI</span>
         </a>
-        <Button variant="ghost" size="icon-lg" class="rounded-full lg:hidden!" aria-label="Toggle navigation" @click="menuOpen = !menuOpen"><IconBars class="size-6" /></Button>
-        <div class="items-center bg-card grow justify-between lg:flex absolute lg:static w-full left-0 top-full px-12 lg:px-0 z-20 rounded-lg" :class="{ hidden: !menuOpen }">
+        <Button variant="ghost" size="icon-lg" class="rounded-full lg:hidden!" aria-label="Toggle navigation" :aria-expanded="menuOpen" aria-controls="landing-nav" @click="menuOpen = !menuOpen"><IconBars class="size-6" /></Button>
+        <div id="landing-nav" class="items-center bg-card grow justify-between lg:flex absolute lg:static w-full left-0 top-full px-12 lg:px-0 z-20 rounded-lg" :class="{ hidden: !menuOpen }">
             <ul class="list-none p-0 m-0 flex lg:items-center select-none flex-col lg:flex-row cursor-pointer gap-8">
                 <li>
-                    <a @click="smoothScroll('hero')" class="px-0 py-4 text-foreground font-medium text-xl">
+                    <a href="#hero" @click="smoothScroll($event, 'hero')" class="px-0 py-4 text-foreground font-medium text-xl">
                         <span>Home</span>
                     </a>
                 </li>
                 <li>
-                    <a @click="smoothScroll('features')" class="px-0 py-4 text-foreground font-medium text-xl">
+                    <a href="#features" @click="smoothScroll($event, 'features')" class="px-0 py-4 text-foreground font-medium text-xl">
                         <span>Features</span>
                     </a>
                 </li>
                 <li>
-                    <a @click="smoothScroll('highlights')" class="px-0 py-4 text-foreground font-medium text-xl">
+                    <a href="#highlights" @click="smoothScroll($event, 'highlights')" class="px-0 py-4 text-foreground font-medium text-xl">
                         <span>Highlights</span>
                     </a>
                 </li>
                 <li>
-                    <a @click="smoothScroll('pricing')" class="px-0 py-4 text-foreground font-medium text-xl">
+                    <a href="#pricing" @click="smoothScroll($event, 'pricing')" class="px-0 py-4 text-foreground font-medium text-xl">
                         <span>Pricing</span>
                     </a>
                 </li>

@@ -5,7 +5,7 @@
     import { acceptConfirm, confirmState, rejectConfirm, type ConfirmOptions } from '@/composables/useConfirm';
 
     // Settling nulls the shared options before the popover has animated out, so the last targeted request is kept
-    // here for the anchor and the content until the next one replaces it.
+    // here for the anchor and the content until the exit animation is over (see onClosed).
     const shown = shallowRef<ConfirmOptions | null>(null);
     watch(
         () => confirmState.options,
@@ -21,12 +21,19 @@
     function onOpenChange(next: boolean): void {
         if (!next && confirmState.visible) rejectConfirm();
     }
+
+    // closeAutoFocus fires when the content unmounts, which Reka's Presence delays until the exit animation ends.
+    // Dropping the options then releases the target element instead of holding it until the next request; the
+    // open check keeps a request that arrived during the animation.
+    function onClosed(): void {
+        if (!open.value) shown.value = null;
+    }
 </script>
 
 <template>
     <Popover :open="open" @update:open="onOpenChange">
         <PopoverAnchor :reference="shown?.target" />
-        <PopoverContent align="center" side="bottom" class="flex w-72 flex-col gap-4" data-slot="confirm-popover">
+        <PopoverContent align="center" side="bottom" class="flex w-72 flex-col gap-4" data-slot="confirm-popover" @close-auto-focus="onClosed">
             <div class="flex items-center gap-3">
                 <component :is="shown.icon" v-if="shown?.icon" class="size-6 shrink-0" />
                 <span>{{ shown?.message }}</span>

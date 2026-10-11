@@ -7,11 +7,12 @@
     // control. It never runs `command` itself; the wrapper that owns the activation does, exactly once,
     // so a click and its keyboard equivalent cannot double-fire. `labelOnly` renders a plain span for
     // triggers that are already the interactive element (menubar and collapsible headers).
+    // The model item's `class` merges last so one entry (a red "Delete") can override the wrapper's styling.
     const props = withDefaults(defineProps<{ item: MenuModelItem; labelOnly?: boolean; class?: string }>(), { labelOnly: false, class: undefined });
 </script>
 
 <template>
-    <span v-if="props.labelOnly" :class="cn('flex w-full items-center gap-2', props.class)">
+    <span v-if="props.labelOnly" :class="cn('flex w-full items-center gap-2', props.class, props.item.class)">
         <component :is="props.item.icon" v-if="props.item.icon" class="size-4 shrink-0" />
         <span>{{ props.item.label }}</span>
     </span>
@@ -20,7 +21,7 @@
         :to="props.item.to"
         :aria-disabled="props.item.disabled || undefined"
         :tabindex="props.item.disabled ? -1 : undefined"
-        :class="cn('flex w-full items-center gap-2', props.item.disabled && 'pointer-events-none opacity-50', props.class)"
+        :class="cn('flex w-full items-center gap-2', props.item.disabled && 'pointer-events-none opacity-50', props.class, props.item.class)"
     >
         <component :is="props.item.icon" v-if="props.item.icon" class="size-4 shrink-0" />
         <span>{{ props.item.label }}</span>
@@ -32,12 +33,12 @@
         :rel="props.item.target === '_blank' ? 'noopener noreferrer' : undefined"
         :aria-disabled="props.item.disabled || undefined"
         :tabindex="props.item.disabled ? -1 : undefined"
-        :class="cn('flex w-full items-center gap-2', props.item.disabled && 'pointer-events-none opacity-50', props.class)"
+        :class="cn('flex w-full items-center gap-2', props.item.disabled && 'pointer-events-none opacity-50', props.class, props.item.class)"
     >
         <component :is="props.item.icon" v-if="props.item.icon" class="size-4 shrink-0" />
         <span>{{ props.item.label }}</span>
     </a>
-    <button v-else type="button" :disabled="props.item.disabled" :aria-disabled="props.item.disabled || undefined" :class="cn('flex w-full items-center gap-2 text-left disabled:opacity-50', props.class)">
+    <button v-else type="button" :disabled="props.item.disabled" :aria-disabled="props.item.disabled || undefined" :class="cn('flex w-full items-center gap-2 text-left disabled:opacity-50', props.class, props.item.class)">
         <component :is="props.item.icon" v-if="props.item.icon" class="size-4 shrink-0" />
         <span>{{ props.item.label }}</span>
     </button>

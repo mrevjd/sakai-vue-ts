@@ -35,4 +35,15 @@ describe('list moves', () => {
     it('returns the same array instance when nothing is selected', () => {
         expect(moveUp(items, [], id)).toBe(items);
     });
+
+    it('returns the same array instances when moveTop, moveBottom or transferAll would change nothing', () => {
+        expect(moveTop(items, [], id)).toBe(items);
+        expect(moveTop(items, ['a', 'b'], id)).toBe(items);
+        expect(moveBottom(items, ['d', 'e'], id)).toBe(items);
+        const source: string[] = [];
+        const target = ['x'];
+        const result = transferAll(source, target);
+        expect(result.from).toBe(source);
+        expect(result.to).toBe(target);
+    });
 });

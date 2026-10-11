@@ -15,6 +15,15 @@ describe('AppBreadcrumb', () => {
         expect(wrapper.findAll('[data-slot=breadcrumb-separator]')).toHaveLength(3);
     });
 
+    it('names an icon-only home link Home and keeps a labelled home item as it is', () => {
+        const iconOnly = mount(AppBreadcrumb, { props: { home: { icon: IconHome, to: '/' }, model: [{ label: 'Item' }] }, global: { plugins: [router] } });
+        expect(iconOnly.get('[data-testid=breadcrumb-home] a').attributes('aria-label')).toBe('Home');
+        const labelled = mount(AppBreadcrumb, { props: { home: { label: 'Start', icon: IconHome, to: '/' }, model: [{ label: 'Item' }] }, global: { plugins: [router] } });
+        const link = labelled.get('[data-testid=breadcrumb-home] a');
+        expect(link.attributes('aria-label')).toBeUndefined();
+        expect(link.text()).toBe('Start');
+    });
+
     it('marks the last visible item as the page and skips hidden ones', () => {
         const wrapper = mount(AppBreadcrumb, { props: { home: { icon: IconHome, to: '/' }, model: [{ label: 'Library' }, { label: 'Data', visible: false }, { label: 'Table' }] }, global: { plugins: [router] } });
         expect(wrapper.get('[data-slot=breadcrumb-page]').text()).toBe('Table');

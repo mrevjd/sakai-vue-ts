@@ -36,9 +36,12 @@ export function moveDown<T>(items: T[], selected: string[], keyOf: KeyOf<T>): T[
     return moved ? next : items;
 }
 
+// The input array comes back whenever nothing would move, as in moveUp and moveDown, so the lists emit no
+// update for an unchanged model.
 export function moveTop<T>(items: T[], selected: string[], keyOf: KeyOf<T>): T[] {
     const indexes = selectedIndexes(items, selected, keyOf);
-    if (indexes.length === 0) return items;
+    // Indexes are ascending, so a selection already stacked at the top is exactly 0, 1, 2 ...
+    if (indexes.every((index, position) => index === position)) return items;
     const picked = indexes.map((index) => items[index]!);
     const rest = items.filter((_, index) => !indexes.includes(index));
     return [...picked, ...rest];
@@ -46,7 +49,8 @@ export function moveTop<T>(items: T[], selected: string[], keyOf: KeyOf<T>): T[]
 
 export function moveBottom<T>(items: T[], selected: string[], keyOf: KeyOf<T>): T[] {
     const indexes = selectedIndexes(items, selected, keyOf);
-    if (indexes.length === 0) return items;
+    const offset = items.length - indexes.length;
+    if (indexes.every((index, position) => index === offset + position)) return items;
     const picked = indexes.map((index) => items[index]!);
     const rest = items.filter((_, index) => !indexes.includes(index));
     return [...rest, ...picked];
@@ -60,5 +64,6 @@ export function transfer<T>(from: T[], to: T[], selected: string[], keyOf: KeyOf
 }
 
 export function transferAll<T>(from: T[], to: T[]): { from: T[]; to: T[] } {
+    if (from.length === 0) return { from, to };
     return { from: [], to: [...to, ...from] };
 }

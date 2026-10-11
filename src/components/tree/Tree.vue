@@ -30,17 +30,22 @@
     const multiple = computed(() => props.selectionMode === 'multiple' || props.selectionMode === 'checkbox');
     const checkbox = computed(() => props.selectionMode === 'checkbox');
 
-    // Filtering opens the matched path on top of whatever the user expanded.
-    const expanded = computed<string[]>(() => {
-        const own = Object.entries(expandedKeysModel.value ?? {})
+    const ownExpanded = computed<string[]>(() =>
+        Object.entries(expandedKeysModel.value ?? {})
             .filter(([, open]) => open)
-            .map(([key]) => key);
-        return [...new Set([...own, ...filtered.value.expanded])];
-    });
+            .map(([key]) => key)
+    );
 
+    // Filtering opens the matched path on top of whatever the user expanded.
+    const expanded = computed<string[]>(() => [...new Set([...ownExpanded.value, ...filtered.value.expanded])]);
+
+    // Reka reports the merged set back, so the keys only the filter opened are dropped here; otherwise they
+    // would land in the user's model and stay open after the filter is cleared.
     function onExpanded(keys: string[]): void {
+        const own = new Set(ownExpanded.value);
+        const filterOnly = new Set(filtered.value.expanded.filter((key) => !own.has(key)));
         const next: Record<string, boolean> = {};
-        for (const key of keys) next[key] = true;
+        for (const key of keys) if (!filterOnly.has(key)) next[key] = true;
         expandedKeysModel.value = next;
     }
 
@@ -76,10 +81,11 @@
         return leaves;
     }
 
-    // Without a selection mode the model never changes, but Reka would still highlight the clicked
-    // row; cancelling its select event keeps the row inert while leaving expansion alone.
-    function onItemSelect(event: Event): void {
-        if (!props.selectionMode) event.preventDefault();
+    // Without a selection mode, or on a node marked `selectable: false`, the model must not change, but Reka
+    // would still highlight the clicked row; cancelling its select event keeps the row inert while leaving
+    // expansion alone.
+    function onItemSelect(event: Event, node: TreeNodeLike): void {
+        if (!props.selectionMode || node.selectable === false) event.preventDefault();
     }
 
     // Reka fires toggle alongside select on a row click, which would expand a parent whenever its
@@ -129,7 +135,7 @@
                 :style="{ paddingLeft: `${(item.level - 1) * 1.25}rem` }"
                 :class="cn('flex items-center gap-1 rounded-md px-1 py-1 text-sm outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring data-[selected]:bg-accent', !props.selectionMode && 'cursor-default')"
                 data-slot="tree-node"
-                @select="onItemSelect"
+                @select="onItemSelect($event, item.value)"
                 @toggle="onItemToggle"
             >
                 <button v-if="item.hasChildren" type="button" class="flex size-6 items-center justify-center rounded-sm hover:bg-muted" :aria-label="`Toggle ${item.value.label}`" @click.stop="handleToggle()">
@@ -137,7 +143,8 @@
                     <IconAngleRight v-else class="size-4" />
                 </button>
                 <span v-else class="size-6 shrink-0" />
-                <Checkbox v-if="checkbox" :model-value="isIndeterminate ? 'indeterminate' : isSelected" data-slot="tree-checkbox" @click.stop="handleSelect()" />
+                <!-- The checkbox calls handleSelect directly, skipping the cancellable select event, so a locked node disables it instead. -->
+                <Checkbox v-if="checkbox" :model-value="isIndeterminate ? 'indeterminate' : isSelected" :disabled="item.value.selectable === false" data-slot="tree-checkbox" @click.stop="handleSelect()" />
                 <component :is="iconOf(item.value)" v-if="iconOf(item.value)" class="size-4 shrink-0 text-muted-foreground" />
                 <span>{{ item.value.label }}</span>
             </TreeItem>

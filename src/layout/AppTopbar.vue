@@ -72,11 +72,11 @@
                 </Popover>
             </div>
 
-            <button type="button" class="layout-topbar-menu-button layout-topbar-action" aria-label="More actions" @click="mobileMenuOpen = !mobileMenuOpen">
+            <button type="button" class="layout-topbar-menu-button layout-topbar-action" aria-label="More actions" :aria-expanded="mobileMenuOpen" aria-controls="layout-topbar-menu" @click="mobileMenuOpen = !mobileMenuOpen">
                 <IconEllipsisV class="size-5" />
             </button>
 
-            <div class="layout-topbar-menu lg:block" :class="{ hidden: !mobileMenuOpen }">
+            <div id="layout-topbar-menu" class="layout-topbar-menu lg:block" :class="{ hidden: !mobileMenuOpen }">
                 <div class="layout-topbar-menu-content">
                     <button type="button" class="layout-topbar-action">
                         <IconCalendar class="size-5" />
