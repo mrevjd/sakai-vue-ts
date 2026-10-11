@@ -2,10 +2,10 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import MaskedInput from './MaskedInput.vue';
 
-// The masked value replaces the raw one on the render after the keystroke, so the assertions wait
-// for the queue to drain rather than for a single tick.
+// Two drains, not one: the keystroke renders first, then the component waits a tick for the vendored
+// input's own model guard to clear before writing the masked value, which renders on the drain after.
 async function type(wrapper: ReturnType<typeof mount>, value: string): Promise<HTMLInputElement> {
-    const input = wrapper.get('input');
+    const input = wrapper.get('[data-slot=masked-input]');
     (input.element as HTMLInputElement).value = value;
     await input.trigger('input');
     await flushPromises();
@@ -35,9 +35,23 @@ describe('MaskedInput', () => {
         expect(wrapper.emitted('update:modelValue')!.at(-1)).toEqual(['912']);
     });
 
+    it('keeps the later of two keystrokes that arrive inside the correction window', async () => {
+        // The correction is deferred by a tick, so a second keystroke lands while the first is still
+        // pending. The last one typed has to win; a stale correction overwriting it would be the bug.
+        const wrapper = mount(MaskedInput, { props: { mask: '9999', modelValue: '1___' } });
+        const input = wrapper.get('[data-slot=masked-input]');
+        (input.element as HTMLInputElement).value = '1a';
+        await input.trigger('input');
+        (input.element as HTMLInputElement).value = '12';
+        await input.trigger('input');
+        await flushPromises();
+        await flushPromises();
+        expect((input.element as HTMLInputElement).value).toBe('12__');
+    });
+
     it('falls back to the mask as the placeholder and marks an incomplete value invalid', () => {
         const wrapper = mount(MaskedInput, { props: { mask: '99/99', modelValue: '12' } });
-        const element = wrapper.get('input').element as HTMLInputElement;
+        const element = wrapper.get('[data-slot=masked-input]').element as HTMLInputElement;
         expect(element.getAttribute('placeholder')).toBe('99/99');
         expect(element.getAttribute('aria-invalid')).toBe('true');
     });
