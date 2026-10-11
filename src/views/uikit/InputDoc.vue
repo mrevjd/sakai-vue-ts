@@ -100,7 +100,15 @@
 
     // The vendored Checkbox is boolean-valued, so the city group keeps its array by hand.
     function toggleCity(city: string, checked: boolean | 'indeterminate'): void {
-        checkboxValue.value = checked === true ? [...checkboxValue.value, city] : checkboxValue.value.filter((name) => name !== city);
+        const without = checkboxValue.value.filter((name) => name !== city);
+        checkboxValue.value = checked === true ? [...without, city] : without;
+    }
+
+    // The text field and the slider share one value. v-model.number would write '' into the number
+    // array the moment the field is cleared, so only a finite number reaches the slider.
+    function setSlider(raw: string | number): void {
+        const next = Number(raw);
+        if (raw !== '' && Number.isFinite(next)) sliderValue.value = [next];
     }
 
     // MultiSelect hands its slots unknown values, so the flag markup narrows them before reading code and name.
@@ -160,7 +168,7 @@
 
             <div class="card flex flex-col gap-4">
                 <div class="font-semibold text-xl">Slider</div>
-                <Input v-model.number="sliderValue[0]" class="w-full" />
+                <Input :model-value="sliderValue[0]" class="w-full" @update:model-value="setSlider" />
                 <Slider v-model="sliderValue" />
 
                 <div class="font-semibold text-xl">Range</div>
