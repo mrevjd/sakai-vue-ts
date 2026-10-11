@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import { toTypedSchema } from '@vee-validate/zod';
+    import type { SubmissionContext } from 'vee-validate';
     import { computed, ref } from 'vue';
     import { z } from 'zod';
     import PasswordInput from '@/components/PasswordInput.vue';
@@ -47,9 +48,11 @@
 
     // vee-validate plus zod is the registry's own form stack; the schema is the single source of truth
     // for both the browser-side rules and the message text.
+    // An untouched field is undefined, which zod reports as a type error before .email() or .min()
+    // ever run, so each string carries its own required_error or a bare submit says only "Required".
     const validationFields = z.object({
-        email: z.string().email('Enter a valid email address'),
-        password: z.string().min(8, 'Use at least 8 characters'),
+        email: z.string({ required_error: 'Enter your email address' }).email('Enter a valid email address'),
+        password: z.string({ required_error: 'Enter a password' }).min(8, 'Use at least 8 characters'),
         accept: z.literal(true, { errorMap: () => ({ message: 'Please accept the terms' }) })
     });
 
@@ -57,8 +60,9 @@
 
     // vee-validate types the submit payload as Record<string, any>, so the handler widens to
     // Record<string, unknown> rather than casting the inferred zod output onto it.
-    function onSubmit(values: Record<string, unknown>): void {
+    function onSubmit(values: Record<string, unknown>, { resetForm }: SubmissionContext): void {
         showToast({ severity: 'success', summary: 'Submitted', detail: String(values.email), life: 3000 });
+        resetForm();
     }
 </script>
 
@@ -204,7 +208,7 @@
                 <FormField v-slot="{ value, handleChange }" name="accept" type="checkbox">
                     <FormItem class="flex flex-row items-center gap-2">
                         <FormControl><Checkbox :model-value="value" @update:model-value="handleChange" /></FormControl>
-                        <FormLabel class="mb-0">I accept the terms</FormLabel>
+                        <FormLabel>I accept the terms</FormLabel>
                         <FormMessage />
                     </FormItem>
                 </FormField>
