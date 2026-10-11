@@ -1,18 +1,15 @@
 <script setup lang="ts">
     import type { ChartData, ChartOptions } from 'chart.js';
-    import { computed, onMounted, ref, watch } from 'vue';
+    import { onMounted, ref, watch } from 'vue';
     import AppChart from '@/components/AppChart.vue';
     import { useLayout } from '@/layout/composables/layout';
-    import { resolvePrimary, resolveSurface, type ThemeMode } from '@/utils/theme';
+    import { chartShade } from '@/utils/chartColors';
     import type { Shade } from '@/layout/palettes';
 
     const { layoutConfig, isDarkTheme } = useLayout();
 
-    // Bar shades follow the picked primary palette; noir has no palette of its own and uses the surface scale.
     function primaryShade(key: Shade): string {
-        const mode: ThemeMode = isDarkTheme.value ? 'dark' : 'light';
-        const primary = resolvePrimary(layoutConfig.primary).palette[key];
-        return primary ?? resolveSurface(layoutConfig.surface, mode).palette[key] ?? '#000000';
+        return chartShade(layoutConfig.primary, layoutConfig.surface, isDarkTheme.value ? 'dark' : 'light', key);
     }
 
     function buildData(): ChartData {
@@ -43,7 +40,6 @@
     // AppChart requires data, so the widget starts with a real object and swaps it once the DOM tokens are readable.
     const chartData = ref<ChartData>(buildData());
     const chartOptions = ref<ChartOptions>({ maintainAspectRatio: false, aspectRatio: 0.8 });
-    const ready = computed(() => chartData.value.datasets.length > 0);
 
     function refresh(): void {
         chartData.value = buildData();
@@ -57,6 +53,6 @@
 <template>
     <div class="card">
         <div class="font-semibold text-xl mb-4">Revenue Stream</div>
-        <AppChart v-if="ready" type="bar" :data="chartData" :options="chartOptions" class="h-80" />
+        <AppChart type="bar" :data="chartData" :options="chartOptions" class="h-80" />
     </div>
 </template>

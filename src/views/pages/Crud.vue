@@ -18,6 +18,7 @@
     import { ProductService } from '@/service/ProductService';
     import type { Product } from '@/service/types';
     import { downloadCsv, toCsv } from '@/utils/csv';
+    import { formatCurrency } from '@/utils/currency';
 
     type Row = Product & Record<string, unknown>;
     type Draft = Partial<Product>;
@@ -44,10 +45,6 @@
     onMounted(() => {
         ProductService.getProducts().then((data) => (products.value = data as Row[]));
     });
-
-    function formatCurrency(value: number | undefined): string {
-        return value === undefined ? '' : value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    }
 
     function statusVariant(status: Product['inventoryStatus']): 'success' | 'warning' | 'destructive' {
         if (status === 'INSTOCK') return 'success';

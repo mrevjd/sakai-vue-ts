@@ -5,14 +5,11 @@
     import { IconSearch } from '@/components/icons';
     import { ProductService } from '@/service/ProductService';
     import type { Product } from '@/service/types';
+    import { formatCurrency } from '@/utils/currency';
 
     type Row = Product & Record<string, unknown>;
 
     const products = ref<Row[]>([]);
-
-    function formatCurrency(value: number): string {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    }
 
     const helper = createColumns<Row>();
     const columns = helper.columns([
