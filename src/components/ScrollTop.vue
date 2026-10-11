@@ -5,13 +5,23 @@
     import { IconArrowUp } from '@/components/icons';
     import { cn } from '@/lib/utils';
 
-    const props = withDefaults(defineProps<{ target?: 'window' | 'parent'; threshold?: number; behavior?: ScrollBehavior; icon?: Component; class?: string }>(), {
-        target: 'window',
-        threshold: 400,
-        behavior: 'smooth',
-        icon: undefined,
-        class: undefined
-    });
+    const props = withDefaults(
+        defineProps<{
+            target?: 'window' | 'parent';
+            threshold?: number;
+            behavior?: ScrollBehavior;
+            icon?: Component;
+            // Styles the button only, not the wrapper: `target` owns positioning, and a class there would fight it.
+            class?: string;
+        }>(),
+        {
+            target: 'window',
+            threshold: 400,
+            behavior: 'smooth',
+            icon: undefined,
+            class: undefined
+        }
+    );
 
     // The anchor span is only there to find the parent.
     const anchor = ref<HTMLElement | null>(null);

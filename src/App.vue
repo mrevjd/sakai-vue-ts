@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { TooltipProvider } from 'reka-ui';
+    import { TooltipProvider } from '@/components/ui/tooltip';
     import 'vue-sonner/style.css';
     import ConfirmDialogHost from '@/components/ConfirmDialogHost.vue';
     import { Toaster } from '@/components/ui/sonner';
