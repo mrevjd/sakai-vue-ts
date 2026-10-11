@@ -41,14 +41,12 @@
         const textColor = documentStyle.getPropertyValue('--foreground');
         const textColorSecondary = documentStyle.getPropertyValue('--muted-foreground');
         const surfaceBorder = documentStyle.getPropertyValue('--border');
-        // chart.js 4 ignores `drawBorder` and reads `color` rather than `fontColor`, but correcting the
-        // showcase options is out of scope for a port, so both keys stay as the PrimeVue page had them.
-        // The cast is what carries the two dead keys past the compiler.
+        // Legend labels read `color` in chart.js 4; the PrimeVue page set `fontColor`, which has been inert since v3.
         return {
             plugins: {
                 legend: {
                     labels: {
-                        fontColor: textColor
+                        color: textColor
                     }
                 }
             },
@@ -58,8 +56,7 @@
                         color: textColorSecondary
                     },
                     grid: {
-                        color: surfaceBorder,
-                        drawBorder: false
+                        color: surfaceBorder
                     }
                 },
                 y: {
@@ -67,12 +64,11 @@
                         color: textColorSecondary
                     },
                     grid: {
-                        color: surfaceBorder,
-                        drawBorder: false
+                        color: surfaceBorder
                     }
                 }
             }
-        } as ChartOptions;
+        };
     }
 
     function buildBarData(): ChartData {
@@ -100,12 +96,11 @@
         const textColor = documentStyle.getPropertyValue('--foreground');
         const textColorSecondary = documentStyle.getPropertyValue('--muted-foreground');
         const surfaceBorder = documentStyle.getPropertyValue('--border');
-        // See buildLineOptions: `fontColor` and `drawBorder` are kept as the PrimeVue page had them.
         return {
             plugins: {
                 legend: {
                     labels: {
-                        fontColor: textColor
+                        color: textColor
                     }
                 }
             },
@@ -118,8 +113,7 @@
                         }
                     },
                     grid: {
-                        display: false,
-                        drawBorder: false
+                        display: false
                     }
                 },
                 y: {
@@ -127,12 +121,11 @@
                         color: textColorSecondary
                     },
                     grid: {
-                        color: surfaceBorder,
-                        drawBorder: false
+                        color: surfaceBorder
                     }
                 }
             }
-        } as ChartOptions;
+        };
     }
 
     function buildPieData(): ChartData {
@@ -228,12 +221,11 @@
         const documentStyle = getComputedStyle(document.documentElement);
         const textColor = documentStyle.getPropertyValue('--foreground');
         const textColorSecondary = documentStyle.getPropertyValue('--muted-foreground');
-        // See buildLineOptions: `fontColor` is kept as the PrimeVue page had it.
         return {
             plugins: {
                 legend: {
                     labels: {
-                        fontColor: textColor
+                        color: textColor
                     }
                 }
             },
@@ -244,7 +236,7 @@
                     }
                 }
             }
-        } as ChartOptions;
+        };
     }
 
     // AppChart requires data, so each ref starts with a real object and is reassigned once the DOM tokens are readable.
@@ -281,37 +273,37 @@
         <div class="col-span-12 xl:col-span-6">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Linear</div>
-                <AppChart type="line" :data="lineData" :options="lineOptions" class="h-80" />
+                <AppChart type="line" :data="lineData" :options="lineOptions" />
             </div>
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Bar</div>
-                <AppChart type="bar" :data="barData" :options="barOptions" class="h-80" />
+                <AppChart type="bar" :data="barData" :options="barOptions" />
             </div>
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card flex flex-col items-center">
                 <div class="font-semibold text-xl mb-4">Pie</div>
-                <AppChart type="pie" :data="pieData" :options="pieOptions" class="h-80" />
+                <AppChart type="pie" :data="pieData" :options="pieOptions" />
             </div>
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card flex flex-col items-center">
                 <div class="font-semibold text-xl mb-4">Doughnut</div>
-                <AppChart type="doughnut" :data="pieData" :options="pieOptions" class="h-80" />
+                <AppChart type="doughnut" :data="pieData" :options="pieOptions" />
             </div>
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card flex flex-col items-center">
                 <div class="font-semibold text-xl mb-4">Polar Area</div>
-                <AppChart type="polarArea" :data="polarData" :options="polarOptions" class="h-80" />
+                <AppChart type="polarArea" :data="polarData" :options="polarOptions" />
             </div>
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card flex flex-col items-center">
                 <div class="font-semibold text-xl mb-4">Radar</div>
-                <AppChart type="radar" :data="radarData" :options="radarOptions" class="h-80" />
+                <AppChart type="radar" :data="radarData" :options="radarOptions" />
             </div>
         </div>
     </div>
