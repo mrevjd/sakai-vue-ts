@@ -1,155 +1,186 @@
-<script setup>
+<script setup lang="ts">
     import { ref } from 'vue';
+    import {
+        IconAngleDown,
+        IconCog,
+        IconCompass,
+        IconCopy,
+        IconDesktop,
+        IconEnvelope,
+        IconFile,
+        IconHome,
+        IconImage,
+        IconList,
+        IconMapMarker,
+        IconPencil,
+        IconPlus,
+        IconRefresh,
+        IconSave,
+        IconSearch,
+        IconShoppingCart,
+        IconSignOut,
+        IconStar,
+        IconTable,
+        IconTag,
+        IconTrash,
+        IconUser,
+        IconUserEdit,
+        IconUserPlus
+    } from '@/components/icons';
+    import { AppBreadcrumb, AppContextMenu, AppMegaMenu, AppMenubar, AppSteps, MenuList, PanelMenu, TieredMenu, type MegaMenuItem, type MenuModelItem } from '@/components/menu';
+    import { Button } from '@/components/ui/button';
+    import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+    import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-    const menu = ref(null);
-    const contextMenu = ref(null);
-
-    const nestedMenuitems = ref([
+    const nestedMenuitems = ref<MenuModelItem[]>([
         {
             label: 'Customers',
-            icon: 'pi pi-fw pi-table',
+            icon: IconTable,
             items: [
                 {
                     label: 'New',
-                    icon: 'pi pi-fw pi-user-plus',
+                    icon: IconUserPlus,
                     items: [
                         {
                             label: 'Customer',
-                            icon: 'pi pi-fw pi-plus'
+                            icon: IconPlus
                         },
                         {
                             label: 'Duplicate',
-                            icon: 'pi pi-fw pi-copy'
+                            icon: IconCopy
                         }
                     ]
                 },
                 {
                     label: 'Edit',
-                    icon: 'pi pi-fw pi-user-edit'
+                    icon: IconUserEdit
                 }
             ]
         },
         {
             label: 'Orders',
-            icon: 'pi pi-fw pi-shopping-cart',
+            icon: IconShoppingCart,
             items: [
                 {
                     label: 'View',
-                    icon: 'pi pi-fw pi-list'
+                    icon: IconList
                 },
                 {
                     label: 'Search',
-                    icon: 'pi pi-fw pi-search'
+                    icon: IconSearch
                 }
             ]
         },
         {
             label: 'Shipments',
-            icon: 'pi pi-fw pi-envelope',
+            icon: IconEnvelope,
             items: [
                 {
                     label: 'Tracker',
-                    icon: 'pi pi-fw pi-compass'
+                    icon: IconCompass
                 },
                 {
                     label: 'Map',
-                    icon: 'pi pi-fw pi-map-marker'
+                    icon: IconMapMarker
                 },
                 {
                     label: 'Manage',
-                    icon: 'pi pi-fw pi-pencil'
+                    icon: IconPencil
                 }
             ]
         },
         {
             label: 'Profile',
-            icon: 'pi pi-fw pi-user',
+            icon: IconUser,
             items: [
                 {
                     label: 'Settings',
-                    icon: 'pi pi-fw pi-cog'
+                    icon: IconCog
                 },
                 {
                     label: 'Billing',
-                    icon: 'pi pi-fw pi-file'
+                    icon: IconFile
                 }
             ]
         },
         {
             label: 'Quit',
-            icon: 'pi pi-fw pi-sign-out'
+            icon: IconSignOut
         }
     ]);
-    const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
-    const breadcrumbItems = ref([{ label: 'Computer' }, { label: 'Notebook' }, { label: 'Accessories' }, { label: 'Backpacks' }, { label: 'Item' }]);
-    const tieredMenuItems = ref([
+    const breadcrumbHome = ref<MenuModelItem>({ icon: IconHome, to: '/' });
+    const breadcrumbItems = ref<MenuModelItem[]>([{ label: 'Computer' }, { label: 'Notebook' }, { label: 'Accessories' }, { label: 'Backpacks' }, { label: 'Item' }]);
+    const stepItems = ref<MenuModelItem[]>([{ label: 'Header I' }, { label: 'Header II' }, { label: 'Header III' }]);
+    // AppSteps is 0-based; PrimeVue's `Stepper value="1"` was 1-based, so both select the first step.
+    const activeStep = ref<number>(0);
+    const tieredMenuItems = ref<MenuModelItem[]>([
         {
             label: 'Customers',
-            icon: 'pi pi-fw pi-table',
+            icon: IconTable,
             items: [
                 {
                     label: 'New',
-                    icon: 'pi pi-fw pi-user-plus',
+                    icon: IconUserPlus,
                     items: [
                         {
                             label: 'Customer',
-                            icon: 'pi pi-fw pi-plus'
+                            icon: IconPlus
                         },
                         {
                             label: 'Duplicate',
-                            icon: 'pi pi-fw pi-copy'
+                            icon: IconCopy
                         }
                     ]
                 },
                 {
                     label: 'Edit',
-                    icon: 'pi pi-fw pi-user-edit'
+                    icon: IconUserEdit
                 }
             ]
         },
         {
             label: 'Orders',
-            icon: 'pi pi-fw pi-shopping-cart',
+            icon: IconShoppingCart,
             items: [
                 {
                     label: 'View',
-                    icon: 'pi pi-fw pi-list'
+                    icon: IconList
                 },
                 {
                     label: 'Search',
-                    icon: 'pi pi-fw pi-search'
+                    icon: IconSearch
                 }
             ]
         },
         {
             label: 'Shipments',
-            icon: 'pi pi-fw pi-envelope',
+            icon: IconEnvelope,
             items: [
                 {
                     label: 'Tracker',
-                    icon: 'pi pi-fw pi-compass'
+                    icon: IconCompass
                 },
                 {
                     label: 'Map',
-                    icon: 'pi pi-fw pi-map-marker'
+                    icon: IconMapMarker
                 },
                 {
                     label: 'Manage',
-                    icon: 'pi pi-fw pi-pencil'
+                    icon: IconPencil
                 }
             ]
         },
         {
             label: 'Profile',
-            icon: 'pi pi-fw pi-user',
+            icon: IconUser,
             items: [
                 {
                     label: 'Settings',
-                    icon: 'pi pi-fw pi-cog'
+                    icon: IconCog
                 },
                 {
                     label: 'Billing',
-                    icon: 'pi pi-fw pi-file'
+                    icon: IconFile
                 }
             ]
         },
@@ -158,41 +189,41 @@
         },
         {
             label: 'Quit',
-            icon: 'pi pi-fw pi-sign-out'
+            icon: IconSignOut
         }
     ]);
-    const overlayMenuItems = ref([
+    const overlayMenuItems = ref<MenuModelItem[]>([
         {
             label: 'Save',
-            icon: 'pi pi-save'
+            icon: IconSave
         },
         {
             label: 'Update',
-            icon: 'pi pi-refresh'
+            icon: IconRefresh
         },
         {
             label: 'Delete',
-            icon: 'pi pi-trash'
+            icon: IconTrash
         },
         {
             separator: true
         },
         {
             label: 'Home',
-            icon: 'pi pi-home'
+            icon: IconHome
         }
     ]);
-    const menuitems = ref([
+    const menuitems = ref<MenuModelItem[]>([
         {
             label: 'Customers',
             items: [
                 {
                     label: 'New',
-                    icon: 'pi pi-fw pi-plus'
+                    icon: IconPlus
                 },
                 {
                     label: 'Edit',
-                    icon: 'pi pi-fw pi-user-edit'
+                    icon: IconUserEdit
                 }
             ]
         },
@@ -201,40 +232,40 @@
             items: [
                 {
                     label: 'View',
-                    icon: 'pi pi-fw pi-list'
+                    icon: IconList
                 },
                 {
                     label: 'Search',
-                    icon: 'pi pi-fw pi-search'
+                    icon: IconSearch
                 }
             ]
         }
     ]);
-    const contextMenuItems = ref([
+    const contextMenuItems = ref<MenuModelItem[]>([
         {
             label: 'Save',
-            icon: 'pi pi-save'
+            icon: IconSave
         },
         {
             label: 'Update',
-            icon: 'pi pi-refresh'
+            icon: IconRefresh
         },
         {
             label: 'Delete',
-            icon: 'pi pi-trash'
+            icon: IconTrash
         },
         {
             separator: true
         },
         {
             label: 'Options',
-            icon: 'pi pi-cog'
+            icon: IconCog
         }
     ]);
-    const megamenuItems = ref([
+    const megamenuItems = ref<MegaMenuItem[]>([
         {
             label: 'Fashion',
-            icon: 'pi pi-fw pi-tag',
+            icon: IconTag,
             items: [
                 [
                     {
@@ -260,7 +291,7 @@
         },
         {
             label: 'Electronics',
-            icon: 'pi pi-fw pi-desktop',
+            icon: IconDesktop,
             items: [
                 [
                     {
@@ -292,7 +323,7 @@
         },
         {
             label: 'Furniture',
-            icon: 'pi pi-fw pi-image',
+            icon: IconImage,
             items: [
                 [
                     {
@@ -318,7 +349,7 @@
         },
         {
             label: 'Sports',
-            icon: 'pi pi-fw pi-star',
+            icon: IconStar,
             items: [
                 [
                     {
@@ -339,128 +370,114 @@
             ]
         }
     ]);
-    const panelMenuitems = ref([
+    const panelMenuitems = ref<MenuModelItem[]>([
         {
             label: 'Customers',
-            icon: 'pi pi-fw pi-table',
+            icon: IconTable,
             items: [
                 {
                     label: 'New',
-                    icon: 'pi pi-fw pi-user-plus',
+                    icon: IconUserPlus,
                     items: [
                         {
                             label: 'Customer',
-                            icon: 'pi pi-fw pi-plus'
+                            icon: IconPlus
                         },
                         {
                             label: 'Duplicate',
-                            icon: 'pi pi-fw pi-copy'
+                            icon: IconCopy
                         }
                     ]
                 },
                 {
                     label: 'Edit',
-                    icon: 'pi pi-fw pi-user-edit'
+                    icon: IconUserEdit
                 }
             ]
         },
         {
             label: 'Orders',
-            icon: 'pi pi-fw pi-shopping-cart',
+            icon: IconShoppingCart,
             items: [
                 {
                     label: 'View',
-                    icon: 'pi pi-fw pi-list'
+                    icon: IconList
                 },
                 {
                     label: 'Search',
-                    icon: 'pi pi-fw pi-search'
+                    icon: IconSearch
                 }
             ]
         },
         {
             label: 'Shipments',
-            icon: 'pi pi-fw pi-envelope',
+            icon: IconEnvelope,
             items: [
                 {
                     label: 'Tracker',
-                    icon: 'pi pi-fw pi-compass'
+                    icon: IconCompass
                 },
                 {
                     label: 'Map',
-                    icon: 'pi pi-fw pi-map-marker'
+                    icon: IconMapMarker
                 },
                 {
                     label: 'Manage',
-                    icon: 'pi pi-fw pi-pencil'
+                    icon: IconPencil
                 }
             ]
         },
         {
             label: 'Profile',
-            icon: 'pi pi-fw pi-user',
+            icon: IconUser,
             items: [
                 {
                     label: 'Settings',
-                    icon: 'pi pi-fw pi-cog'
+                    icon: IconCog
                 },
                 {
                     label: 'Billing',
-                    icon: 'pi pi-fw pi-file'
+                    icon: IconFile
                 }
             ]
         }
     ]);
-
-    function toggleMenu(event) {
-        menu.value.toggle(event);
-    }
-
-    function onContextRightClick(event) {
-        contextMenu.value.show(event);
-    }
 </script>
 
 <template>
     <div class="card">
         <div class="font-semibold text-xl mb-4">Menubar</div>
-        <Menubar :model="nestedMenuitems">
+        <AppMenubar :model="nestedMenuitems">
             <template #end>
-                <IconField iconPosition="left">
-                    <InputIcon class="pi pi-search" />
-                    <InputText type="text" placeholder="Search" />
-                </IconField>
+                <InputGroup class="w-56">
+                    <InputGroupAddon><IconSearch /></InputGroupAddon>
+                    <InputGroupInput placeholder="Search" />
+                </InputGroup>
             </template>
-        </Menubar>
+        </AppMenubar>
     </div>
 
     <div class="card">
         <div class="font-semibold text-xl mb-4">Breadcrumb</div>
-        <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" />
+        <AppBreadcrumb :home="breadcrumbHome" :model="breadcrumbItems" />
     </div>
 
     <div class="flex flex-col md:flex-row gap-8">
         <div class="md:w-1/2">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Steps</div>
-                <Stepper value="1">
-                    <StepList>
-                        <Step value="1">Header I</Step>
-                        <Step value="2">Header II</Step>
-                        <Step value="3">Header III</Step>
-                    </StepList>
-                </Stepper>
+                <AppSteps v-model:active-step="activeStep" :model="stepItems" :readonly="false" />
             </div>
         </div>
         <div class="md:w-1/2">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">TabMenu</div>
-                <Tabs value="0">
-                    <TabList>
-                        <Tab value="0">Header I</Tab>
-                        <Tab value="1">Header II</Tab>
-                        <Tab value="2">Header III</Tab>
-                    </TabList>
+                <Tabs default-value="0">
+                    <TabsList>
+                        <TabsTrigger value="0">Header I</TabsTrigger>
+                        <TabsTrigger value="1">Header II</TabsTrigger>
+                        <TabsTrigger value="2">Header III</TabsTrigger>
+                    </TabsList>
                 </Tabs>
             </div>
         </div>
@@ -476,20 +493,24 @@
         <div class="md:w-1/3">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Plain Menu</div>
-                <Menu :model="menuitems" />
+                <MenuList :model="menuitems" />
             </div>
         </div>
         <div class="md:w-1/3">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Overlay Menu</div>
-                <Menu ref="menu" :model="overlayMenuItems" :popup="true" />
-                <Button type="button" label="Options" icon="pi pi-angle-down" @click="toggleMenu" style="width: auto" />
+                <MenuList :model="overlayMenuItems" popup>
+                    <template #trigger>
+                        <Button variant="outline">Options<IconAngleDown /></Button>
+                    </template>
+                </MenuList>
             </div>
 
-            <div class="card" @contextmenu="onContextRightClick">
+            <div class="card">
                 <div class="font-semibold text-xl mb-4">Context Menu</div>
-                Right click to display.
-                <ContextMenu ref="contextMenu" :model="contextMenuItems" />
+                <AppContextMenu :model="contextMenuItems">
+                    <div class="flex h-24 items-center justify-center rounded-lg border border-dashed border-border text-muted-foreground">Right click to display.</div>
+                </AppContextMenu>
             </div>
         </div>
     </div>
@@ -498,10 +519,10 @@
         <div class="md:w-1/2">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">MegaMenu | Horizontal</div>
-                <MegaMenu :model="megamenuItems" />
+                <AppMegaMenu :model="megamenuItems" />
 
                 <div class="font-semibold text-xl mb-4 mt-8">MegaMenu | Vertical</div>
-                <MegaMenu :model="megamenuItems" orientation="vertical" />
+                <AppMegaMenu :model="megamenuItems" orientation="vertical" />
             </div>
         </div>
         <div class="md:w-1/2">
