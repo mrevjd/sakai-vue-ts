@@ -79,7 +79,7 @@
                     </div>
                 </CarouselItem>
             </CarouselContent>
-            <!-- Inside the track, as Galleria does: the default -left-12 hangs past the card padding and scrolls a phone sideways. -->
+            <!-- Pulled inside the carousel box, as Galleria does: the default -left-12 hangs past the card padding and scrolls a phone sideways. -->
             <CarouselPrevious class="left-2" />
             <CarouselNext class="right-2" />
         </Carousel>
