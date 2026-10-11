@@ -112,9 +112,9 @@
                     <Button type="button">
                         <img alt="logo" src="/demo/images/logo-white.svg" class="w-6" />
                     </Button>
-                    <Button type="button" variant="outline" class="border-green-600 text-green-600">
+                    <Button variant="outline" class="border-green-600 text-green-600" type="button">
                         <img alt="logo" src="/demo/images/logo.svg" class="w-6" />
-                        <span class="ml-2 text-bold">shadcn-vue</span>
+                        <span>shadcn-vue</span>
                     </Button>
                 </div>
             </div>
@@ -195,8 +195,8 @@
                 <div class="flex flex-wrap gap-2">
                     <Button type="button" :disabled="loading[0]" @click="load(0)"><Spinner v-if="loading[0]" /><IconSearch v-else />Search</Button>
                     <Button type="button" :disabled="loading[1]" @click="load(1)">Search<Spinner v-if="loading[1]" /><IconSearch v-else /></Button>
-                    <Button type="button" size="icon" aria-label="Search" :disabled="loading[2]" @click="load(2)"><Spinner v-if="loading[2]" /><IconSearch v-else /></Button>
-                    <Button type="button" :disabled="loading[3]" @click="load(3)">Search</Button>
+                    <Button size="icon" type="button" aria-label="Search" :disabled="loading[2]" @click="load(2)"><Spinner v-if="loading[2]" /><IconSearch v-else /></Button>
+                    <Button type="button" :disabled="loading[3]" @click="load(3)"><Spinner v-if="loading[3]" />Search</Button>
                 </div>
             </div>
         </div>

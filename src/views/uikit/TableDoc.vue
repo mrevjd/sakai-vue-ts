@@ -270,7 +270,7 @@
         >
             <template #header>
                 <div class="flex justify-between">
-                    <Button type="button" variant="outline" @click="clearFilters"><IconFilterSlash />Clear</Button>
+                    <Button variant="outline" type="button" @click="clearFilters"><IconFilterSlash />Clear</Button>
                     <InputGroup class="w-56">
                         <InputGroupAddon><IconSearch /></InputGroupAddon>
                         <InputGroupInput v-model="globalFilter" placeholder="Keyword Search" />

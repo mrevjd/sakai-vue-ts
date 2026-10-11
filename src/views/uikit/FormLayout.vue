@@ -119,11 +119,11 @@
             <div class="card flex flex-col gap-4">
                 <div class="font-semibold text-xl">Inline</div>
                 <div class="flex flex-wrap items-start gap-4">
-                    <div class="field">
+                    <div class="flex flex-col gap-2">
                         <Label for="firstname1" class="sr-only">Firstname</Label>
                         <Input id="firstname1" v-model="firstname1" type="text" placeholder="Firstname" />
                     </div>
-                    <div class="field">
+                    <div class="flex flex-col gap-2">
                         <Label for="lastname1" class="sr-only">Lastname</Label>
                         <Input id="lastname1" v-model="lastname1" type="text" placeholder="Lastname" />
                     </div>
@@ -212,7 +212,7 @@
                         <FormMessage />
                     </FormItem>
                 </FormField>
-                <Button type="submit" class="self-start">Submit</Button>
+                <Button class="self-start" type="submit">Submit</Button>
             </Form>
         </div>
     </div>

@@ -105,7 +105,7 @@
                                         </div>
                                     </div>
                                     <div class="flex flex-col gap-6 mt-6">
-                                        <span class="text-xl font-semibold">${{ item.price }}</span>
+                                        <span class="text-xxl font-semibold">${{ item.price }}</span>
                                         <div class="flex gap-2">
                                             <Button class="flex-auto whitespace-nowrap" :disabled="item.inventoryStatus === 'OUTOFSTOCK'"><IconShoppingCart />Buy Now</Button>
                                             <Button variant="outline" size="icon" aria-label="Add to favourites"><IconHeart /></Button>
