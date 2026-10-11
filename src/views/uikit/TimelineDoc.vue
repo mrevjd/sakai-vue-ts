@@ -1,35 +1,47 @@
-<script setup>
-    import { ref } from 'vue';
+<script setup lang="ts">
+    import { ref, type Component } from 'vue';
+    import Timeline from '@/components/Timeline.vue';
+    import { IconCheck, IconCog, IconEnvelope, IconShoppingCart } from '@/components/icons';
+    import { Button } from '@/components/ui/button';
+    import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-    const events = ref([
+    interface TimelineEvent {
+        status: string;
+        date: string;
+        icon: Component;
+        color: string;
+        image?: string;
+    }
+
+    const events = ref<TimelineEvent[]>([
         {
             status: 'Ordered',
             date: '15/10/2020 10:30',
-            icon: 'pi pi-shopping-cart',
+            icon: IconShoppingCart,
             color: '#9C27B0',
             image: 'game-controller.jpg'
         },
         {
             status: 'Processing',
             date: '15/10/2020 14:00',
-            icon: 'pi pi-cog',
+            icon: IconCog,
             color: '#673AB7'
         },
         {
             status: 'Shipped',
             date: '15/10/2020 16:15',
-            icon: 'pi pi-envelope',
+            icon: IconEnvelope,
             color: '#FF9800'
         },
         {
             status: 'Delivered',
             date: '16/10/2020 10:00',
-            icon: 'pi pi-check',
+            icon: IconCheck,
             color: '#607D8B'
         }
     ]);
 
-    const horizontalEvents = ref(['2020', '2021', '2022', '2023']);
+    const horizontalEvents = ref<string[]>(['2020', '2021', '2022', '2023']);
 </script>
 
 <template>
@@ -69,7 +81,7 @@
                 <div class="font-semibold text-xl mb-4">Opposite Content</div>
                 <Timeline :value="events">
                     <template #opposite="slotProps">
-                        <small class="text-muted-color">{{ slotProps.item.date }}</small>
+                        <small class="text-muted-foreground">{{ slotProps.item.date }}</small>
                     </template>
                     <template #content="slotProps">
                         {{ slotProps.item.status }}
@@ -83,25 +95,23 @@
                 <Timeline :value="events" align="alternate" class="customized-timeline">
                     <template #marker="slotProps">
                         <span class="flex w-8 h-8 items-center justify-center text-white rounded-full z-10 shadow-sm" :style="{ backgroundColor: slotProps.item.color }">
-                            <i :class="slotProps.item.icon"></i>
+                            <component :is="slotProps.item.icon" class="size-4" />
                         </span>
                     </template>
                     <template #content="slotProps">
                         <Card class="mt-4">
-                            <template #title>
-                                {{ slotProps.item.status }}
-                            </template>
-                            <template #subtitle>
-                                {{ slotProps.item.date }}
-                            </template>
-                            <template #content>
-                                <img v-if="slotProps.item.image" :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.item.image}`" :alt="slotProps.item.name" width="200" class="shadow-sm" />
+                            <CardHeader>
+                                <CardTitle>{{ slotProps.item.status }}</CardTitle>
+                                <CardDescription>{{ slotProps.item.date }}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <img v-if="slotProps.item.image" :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.item.image}`" :alt="slotProps.item.status" width="200" class="shadow-sm" />
                                 <p>
                                     Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse,
                                     cupiditate neque quas!
                                 </p>
-                                <Button label="Read more" text></Button>
-                            </template>
+                                <Button variant="ghost">Read more</Button>
+                            </CardContent>
                         </Card>
                     </template>
                 </Timeline>
@@ -136,24 +146,19 @@
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
     @media screen and (max-width: 960px) {
-        ::v-deep(.customized-timeline) {
-            .p-timeline-event:nth-child(even) {
-                flex-direction: row !important;
+        /* The alternate layout needs both sides on one line once the card no longer fits beside the rail. */
+        .customized-timeline :deep([data-slot='timeline-event'][data-side='right']) {
+            flex-direction: row;
+        }
 
-                .p-timeline-event-content {
-                    text-align: left !important;
-                }
-            }
+        .customized-timeline :deep([data-slot='timeline-content']) {
+            text-align: left;
+        }
 
-            .p-timeline-event-opposite {
-                flex: 0;
-            }
-
-            .p-card {
-                margin-top: 1rem;
-            }
+        .customized-timeline :deep([data-slot='timeline-opposite']) {
+            flex: 0;
         }
     }
 </style>
