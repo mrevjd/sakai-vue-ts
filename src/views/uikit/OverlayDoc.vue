@@ -1,72 +1,87 @@
-<script setup>
+<script setup lang="ts">
+    import { h, onMounted, ref } from 'vue';
+    import { createColumns, DataTable } from '@/components/data-table';
+    import { Button } from '@/components/ui/button';
+    import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+    import { Input } from '@/components/ui/input';
+    import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+    import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+    import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+    import { IconArrowDown, IconArrowLeft, IconArrowRight, IconArrowUp, IconCheck, IconExclamationTriangle, IconExternalLink, IconTimes, IconTrash } from '@/components/icons';
+    import { useConfirm } from '@/composables/useConfirm';
+    import { useToast } from '@/composables/useToast';
     import { ProductService } from '@/service/ProductService';
-    import { useConfirm } from 'primevue/useconfirm';
-    import { useToast } from 'primevue/usetoast';
-    import { onMounted, ref } from 'vue';
+    import type { Product } from '@/service/types';
+    import { formatCurrency } from '@/utils/currency';
 
-    const display = ref(false);
-    const displayConfirmation = ref(false);
-    const visibleLeft = ref(false);
-    const visibleRight = ref(false);
-    const visibleTop = ref(false);
-    const visibleBottom = ref(false);
-    const visibleFull = ref(false);
-    const products = ref(null);
-    const selectedProduct = ref(null);
-    const op = ref(null);
-    const popup = ref(null);
+    type Row = Product & Record<string, unknown>;
+
+    const display = ref<boolean>(false);
+    const displayConfirmation = ref<boolean>(false);
+    const visibleLeft = ref<boolean>(false);
+    const visibleRight = ref<boolean>(false);
+    const visibleTop = ref<boolean>(false);
+    const visibleBottom = ref<boolean>(false);
+    const visibleFull = ref<boolean>(false);
+    const products = ref<Row[]>([]);
+    const popoverOpen = ref(false);
 
     const toast = useToast();
     const confirmPopup = useConfirm();
 
+    const helper = createColumns<Row>();
+    const columns = helper.columns([
+        helper.accessor('name', { header: 'Name' }),
+        helper.display({
+            id: 'image',
+            header: 'Image',
+            cell: ({ row }) => h('img', { src: `https://primefaces.org/cdn/primevue/images/product/${row.original.image}`, alt: row.original.image, class: 'shadow-sm', style: 'width: 64px' })
+        }),
+        helper.accessor('price', { header: 'Price', cell: (ctx) => formatCurrency(ctx.getValue()) })
+    ]);
+
     onMounted(() => {
-        ProductService.getProductsSmall().then((data) => (products.value = data));
+        ProductService.getProductsSmall().then((data) => (products.value = data as Row[]));
     });
 
-    function open() {
-        display.value = true;
-    }
-
-    function close() {
+    function close(): void {
         display.value = false;
     }
 
-    function openConfirmation() {
+    function openConfirmation(): void {
         displayConfirmation.value = true;
     }
 
-    function closeConfirmation() {
+    function closeConfirmation(): void {
         displayConfirmation.value = false;
     }
 
-    function toggleDataTable(event) {
-        op.value.toggle(event);
+    // Reka focuses the first tabbable element and ignores the autofocus attribute, so the PrimeVue
+    // original's focus on Yes is restored by hand.
+    function focusAccept(event: Event): void {
+        const accept = (event.target as HTMLElement).querySelector<HTMLElement>('[data-autofocus]');
+        if (!accept) return;
+        event.preventDefault();
+        accept.focus();
     }
 
-    function onProductSelect(event) {
-        op.value.hide();
-        toast.add({ severity: 'info', summary: 'Product Selected', detail: event.data.name, life: 3000 });
+    function onProductSelect(row: Row): void {
+        popoverOpen.value = false;
+        toast.add({ severity: 'info', summary: 'Product Selected', detail: row.name, life: 3000 });
     }
 
-    function confirm(event) {
+    function confirm(event: MouseEvent): void {
+        // currentTarget is captured now: it is null by the time the popover renders.
+        const target = event.currentTarget as HTMLElement;
         confirmPopup.require({
-            target: event.target,
+            target,
             message: 'Are you sure you want to proceed?',
-            icon: 'pi pi-exclamation-triangle',
-            rejectProps: {
-                label: 'Cancel',
-                severity: 'secondary',
-                outlined: true
-            },
-            acceptProps: {
-                label: 'Save'
-            },
-            accept: () => {
-                toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
-            },
-            reject: () => {
-                toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
-            }
+            icon: IconExclamationTriangle,
+            acceptLabel: 'Save',
+            rejectLabel: 'Cancel',
+            rejectVariant: 'outline',
+            accept: () => toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 }),
+            reject: () => toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have rejected', life: 3000 })
         });
     }
 </script>
@@ -76,34 +91,37 @@
         <div class="md:w-1/2">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Dialog</div>
-                <Dialog header="Dialog" v-model:visible="display" :breakpoints="{ '960px': '75vw' }" :style="{ width: '30vw' }" :modal="true">
-                    <p class="leading-normal m-0">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
-                    <template #footer>
-                        <Button label="Save" @click="close" />
-                    </template>
+                <Dialog v-model:open="display">
+                    <DialogTrigger as-child>
+                        <Button>Show</Button>
+                    </DialogTrigger>
+                    <DialogContent class="sm:max-w-[30rem]">
+                        <DialogHeader>
+                            <DialogTitle>Dialog</DialogTitle>
+                            <DialogDescription class="sr-only">An example dialog holding a paragraph of placeholder text.</DialogDescription>
+                        </DialogHeader>
+                        <p class="leading-normal m-0">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                            consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
+                            laborum.
+                        </p>
+                        <DialogFooter>
+                            <Button @click="close">Save</Button>
+                        </DialogFooter>
+                    </DialogContent>
                 </Dialog>
-                <Button label="Show" style="width: auto" @click="open" />
             </div>
 
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Popover</div>
                 <div class="flex flex-wrap gap-2">
-                    <Button type="button" label="Show" @click="toggleDataTable" />
-                    <Popover ref="op" id="overlay_panel" style="width: 450px">
-                        <DataTable v-model:selection="selectedProduct" :value="products" selectionMode="single" :paginator="true" :rows="5" @row-select="onProductSelect">
-                            <Column field="name" header="Name" sortable style="min-width: 12rem"></Column>
-                            <Column header="Image">
-                                <template #body="slotProps">
-                                    <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`" :alt="slotProps.data.image" class="w-16 shadow-sm" />
-                                </template>
-                            </Column>
-                            <Column field="price" header="Price" sortable style="min-width: 8rem">
-                                <template #body="slotProps"> $ {{ slotProps.data.price }} </template>
-                            </Column>
-                        </DataTable>
+                    <Popover v-model:open="popoverOpen">
+                        <PopoverTrigger as-child>
+                            <Button type="button">Show</Button>
+                        </PopoverTrigger>
+                        <PopoverContent class="w-[28rem] p-0">
+                            <DataTable :columns="columns" :data="products" row-key="id" paginator :page-size="5" @row-click="onProductSelect" />
+                        </PopoverContent>
                     </Popover>
                 </div>
             </div>
@@ -111,74 +129,117 @@
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Tooltip</div>
                 <div class="inline-flex gap-4">
-                    <InputText type="text" placeholder="Username" v-tooltip="'Your username'" />
-                    <Button type="button" label="Save" v-tooltip="'Click to proceed'" />
+                    <Tooltip>
+                        <TooltipTrigger as-child>
+                            <Input type="text" placeholder="Username" />
+                        </TooltipTrigger>
+                        <TooltipContent>Your username</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger as-child>
+                            <Button type="button">Save</Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Click to proceed</TooltipContent>
+                    </Tooltip>
                 </div>
             </div>
         </div>
         <div class="md:w-1/2">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">Drawer</div>
-                <Drawer v-model:visible="visibleLeft" header="Drawer">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                        consequat.
-                    </p>
-                </Drawer>
+                <Sheet v-model:open="visibleLeft">
+                    <SheetContent side="left">
+                        <SheetHeader>
+                            <SheetTitle>Drawer</SheetTitle>
+                            <SheetDescription class="text-foreground">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                commodo consequat.
+                            </SheetDescription>
+                        </SheetHeader>
+                    </SheetContent>
+                </Sheet>
 
-                <Drawer v-model:visible="visibleRight" header="Drawer" position="right">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                        consequat.
-                    </p>
-                </Drawer>
+                <Sheet v-model:open="visibleRight">
+                    <SheetContent side="right">
+                        <SheetHeader>
+                            <SheetTitle>Drawer</SheetTitle>
+                            <SheetDescription class="text-foreground">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                commodo consequat.
+                            </SheetDescription>
+                        </SheetHeader>
+                    </SheetContent>
+                </Sheet>
 
-                <Drawer v-model:visible="visibleTop" header="Drawer" position="top">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                        consequat.
-                    </p>
-                </Drawer>
+                <Sheet v-model:open="visibleTop">
+                    <SheetContent side="top">
+                        <SheetHeader>
+                            <SheetTitle>Drawer</SheetTitle>
+                            <SheetDescription class="text-foreground">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                commodo consequat.
+                            </SheetDescription>
+                        </SheetHeader>
+                    </SheetContent>
+                </Sheet>
 
-                <Drawer v-model:visible="visibleBottom" header="Drawer" position="bottom">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                        consequat.
-                    </p>
-                </Drawer>
+                <Sheet v-model:open="visibleBottom">
+                    <SheetContent side="bottom">
+                        <SheetHeader>
+                            <SheetTitle>Drawer</SheetTitle>
+                            <SheetDescription class="text-foreground">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                commodo consequat.
+                            </SheetDescription>
+                        </SheetHeader>
+                    </SheetContent>
+                </Sheet>
 
-                <Drawer v-model:visible="visibleFull" header="Drawer" position="full">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                        consequat.
-                    </p>
-                </Drawer>
+                <!-- Prefixed to match SheetContent's own side-scoped width classes: bare w-screen loses to their attribute selector,
+                     while matching modifiers let tailwind-merge drop the vendored widths instead. -->
+                <Sheet v-model:open="visibleFull">
+                    <SheetContent side="right" class="data-[side=right]:w-screen data-[side=right]:sm:max-w-none">
+                        <SheetHeader>
+                            <SheetTitle>Drawer</SheetTitle>
+                            <SheetDescription class="text-foreground">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                commodo consequat.
+                            </SheetDescription>
+                        </SheetHeader>
+                    </SheetContent>
+                </Sheet>
 
-                <Button icon="pi pi-arrow-right" @click="visibleLeft = true" style="margin-right: 0.25em" />
-                <Button icon="pi pi-arrow-left" @click="visibleRight = true" style="margin-right: 0.25em" />
-                <Button icon="pi pi-arrow-down" @click="visibleTop = true" style="margin-right: 0.25em" />
-                <Button icon="pi pi-arrow-up" @click="visibleBottom = true" style="margin-right: 0.25em" />
-                <Button icon="pi pi-external-link" @click="visibleFull = true" />
+                <div class="flex gap-2">
+                    <Button size="icon" aria-label="Open drawer on the left" @click="visibleLeft = true"><IconArrowRight /></Button>
+                    <Button size="icon" aria-label="Open drawer on the right" @click="visibleRight = true"><IconArrowLeft /></Button>
+                    <Button size="icon" aria-label="Open drawer at the top" @click="visibleTop = true"><IconArrowDown /></Button>
+                    <Button size="icon" aria-label="Open drawer at the bottom" @click="visibleBottom = true"><IconArrowUp /></Button>
+                    <Button size="icon" aria-label="Open full screen drawer" @click="visibleFull = true"><IconExternalLink /></Button>
+                </div>
             </div>
 
             <div class="card">
                 <div class="font-semibold text-xl mb-4">ConfirmPopup</div>
-                <ConfirmPopup></ConfirmPopup>
-                <Button ref="popup" @click="confirm($event)" icon="pi pi-check" label="Confirm" class="mr-2"></Button>
+                <Button class="mr-2" @click="confirm($event)"><IconCheck />Confirm</Button>
             </div>
 
             <div class="card">
                 <div class="font-semibold text-xl mb-4">ConfirmDialog</div>
-                <Button label="Delete" icon="pi pi-trash" severity="danger" style="width: auto" @click="openConfirmation" />
-                <Dialog header="Confirmation" v-model:visible="displayConfirmation" :style="{ width: '350px' }" :modal="true">
-                    <div class="flex items-center justify-center">
-                        <i class="pi pi-exclamation-triangle mr-4" style="font-size: 2rem" />
-                        <span>Are you sure you want to proceed?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" @click="closeConfirmation" text severity="secondary" />
-                        <Button label="Yes" icon="pi pi-check" @click="closeConfirmation" severity="danger" outlined autofocus />
-                    </template>
+                <Button variant="destructive" @click="openConfirmation"><IconTrash />Delete</Button>
+                <Dialog v-model:open="displayConfirmation">
+                    <DialogContent class="sm:max-w-[22rem]" @open-auto-focus="focusAccept">
+                        <DialogHeader>
+                            <DialogTitle>Confirmation</DialogTitle>
+                        </DialogHeader>
+                        <div class="flex items-center justify-center gap-4">
+                            <IconExclamationTriangle class="size-8 shrink-0" />
+                            <DialogDescription class="text-foreground">Are you sure you want to proceed?</DialogDescription>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="ghost" class="text-secondary-foreground" @click="closeConfirmation"><IconTimes />No</Button>
+                            <Button variant="outline" class="border-destructive text-destructive" data-autofocus @click="closeConfirmation"><IconCheck />Yes</Button>
+                        </DialogFooter>
+                    </DialogContent>
                 </Dialog>
             </div>
         </div>
